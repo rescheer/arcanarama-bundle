@@ -1,12 +1,12 @@
 {
   "name": "arcanarama-bundle",
   "version": "0.0.0",
-  "description": "",
-  "homepage": "",
+  "description": "A NodeCG Bundle built for the Arcanarama Twitch livestream.",
+  "homepage": "https://github.com/rescheer/arcanarama-bundle",
   "author": {
     "name": "Robert Scheer",
     "email": "robertedwinscheer@gmail.com",
-    "url": ""
+    "url": "https://github.com/rescheer"
   },
   "files": [
     "dashboard",
@@ -22,16 +22,21 @@
     "compatibleRange": "^1.1.1",
     "dashboardPanels": [
       {
-        "name": "panel",
-        "title": "Panel",
+        "name": "stream-tech-dashboard",
+        "title": "Stream Tech Dashboard",
         "width": 2,
-        "file": "panel.html",
+        "file": "stream-tech-dashboard.html",
         "headerColor": "#525F78"
       }
     ],
     "graphics": [
       {
         "file": "index.html",
+        "width": 1920,
+        "height": 1080
+      },
+      {
+        "file": "utility.html",
         "width": 1920,
         "height": 1080
       }

@@ -1,0 +1,14 @@
+{
+  "name": "arcanarama-bundle",
+  "dependencies": {
+    "paper-button": "PolymerElements/paper-button#^3.0.1",
+    "paper-checkbox": "PolymerElements/paper-checkbox#^3.0.1",
+    "paper-item": "PolymerElements/paper-item#^3.0.1",
+    "paper-dropdown-menu": "PolymerElements/paper-dropdown-menu#^3.2.0",
+    "paper-listbox": "PolymerElements/paper-listbox#^3.0.1",
+    "paper-icon-button": "PolymerElements/paper-icon-button#^3.0.2",
+    "paper-input": "PolymerElements/paper-input#^3.2.0",
+    "paper-progress": "PolymerElements/paper-progress#^3.0.1",
+    "gsap": "gsap#^3.10.4"
+  }
+}
