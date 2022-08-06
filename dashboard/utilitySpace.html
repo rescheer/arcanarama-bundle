@@ -2,14 +2,22 @@
 <html lang="en">
 <head>
 	<link href="style/formStyle.css" rel="stylesheet">
+	<link href="style/tabStyle.css" rel="stylesheet">
 	<title>Utility Space Controls</title>
 </head>
 <body>
-	<div class="buttonContainer">
-		<button class="button" id="moreFunButton">More Fun</button>
+	<div id="currentItemContainer" style="text-align: center; padding: 4px;">
+		<!-- TODO: Check upon startup what is displayed -->
+		Currently Displayed: 
+		<span id="currentItemValue"></span>
 		<br>
-		<button class="button" id="defaultButton">Default</button>
+		<div>
+			<button class="defaultbutton tabcontentbutton active" style="width: 98%; text-align: center;"
+			onclick="switchActiveUtilityItem(event, DEFAULT_UTIL_ID, DEFAULT_UTIL_TITLE)">Return to Default</button>
+		</div>
 	</div>
+	<div class="container" id="utilityContainer"></div>
+
 	<script src="scripts/utilitySpace.js"></script>
 </body>
 </html>
