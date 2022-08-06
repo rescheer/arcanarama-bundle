@@ -1,0 +1,61 @@
+/**
+ * Containers
+**/
+.buttonContainer {
+    position: relative;
+    background-color:#FFFFFF;
+    border: 15px black;
+    border-radius: 5px;
+    padding: 5px;
+    margin: 5px;
+    text-align: center;
+}
+
+/**
+ * Buttons
+**/
+.button {
+  position: relative;
+  background-color: #40193a;
+  border: none;
+  border-radius: 12px;
+  font-size: 16px;
+  color: #FFFFFF;
+  padding: 8px;
+  margin: 5px;
+  width: 100px;
+  text-align: center;
+  transition-duration: 0.4s;
+  text-decoration: none;
+  overflow: hidden;
+  cursor: pointer;
+}
+
+.button:after {
+  content: "";
+  background: #32456B;
+  display: block;
+  border-radius: 12px;
+  position: absolute;
+  padding-top: 300%;
+  padding-left: 350%;
+  margin-left: -20px !important;
+  margin-top: -120%;
+  opacity: 0;
+  transition: all 0.8s
+}
+
+.button:hover {
+  box-shadow: 0 2px 6px 0 rgba(0,0,0,0.24), 0 7px 5px 0 rgba(0,0,0,0.19);
+}
+
+.button:active:after {
+  padding: 0;
+  margin: 0;
+  opacity: 1;
+  transition: 0s
+}
+
+/**
+ * Text Input
+**/

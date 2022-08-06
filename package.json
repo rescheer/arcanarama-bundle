@@ -15,28 +15,31 @@
     "extension"
   ],
   "keywords": [
-    "",
     "nodecg-bundle"
   ],
   "nodecg": {
     "compatibleRange": "^1.1.1",
     "dashboardPanels": [
       {
-        "name": "stream-tech-dashboard",
-        "title": "Stream Tech Dashboard",
-        "width": 2,
-        "file": "stream-tech-dashboard.html",
-        "headerColor": "#525F78"
+        "name": "UtilitySpace",
+        "title": "UtilitySpace",
+        "width": 6,
+        "file": "UtilitySpace.html",
+        "headerColor": "#525F78",
+        "workspace": "Main"
+      },
+      {
+        "name": "assetManager",
+        "title": "Asset Manager",
+        "width": 4,
+        "file": "assetManager.html",
+        "headerColor": "#525F78",
+        "workspace": "Settings"
       }
     ],
     "graphics": [
       {
-        "file": "index.html",
-        "width": 1920,
-        "height": 1080
-      },
-      {
-        "file": "utility.html",
+        "file": "utilityGraphic.html",
         "width": 1920,
         "height": 1080
       }
