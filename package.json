@@ -17,8 +17,51 @@
   "keywords": [
     "nodecg-bundle"
   ],
+  "browserlist": "last 2 chrome versions",
   "nodecg": {
     "compatibleRange": "^1.1.1",
+    "assetCategories": [
+      {
+        "name": "assetUtilGiveaways",
+        "title": "Utility - Giveaways",
+        "allowedTypes": [
+          "jpg",
+          "jpeg",
+          "gif",
+          "png"
+        ]
+      },
+      {
+        "name": "assetUtilCharacters",
+        "title": "Utility - Character Cards",
+        "allowedTypes": [
+          "jpg",
+          "jpeg",
+          "gif",
+          "png"
+        ]
+      },
+      {
+        "name": "assetUtilSponsors",
+        "title": "Utility - Sponsors",
+        "allowedTypes": [
+          "jpg",
+          "jpeg",
+          "gif",
+          "png"
+        ]
+      },
+      {
+        "name": "assetUtilMisc",
+        "title": "Utility - Misc",
+        "allowedTypes": [
+          "jpg",
+          "jpeg",
+          "gif",
+          "png"
+        ]
+      }
+    ],
     "dashboardPanels": [
       {
         "name": "UtilitySpace",
@@ -35,6 +78,23 @@
         "file": "assetManager.html",
         "headerColor": "#525F78",
         "workspace": "Settings"
+      },
+      {
+        "name": "editUtilItemDialog",
+        "title": "Edit Utility Item",
+        "width": 2,
+        "dialog": true,
+        "dialogButtons": [
+          {
+            "name": "save",
+            "type": "confirm"
+          },
+          {
+            "name": "cancel",
+            "type": "dismiss"
+          }
+        ],
+        "file": "dialog/editUtilItemDialog.html"
       }
     ],
     "graphics": [
@@ -45,6 +105,17 @@
       }
     ]
   },
+  "scripts": {
+    "watch": "parcel watch src/dashboard/*.html --out-dir dashboard --public-url ./",
+    "build": "parcel build src/dashboard/*.html --out-dir dashboard --public-url ./"
+  },
   "repository": "https://github.com/nodecg/nodecg.git",
-  "license": "MIT"
+  "license": "MIT",
+  "devDependencies": {
+    "parcel": "^2.7.0"
+  },
+  "dependencies": {
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0"
+  }
 }
