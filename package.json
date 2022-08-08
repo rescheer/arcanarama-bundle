@@ -17,6 +17,9 @@
   "keywords": [
     "nodecg-bundle"
   ],
+  "prettier": {
+    "singleQuote": true
+  },
   "browserlist": "last 2 chrome versions",
   "nodecg": {
     "compatibleRange": "^1.1.1",
@@ -106,15 +109,31 @@
     ]
   },
   "scripts": {
-    "watch": "parcel watch src/dashboard/*.html --out-dir dashboard --public-url ./",
-    "build": "parcel build src/dashboard/*.html --out-dir dashboard --public-url ./"
+    "watch": "parcel watch",
+    "build": "parcel build"
+  },
+  "targets": {
+    "dashboard": {
+      "source": "src/dashboard/index.html",
+      "distDir": "./dashboard"
+    }
   },
   "repository": "https://github.com/nodecg/nodecg.git",
   "license": "MIT",
   "devDependencies": {
-    "parcel": "^2.7.0"
+    "eslint": "^8.21.0",
+    "eslint-config-airbnb": "^19.0.4",
+    "eslint-config-prettier": "^8.5.0",
+    "eslint-plugin-import": "^2.26.0",
+    "eslint-plugin-jsx-a11y": "^6.6.1",
+    "eslint-plugin-prettier": "^4.2.1",
+    "eslint-plugin-react": "^7.30.1",
+    "eslint-plugin-react-hooks": "^4.6.0",
+    "parcel": "^2.7.0",
+    "prettier": "^2.7.1"
   },
   "dependencies": {
+    "gsap": "^3.10.4",
     "react": "^18.2.0",
     "react-dom": "^18.2.0"
   }

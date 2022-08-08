@@ -1,6 +1,0 @@
-{
-  "name": "arcanarama-bundle",
-  "dependencies": {
-    "gsap": "gsap#^3.10.4"
-  }
-}

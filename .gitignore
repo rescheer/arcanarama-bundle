@@ -1,9 +1,5 @@
 node_modules
 coverage
-bower_components
-
-graphics/img/*
-data/*
-ideas
+.parcel-cache
 
 !.empty_directory
