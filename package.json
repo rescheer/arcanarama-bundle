@@ -113,9 +113,13 @@
     "build": "parcel build"
   },
   "targets": {
-    "dashboard": {
+    "frontend": {
       "source": "src/dashboard/index.html",
       "distDir": "./dashboard"
+    },
+    "backend": {
+      "source": "src/extension/index.js",
+      "distdir": "./extension"
     }
   },
   "repository": "https://github.com/nodecg/nodecg.git",
