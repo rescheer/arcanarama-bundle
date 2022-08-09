@@ -67,42 +67,17 @@
     ],
     "dashboardPanels": [
       {
-        "name": "UtilitySpace",
-        "title": "UtilitySpace",
+        "name": "utilityController",
+        "title": "Utility Controller",
         "width": 6,
-        "file": "UtilitySpace.html",
+        "file": "utilityController.html",
         "headerColor": "#525F78",
         "workspace": "Main"
-      },
-      {
-        "name": "assetManager",
-        "title": "Asset Manager",
-        "width": 4,
-        "file": "assetManager.html",
-        "headerColor": "#525F78",
-        "workspace": "Settings"
-      },
-      {
-        "name": "editUtilItemDialog",
-        "title": "Edit Utility Item",
-        "width": 2,
-        "dialog": true,
-        "dialogButtons": [
-          {
-            "name": "save",
-            "type": "confirm"
-          },
-          {
-            "name": "cancel",
-            "type": "dismiss"
-          }
-        ],
-        "file": "dialog/editUtilItemDialog.html"
       }
     ],
     "graphics": [
       {
-        "file": "utilityGraphic.html",
+        "file": "utility.html",
         "width": 1920,
         "height": 1080
       }
@@ -114,11 +89,15 @@
   },
   "targets": {
     "dashboard": {
-      "source": "src/dashboard/index.html",
+      "source": "src/dashboard/utilityController.html",
       "distDir": "./dashboard"
+    },
+    "graphics": {
+      "source": "src/graphics/utility.html",
+      "distDir": "./graphics"
     }
   },
-  "repository": "https://github.com/nodecg/nodecg.git",
+  "repository": "https://github.com/rescheer/arcanarama-bundle.git",
   "license": "MIT",
   "devDependencies": {
     "eslint": "^8.21.0",
@@ -133,6 +112,10 @@
     "prettier": "^2.7.1"
   },
   "dependencies": {
+    "@emotion/react": "^11.10.0",
+    "@emotion/styled": "^11.10.0",
+    "@mui/material": "^5.10.0",
+    "formik": "^2.2.9",
     "gsap": "^3.10.4",
     "react": "^18.2.0",
     "react-dom": "^18.2.0"
