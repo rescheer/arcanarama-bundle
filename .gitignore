@@ -1,5 +1,7 @@
 node_modules
 coverage
+dashboard
+graphics
 .parcel-cache
 
 !.empty_directory
