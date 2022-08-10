@@ -1,0 +1,50 @@
+[
+	{
+		"itemName": "moreFun",
+		"title": "More Fun Comics and Games",
+		"type": "sponsor",
+		"shortDesc": "shortDesc",
+		"homepage": "homepage",
+		"imagePath": "imagePath",
+		"provider": "provider",
+		"providerImagePath": "providerImagePath",
+		"defaultDuration": "defaultDuration",
+		"defaultInterval": "defaultInterval"
+	},
+	{
+		"itemName": "kiitysKitchen",
+		"title": "Kitty's Scratch Kitchen",
+		"type": "sponsor",
+		"shortDesc": "shortDesc",
+		"homepage": "homepage",
+		"imagePath": "imagePath",
+		"provider": "provider",
+		"providerImagePath": "providerImagePath",
+		"defaultDuration": "defaultDuration",
+		"defaultInterval": "defaultInterval"
+	},
+	{
+		"itemName": "vibeCheck",
+		"title": "Vibe Check",
+		"type": "other",
+		"shortDesc": "shortDesc",
+		"homepage": "homepage",
+		"imagePath": "imagePath",
+		"provider": "provider",
+		"providerImagePath": "providerImagePath",
+		"defaultDuration": "defaultDuration",
+		"defaultInterval": "defaultInterval"
+	},
+	{
+		"itemName": "cardSylas",
+		"title": "Sylas",
+		"type": "characterCard",
+		"shortDesc": "shortDesc",
+		"homepage": "homepage",
+		"imagePath": "imagePath",
+		"provider": "provider",
+		"providerImagePath": "providerImagePath",
+		"defaultDuration": "defaultDuration",
+		"defaultInterval": "defaultInterval"
+	}
+]

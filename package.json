@@ -25,6 +25,16 @@
     "compatibleRange": "^1.1.1",
     "assetCategories": [
       {
+        "name": "assetUtilSponsors",
+        "title": "Utility - Sponsors",
+        "allowedTypes": [
+          "jpg",
+          "jpeg",
+          "gif",
+          "png"
+        ]
+      },
+      {
         "name": "assetUtilGiveaways",
         "title": "Utility - Giveaways",
         "allowedTypes": [
@@ -37,16 +47,6 @@
       {
         "name": "assetUtilCharacters",
         "title": "Utility - Character Cards",
-        "allowedTypes": [
-          "jpg",
-          "jpeg",
-          "gif",
-          "png"
-        ]
-      },
-      {
-        "name": "assetUtilSponsors",
-        "title": "Utility - Sponsors",
         "allowedTypes": [
           "jpg",
           "jpeg",
@@ -84,8 +84,9 @@
     ]
   },
   "scripts": {
-    "watch": "parcel watch",
-    "build": "parcel build"
+    "watch": "parcel watch --public-url ./",
+    "build": "parcel build --public-url ./",
+    "start": "npm --prefix ./../../ run start"
   },
   "targets": {
     "dashboard": {
@@ -115,8 +116,10 @@
     "@emotion/react": "^11.10.0",
     "@emotion/styled": "^11.10.0",
     "@mui/material": "^5.10.0",
+    "flux": "^4.0.3",
     "formik": "^2.2.9",
     "gsap": "^3.10.4",
+    "prop-types": "^15.8.1",
     "react": "^18.2.0",
     "react-dom": "^18.2.0"
   }

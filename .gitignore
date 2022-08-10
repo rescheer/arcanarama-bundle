@@ -5,3 +5,4 @@ graphics
 .parcel-cache
 
 !.empty_directory
+!src/**
