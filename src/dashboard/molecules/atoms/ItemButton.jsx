@@ -25,10 +25,11 @@ export default function ItemButton(props) {
   };
 
   return (
-    <Box sx={{ pb: '4px' }}>
+    <Box sx={{ pt: '8px' }}>
       <Button
+        color="secondary"
         variant="contained"
-        sx={{ width: 1 }}
+        sx={{ width: 0.961, ml: 1 }}
         startIcon={<Icon>{icon}</Icon>}
         id={element.itemName}
         onClick={handleClick}

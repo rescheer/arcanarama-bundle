@@ -4,22 +4,21 @@ import PropTypes from 'prop-types';
 import Box from '@mui/material/Box';
 
 export default function TabPanel(props) {
-  const { children, tabId, index, ...other } = props;
+  const { children, value, index, ...other } = props;
 
   return (
     <div
       role="tabpanel"
-      hidden={tabId !== index}
+      hidden={value !== index}
       id={`vertical-tabpanel-${index}`}
       aria-labelledby={`vertical-tab-${index}`}
       {...other}
     >
-      {tabId === index && (
+      {value === index && (
         <Box
           sx={{
-            pl: 1,
-            pr: 1,
-            color: 'black',
+            pl: 0,
+            pr: 0,
           }}
         >
           {children}
@@ -31,7 +30,7 @@ export default function TabPanel(props) {
 TabPanel.propTypes = {
   children: PropTypes.node,
   index: PropTypes.number.isRequired,
-  tabId: PropTypes.number.isRequired,
+  value: PropTypes.number.isRequired,
 };
 TabPanel.defaultProps = {
   children: {},

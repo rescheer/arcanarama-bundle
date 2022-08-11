@@ -8,8 +8,8 @@ import Tab from '@mui/material/Tab';
 import Box from '@mui/material/Box';
 
 // Ours
-import ItemButton from './atoms/ItemButton';
-import TabPanel from './atoms/TabPanel';
+import ItemButton from './ItemButton';
+import TabPanel from './TabPanel';
 
 const { nodecg } = window;
 const currentUtilityItem = nodecg.Replicant('currentUtilityItem');
@@ -22,7 +22,7 @@ function a11yProps(index) {
 }
 
 export default function VerticalTabs(props) {
-  const [tabId, setTabID] = React.useState(0);
+  const [value, setValue] = React.useState(0);
 
   const activeItemType = currentUtilityItem.value.type;
   const tabIcons = ['', '', '', ''];
@@ -44,7 +44,7 @@ export default function VerticalTabs(props) {
   };
 
   const handleTabChange = (event, newValue) => {
-    setTabID(newValue);
+    setValue(newValue);
   };
 
   function sortItemArray() {
@@ -122,12 +122,20 @@ export default function VerticalTabs(props) {
       }}
     >
       <Tabs
-        value={tabId}
+        value={value}
         onChange={handleTabChange}
+        textColor="secondary"
+        indicatorColor="secondary"
+        TabIndicatorProps={{ sx: { width: '6px' } }}
         aria-label="tabs"
         orientation="vertical"
         // variant="scrollable"
-        sx={{ borderRight: 1, borderColor: 'divider' }}
+        sx={{
+          borderRight: 1,
+          borderColor: 'divider',
+          bgcolor: '#525f78',
+          pt: 1,
+        }}
       >
         <Tab
           label="Sponsors"
@@ -155,16 +163,16 @@ export default function VerticalTabs(props) {
         />
       </Tabs>
       <Box id="tabpanelbox" sx={{ width: '100%' }}>
-        <TabPanel tabId={tabId} index={0}>
+        <TabPanel value={value} index={0}>
           {itemObject.sponsor}
         </TabPanel>
-        <TabPanel tabId={tabId} index={1}>
+        <TabPanel value={value} index={1}>
           {itemObject.giveaway}
         </TabPanel>
-        <TabPanel tabId={tabId} index={2}>
+        <TabPanel value={value} index={2}>
           {itemObject.characterCard}
         </TabPanel>
-        <TabPanel tabId={tabId} index={3}>
+        <TabPanel value={value} index={3}>
           {itemObject.other}
         </TabPanel>
       </Box>
