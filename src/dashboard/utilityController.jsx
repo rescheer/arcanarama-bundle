@@ -1,13 +1,10 @@
 /* eslint-disable react/jsx-props-no-spreading */
 import * as React from 'react';
 import ReactDOM from 'react-dom/client';
-import { createTheme, ThemeProvider } from '@mui/material/styles';
-import VerticalTabs from './molecules/atoms/VerticalTabs';
+import VerticalTabs from './molecules/VerticalTabs';
 import NCGStore, { replicateMany } from '../stores/NodecgStore';
 
-const baseTheme = createTheme({});
-
-const replicantNames = ['utilityItemList'];
+const replicantNames = ['utilityItemList', 'currentUtilityItem'];
 
 class App extends React.Component {
   constructor() {
@@ -33,12 +30,23 @@ class App extends React.Component {
     const { replicants } = this.state;
     return (
       <React.StrictMode>
-        <ThemeProvider theme={baseTheme}>
-          <VerticalTabs {...replicants} />
-        </ThemeProvider>
+        <VerticalTabs {...replicants} />
       </React.StrictMode>
     );
   }
 }
 
-ReactDOM.createRoot(document.querySelector('#root')).render(<App />);
+const utilityItemList = window.NodeCG.Replicant(
+  'utilityItemList',
+  'arcanarama-bundle'
+);
+const currentUtilityItem = window.NodeCG.Replicant(
+  'currentUtilityItem',
+  'arcanarama-bundle'
+);
+
+window.NodeCG.waitForReplicants(utilityItemList, currentUtilityItem).then(
+  () => {
+    ReactDOM.createRoot(document.querySelector('#root')).render(<App />);
+  }
+);

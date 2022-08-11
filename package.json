@@ -69,7 +69,7 @@
       {
         "name": "utilityController",
         "title": "Utility Controller",
-        "width": 6,
+        "width": 4,
         "file": "utilityController.html",
         "headerColor": "#525F78",
         "workspace": "Main"

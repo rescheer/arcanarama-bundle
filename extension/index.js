@@ -3,6 +3,11 @@ const fs = require('fs');
 const path = require('path');
 const nodecgApiContext = require('./util/nodecg-api-context');
 
+const DEFAULT_TIME = {
+  interval: 15 * 60 * 1000,
+  duration: 10 * 1000,
+};
+
 class UtilityItem {
   constructor(
     itemName,
@@ -29,54 +34,24 @@ class UtilityItem {
   }
 }
 
-const DEFAULT_TIME = {
-  interval: 15 * 60 * 1000,
-  duration: 10 * 1000,
-};
-
 module.exports = function (nodecg) {
   nodecgApiContext.set(nodecg);
 
   const utilityItemList = nodecg.Replicant('utilityItemList', {
     defaultValue: [],
   });
+  // TODO: currentUtilityItem needs a default, and should not persist
+  const currentUtilityItem = nodecg.Replicant('currentUtilityItem', {
+    defaultValue: {},
+  });
 
-  utilityItemList.value = JSON.parse(
+  currentUtilityItem.on('change', (newValue, oldValue) => {
+    const { title } = newValue;
+    // console.log(`currentUtilityItem changed to ${title}.`);
+  });
+
+  // Tests
+  /* utilityItemList.value = JSON.parse(
     fs.readFileSync(path.resolve(__dirname, './test.json'))
-  );
-
-  // console.log(utilityItemList.value[0]);
+  ); */
 };
-
-// Tests
-/* const testItem = new UtilityItem(
-  'itemName',
-  'type',
-  'title',
-  'shortDesc',
-  'homepage',
-  'imagePath',
-  'provider',
-  'providerImagePath',
-  'defaultDuration',
-  'defaultInterval'
-);
-const testItemTwo = new UtilityItem(
-  'itemName',
-  'type',
-  'title',
-  'shortDesc',
-  'homepage',
-  'imagePath',
-  'provider',
-  'providerImagePath',
-  'defaultDuration',
-  'defaultInterval'
-);
-
-const testArray = [testItem, testItemTwo];
-
-fs.writeFile('./test.json', JSON.stringify(testArray), (err) => {
-  if (err) throw err;
-  console.log('Saved!');
-}); */
