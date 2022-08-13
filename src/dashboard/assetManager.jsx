@@ -4,7 +4,7 @@ import ReactDOM from 'react-dom/client';
 import { ThemeProvider, createTheme } from '@mui/material/styles';
 
 // Ours
-import UtilityApp from './molecules/UtilityApp';
+import AssetApp from './molecules/AssetApp';
 import NCGStore, { replicateMany } from '../stores/NodecgStore';
 
 const replicantNames = ['utilityItemList', 'currentUtilityItem'];
@@ -50,7 +50,7 @@ class App extends React.Component {
     return (
       <React.StrictMode>
         <ThemeProvider theme={baseTheme}>
-          <UtilityApp {...replicants} />
+          <AssetApp {...replicants} />
         </ThemeProvider>
       </React.StrictMode>
     );

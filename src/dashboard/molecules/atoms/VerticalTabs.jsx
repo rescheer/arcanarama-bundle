@@ -6,6 +6,8 @@ import Icon from '@mui/material/Icon';
 import Tabs from '@mui/material/Tabs';
 import Tab from '@mui/material/Tab';
 import Box from '@mui/material/Box';
+import Button from '@mui/material/Button';
+import Divider from '@mui/material/Divider';
 
 // Ours
 import ItemButton from './ItemButton';
@@ -22,12 +24,19 @@ function a11yProps(index) {
 }
 
 export default function VerticalTabs(props) {
-  const [value, setValue] = React.useState(0);
+  const [tabId, setTabId] = React.useState(0);
 
-  const activeItemType = currentUtilityItem.value.type;
+  const activeItemType = props.currentUtilityItem.type;
+
   const tabIcons = ['', '', '', ''];
+  let defaultIcon;
+
   const setActiveTabIcon = () => {
+    defaultIcon = '';
     switch (activeItemType) {
+      case 'defaultItem':
+        defaultIcon = 'visibility';
+        break;
       case 'sponsor':
         tabIcons[0] = 'visibility';
         break;
@@ -37,21 +46,23 @@ export default function VerticalTabs(props) {
       case 'characterCard':
         tabIcons[2] = 'visibility';
         break;
-      default:
+      case 'other':
         tabIcons[3] = 'visibility';
+        break;
+      default:
         break;
     }
   };
 
-  const handleTabChange = (event, newValue) => {
-    setValue(newValue);
-  };
-
+  // TODO: Move this function up to App level and run onMount and onUpdate.
+  // We should just pass the sorted list as a prop down to this component,
+  // then have a new map function to create the ItemButton component children.
   function sortItemArray() {
     const sortedItems = {
       sponsor: [],
       giveaway: [],
       characterCard: [],
+      defaultItem: {},
       other: [],
     };
     if (!props.utilityItemList || props.utilityItemList === undefined) {
@@ -66,7 +77,7 @@ export default function VerticalTabs(props) {
     const filteredProps = props.utilityItemList.filter((n) => n);
     // Sort into type arrays within an object
     filteredProps.forEach((element) => {
-      switch (element.type.toString()) {
+      switch (element.type) {
         case 'sponsor':
           sortedItems.sponsor.push(
             <ItemButton
@@ -97,7 +108,10 @@ export default function VerticalTabs(props) {
             />
           );
           break;
-        default:
+        case 'defaultItem':
+          sortedItems.defaultItem = element;
+          break;
+        case 'other':
           sortedItems.other.push(
             <ItemButton
               {...props}
@@ -106,13 +120,31 @@ export default function VerticalTabs(props) {
               element={element}
             />
           );
+          break;
+        default:
+          break;
       }
     });
     return sortedItems;
   }
 
+  // TODO: One sortItemArray is moved, we won't need this
   const itemObject = sortItemArray();
+
   setActiveTabIcon();
+
+  const handleTabChange = (event, newTabId) => {
+    setTabId(newTabId);
+  };
+
+  const handleDefaultClicked = () => {
+    if (itemObject.defaultItem !== undefined) {
+      currentUtilityItem.value = itemObject.defaultItem;
+      setActiveTabIcon();
+      defaultIcon = 'visibility';
+    }
+  };
+
   return (
     <Box
       sx={{
@@ -122,7 +154,7 @@ export default function VerticalTabs(props) {
       }}
     >
       <Tabs
-        value={value}
+        value={tabId}
         onChange={handleTabChange}
         textColor="secondary"
         indicatorColor="secondary"
@@ -132,7 +164,7 @@ export default function VerticalTabs(props) {
         // variant="scrollable"
         sx={{
           borderRight: 1,
-          borderColor: 'divider',
+          borderColor: 'primary',
           bgcolor: '#525f78',
           pt: 1,
         }}
@@ -163,16 +195,56 @@ export default function VerticalTabs(props) {
         />
       </Tabs>
       <Box id="tabpanelbox" sx={{ width: '100%' }}>
-        <TabPanel value={value} index={0}>
+        <TabPanel value={tabId} index={0}>
+          <Button
+            variant="contained"
+            color="info"
+            onClick={handleDefaultClicked}
+            sx={{ m: 1, width: 0.961 }}
+            startIcon={<Icon>{defaultIcon}</Icon>}
+          >
+            Default
+          </Button>
+          <Divider sx={{ ml: 2, mr: 2 }} />
           {itemObject.sponsor}
         </TabPanel>
-        <TabPanel value={value} index={1}>
+        <TabPanel value={tabId} index={1}>
+          <Button
+            variant="contained"
+            color="info"
+            onClick={handleDefaultClicked}
+            sx={{ m: 1, width: 0.961 }}
+            startIcon={<Icon>{defaultIcon}</Icon>}
+          >
+            Default
+          </Button>
+          <Divider />
           {itemObject.giveaway}
         </TabPanel>
-        <TabPanel value={value} index={2}>
+        <TabPanel value={tabId} index={2}>
+          <Button
+            variant="contained"
+            color="info"
+            onClick={handleDefaultClicked}
+            sx={{ m: 1, width: 0.961 }}
+            startIcon={<Icon>{defaultIcon}</Icon>}
+          >
+            Default
+          </Button>
+          <Divider />
           {itemObject.characterCard}
         </TabPanel>
-        <TabPanel value={value} index={3}>
+        <TabPanel value={tabId} index={3}>
+          <Button
+            variant="contained"
+            color="info"
+            onClick={handleDefaultClicked}
+            sx={{ m: 1, width: 0.961 }}
+            startIcon={<Icon>{defaultIcon}</Icon>}
+          >
+            Default
+          </Button>
+          <Divider />
           {itemObject.other}
         </TabPanel>
       </Box>

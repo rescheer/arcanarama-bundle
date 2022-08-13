@@ -31,7 +31,10 @@
           "jpg",
           "jpeg",
           "gif",
-          "png"
+          "png",
+          "mp4",
+          "ogg",
+          "webm"
         ]
       },
       {
@@ -41,7 +44,10 @@
           "jpg",
           "jpeg",
           "gif",
-          "png"
+          "png",
+          "mp4",
+          "ogg",
+          "webm"
         ]
       },
       {
@@ -61,7 +67,10 @@
           "jpg",
           "jpeg",
           "gif",
-          "png"
+          "png",
+          "mp4",
+          "ogg",
+          "webm"
         ]
       }
     ],
@@ -71,13 +80,19 @@
         "title": "Utility Controller",
         "width": 4,
         "file": "utilityController.html",
+        "headerColor": "#2f3a4f"
+      },
+      {
+        "name": "Asset Manager",
+        "title": "Asset Manager",
+        "file": "assetManager.html",
         "headerColor": "#2f3a4f",
-        "workspace": "Main"
+        "fullbleed": "true"
       }
     ],
     "graphics": [
       {
-        "file": "utility.html",
+        "file": "utilityGraphic.html",
         "width": 1920,
         "height": 1080
       }
@@ -89,12 +104,16 @@
     "start": "npm --prefix ./../../ run start"
   },
   "targets": {
-    "dashboard": {
+    "utilityController": {
       "source": "src/dashboard/utilityController.html",
       "distDir": "./dashboard"
     },
+    "assetManager": {
+      "source": "src/dashboard/assetManager.html",
+      "distDir": "./dashboard"
+    },
     "graphics": {
-      "source": "src/graphics/utility.html",
+      "source": "src/graphics/utilityGraphic.html",
       "distDir": "./graphics"
     }
   },
