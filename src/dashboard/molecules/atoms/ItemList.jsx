@@ -1,65 +1,92 @@
+/* eslint-disable no-unused-vars */
 import * as React from 'react';
 import List from '@mui/material/List';
+import ListSubheader from '@mui/material/ListSubheader';
 import ListItem from '@mui/material/ListItem';
+import ListItemAvatar from '@mui/material/ListItemAvatar';
 import Avatar from '@mui/material/Avatar';
+import Collapse from '@mui/material/Collapse';
 import ListItemButton from '@mui/material/ListItemButton';
 import ListItemText from '@mui/material/ListItemText';
-import IconButton from '@mui/material/IconButton';
 import Icon from '@mui/material/Icon';
 
 // eslint-disable-next-line no-unused-vars
 export default function ItemList(props) {
-  // const [selectedToEdit, setSelectedToEdit] = React.useState([0]);
+  const [sponsors, setSponsors] = React.useState(false);
+  const [giveaways, setGiveaways] = React.useState(false);
+  const [characters, setCharacters] = React.useState(false);
+  const [others, setOthers] = React.useState(false);
+
+  const toggleSponsors = () => {
+    setSponsors(!sponsors);
+  };
+
+  const toggleGiveaways = () => {
+    setGiveaways(!giveaways);
+  };
+
+  const toggleCharacters = () => {
+    setCharacters(!characters);
+  };
+
+  const toggleOthers = () => {
+    setOthers(!others);
+  };
 
   return (
-    <List sx={{ width: '50%', bgcolor: 'background.paper' }}>
-      {[0, 1, 2, 3].map((element) => {
-        const labelId = `item-list-label-${element}`;
+    <List
+      sx={{ width: '100%', bgcolor: 'background.paper' }}
+      component="nav"
+      aria-labelledby="nested-list-subheader"
+      subheader={
+        <ListSubheader component="div" id="nested-list-subheader">
+          Utility Items
+        </ListSubheader>
+      }
+    >
+      <ListItemButton onClick={toggleSponsors}>
+        <Icon>paid</Icon>
+        <ListItemText primary="Sponsors" />
+        {sponsors ? <Icon>expand_less</Icon> : <Icon>expand_more</Icon>}
+      </ListItemButton>
+      <Collapse in={sponsors} timeout="auto" unmountOnExit>
+        <List component="div" disablePadding>
+          {/* Content goes in this list */}
+        </List>
+      </Collapse>
 
-        return (
-          <div key={element}>
-            <ListItem
-              secondaryAction={
-                <div>
-                  <IconButton edge="start" aria-label="edit">
-                    <Icon>edit</Icon>
-                  </IconButton>
-                  <IconButton edge="end" aria-label="delete">
-                    <Icon>delete</Icon>
-                  </IconButton>
-                </div>
-              }
-              disablePadding
-              divider
-            >
-              <ListItemButton
-                role={undefined}
-                // onClick={handleShowFullsize(element)}
-                dense
-              >
-                <Avatar
-                  variant="rounded"
-                  alt="Test Item"
-                  src="../../../assets/arcanarama-bundle/assetUtilSponsors/moreFunLogo.png"
-                  sx={{
-                    width: 0.2,
-                    minWidth: 35,
-                    maxWidth: 65,
-                    height: 0.2,
-                    minHeight: 35,
-                    maxHeight: 65,
-                    mr: 1,
-                  }}
-                />
-                <ListItemText
-                  id={labelId}
-                  primary={`Line item ${element + 1}`}
-                />
-              </ListItemButton>
-            </ListItem>
-          </div>
-        );
-      })}
+      <ListItemButton onClick={toggleGiveaways}>
+        <Icon>shopping_cart</Icon>
+        <ListItemText primary="Giveaways" />
+        {giveaways ? <Icon>expand_less</Icon> : <Icon>expand_more</Icon>}
+      </ListItemButton>
+      <Collapse in={giveaways} timeout="auto" unmountOnExit>
+        <List component="div" disablePadding>
+          {/* Content goes in this list */}
+        </List>
+      </Collapse>
+
+      <ListItemButton onClick={toggleCharacters}>
+        <Icon>people</Icon>
+        <ListItemText primary="Character Cards" />
+        {characters ? <Icon>expand_less</Icon> : <Icon>expand_more</Icon>}
+      </ListItemButton>
+      <Collapse in={characters} timeout="auto" unmountOnExit>
+        <List component="div" disablePadding>
+          {/* Content goes in this list */}
+        </List>
+      </Collapse>
+
+      <ListItemButton onClick={toggleOthers}>
+        <Icon>people</Icon>
+        <ListItemText primary="Other" />
+        {others ? <Icon>expand_less</Icon> : <Icon>expand_more</Icon>}
+      </ListItemButton>
+      <Collapse in={others} timeout="auto" unmountOnExit>
+        <List component="div" disablePadding>
+          {/* Content goes in this list */}
+        </List>
+      </Collapse>
     </List>
   );
 }

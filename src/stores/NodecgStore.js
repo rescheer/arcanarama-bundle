@@ -43,6 +43,19 @@ const replicate = (name) => {
   });
 };
 
+const replicateFromBundle = (name, bundleName) => {
+  const replicant = window.nodecg.Replicant(name, bundleName);
+  window.NodeCG.waitForReplicants(replicant).then(() => {
+    replicant.on('change', (newValue) => {
+      dispatcher.dispatch({
+        type: 'SET_REPLICANT',
+        name: replicant.name,
+        value: newValue,
+      });
+    });
+  });
+};
+
 // Same, but for arrays
 const replicateMany = (...names) => {
   names.forEach((name) => replicate(name));
@@ -51,4 +64,4 @@ const replicateMany = (...names) => {
 const nodeCGStore = new NCGStore();
 dispatcher.register(nodeCGStore.handleActions.bind(nodeCGStore));
 export default nodeCGStore;
-export { replicate, replicateMany };
+export { replicate, replicateFromBundle, replicateMany };

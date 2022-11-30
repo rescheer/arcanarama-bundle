@@ -76,18 +76,11 @@
     ],
     "dashboardPanels": [
       {
-        "name": "utilityController",
-        "title": "Utility Controller",
+        "name": "giveawayController",
+        "title": "Giveaway Controller",
         "width": 4,
-        "file": "utilityController.html",
+        "file": "giveawayController.html",
         "headerColor": "#2f3a4f"
-      },
-      {
-        "name": "Asset Manager",
-        "title": "Asset Manager",
-        "file": "assetManager.html",
-        "headerColor": "#2f3a4f",
-        "fullbleed": "true"
       }
     ],
     "graphics": [
@@ -106,6 +99,10 @@
   "targets": {
     "utilityController": {
       "source": "src/dashboard/utilityController.html",
+      "distDir": "./dashboard"
+    },
+    "givewawayController": {
+      "source": "src/dashboard/giveawayController.html",
       "distDir": "./dashboard"
     },
     "assetManager": {
@@ -136,7 +133,6 @@
     "@emotion/styled": "^11.10.0",
     "@mui/material": "^5.10.0",
     "flux": "^4.0.3",
-    "formik": "^2.2.9",
     "gsap": "^3.10.4",
     "prop-types": "^15.8.1",
     "react": "^18.2.0",
