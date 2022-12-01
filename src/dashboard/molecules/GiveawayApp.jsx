@@ -35,6 +35,7 @@ function TabPanel(props) {
 
 function ScrollableTabsButtonAuto(props) {
   const [value, setValue] = React.useState(-1);
+  const [giveawayName, setGiveawayName] = React.useState('');
 
   const { giveawayRep } = props;
   const { chatConnected } = props.statusRep;
@@ -50,6 +51,10 @@ function ScrollableTabsButtonAuto(props) {
 
   const handleChange = (event, newValue) => {
     setValue(newValue);
+  };
+
+  const handleNameChange = (event) => {
+    setGiveawayName(event.target.value);
   };
 
   const handleActiveToggle = (id) => {
@@ -94,6 +99,7 @@ function ScrollableTabsButtonAuto(props) {
 
     const data = { add: { key: keyword, name: fullName, active: false } };
     window.nodecg.sendMessageToBundle('giveaway', 'autonorama-bundle', data);
+    setGiveawayName('');
     setValue(lastIndex + 1);
   };
 
@@ -118,6 +124,29 @@ function ScrollableTabsButtonAuto(props) {
     >
       <TabPanel value={value} index={-1} align="center">
         <Box component="form" onSubmit={handleSubmit}>
+          <Button
+            id="witchlight"
+            size="small"
+            variant="contained"
+            color="info"
+            onClick={(e) =>
+              setGiveawayName('More Fun Mystery Box - Witchlight', e)
+            }
+          >
+            Quick Witchlight
+          </Button>
+          <Button
+            size="small"
+            id="snowbound"
+            variant="contained"
+            color="info"
+            onClick={(e) =>
+              setGiveawayName('More Fun Mystery Box - Snowbound', e)
+            }
+          >
+            Quick Snowbound
+          </Button>
+          <br />
           <TextField
             id="name"
             name="name"
@@ -126,7 +155,10 @@ function ScrollableTabsButtonAuto(props) {
             inputProps={{ inputMode: 'text' }}
             color="secondary"
             variant="filled"
-            sx={{ mb: 1, width: 0.6, maxWidth: 350 }}
+            InputLabelProps={{ shrink: true }}
+            value={giveawayName}
+            onChange={(e) => handleNameChange(e)}
+            sx={{ my: 1, width: 0.6, maxWidth: 350 }}
           />
           <br />
           <TextField
@@ -136,6 +168,7 @@ function ScrollableTabsButtonAuto(props) {
             required
             helperText="Letters and numbers only"
             inputProps={{ inputMode: 'text', pattern: '^[a-zA-Z0-9]+$' }}
+            InputLabelProps={{ shrink: true }}
             color="secondary"
             variant="filled"
             sx={{ mb: 1, width: 0.4, maxWidth: 200 }}
