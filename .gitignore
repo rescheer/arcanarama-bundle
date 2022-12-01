@@ -1,6 +1,7 @@
 node_modules
 coverage
 dashboard
+extension
 graphics
 .parcel-cache
 
