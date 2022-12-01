@@ -1,6 +1,6 @@
 {
   "name": "arcanarama-bundle",
-  "version": "0.0.0",
+  "version": "0.8.0",
   "description": "A NodeCG Bundle built for the Arcanarama Twitch livestream.",
   "homepage": "https://github.com/rescheer/arcanarama-bundle",
   "author": {
@@ -15,7 +15,8 @@
     "extension"
   ],
   "keywords": [
-    "nodecg-bundle"
+    "nodecg-bundle",
+    "twitch-bot"
   ],
   "prettier": {
     "singleQuote": true
@@ -89,14 +90,39 @@
         "width": 1920,
         "height": 1080
       }
-    ]
+    ],
+    "bundleDependencies": {
+      "nodecg-io-twitch-chat": "^0.2.0"
+    }
   },
   "scripts": {
-    "watch": "parcel watch --public-url ./ --dist-dir ./dashboard/",
-    "build": "parcel build --public-url ./ --dist-dir ./dashboard/",
+    "watch": "parcel watch --public-url ./",
+    "build": "parcel build --public-url ./",
     "start": "npm --prefix ./../../ run start"
   },
-  "source": "./src/dashboard/giveawayController.html",
+  "targets": {
+    "dashboard": {
+      "source": [
+        "src/dashboard/giveawayController.html"
+      ],
+      "context": "browser",
+      "distDir": "dashboard/"
+    },
+    "graphics": {
+      "source": [
+        "src/graphics/utilityGraphic.html"
+      ],
+      "context": "browser",
+      "distDir": "graphics/"
+    },
+    "backend": {
+      "source": "src/extension/index.js",
+      "context": "node",
+      "outputFormat": "commonjs",
+      "scopeHoist": false,
+      "distDir": "extension/"
+    }
+  },
   "repository": "https://github.com/rescheer/arcanarama-bundle.git",
   "license": "MIT",
   "devDependencies": {
@@ -108,7 +134,9 @@
     "eslint-plugin-prettier": "^4.2.1",
     "eslint-plugin-react": "^7.30.1",
     "eslint-plugin-react-hooks": "^4.6.0",
+    "events": "^3.3.0",
     "parcel": "^2.7.0",
+    "path-browserify": "^1.0.1",
     "prettier": "^2.7.1"
   },
   "dependencies": {
@@ -117,6 +145,8 @@
     "@mui/material": "^5.10.0",
     "flux": "^4.0.3",
     "gsap": "^3.10.4",
+    "nodecg-io-core": "^0.2.0",
+    "nodecg-io-twitch-chat": "^0.2.0",
     "prop-types": "^15.8.1",
     "react": "^18.2.0",
     "react-dom": "^18.2.0"

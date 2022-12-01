@@ -247,7 +247,7 @@ function ScrollableTabsButtonAuto(props) {
             <Typography align="center" variant="h5">
               {name}
             </Typography>
-            <Grid container spacing={0}  sx={{ maxWidth: 600 }}>
+            <Grid container spacing={0} sx={{ maxWidth: 600 }}>
               <Grid item xs={12} align="center" sx={{ my: 1 }}>
                 <Typography variant="body1" color="error">
                   {errorMsg}
