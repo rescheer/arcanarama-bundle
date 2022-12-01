@@ -158,7 +158,7 @@ function ScrollableTabsButtonAuto(props) {
             InputLabelProps={{ shrink: true }}
             value={giveawayName}
             onChange={(e) => handleNameChange(e)}
-            sx={{ my: 1, width: 0.6, maxWidth: 400 }}
+            sx={{ my: 1, width: 1, maxWidth: 500 }}
           />
           <br />
           <TextField
@@ -171,11 +171,11 @@ function ScrollableTabsButtonAuto(props) {
             InputLabelProps={{ shrink: true }}
             color="secondary"
             variant="filled"
-            sx={{ mb: 1, width: 0.4, maxWidth: 300 }}
+            sx={{ mb: 1, width: 1, maxWidth: 300 }}
           />
           <br />
           <Button
-            sx={{ width: 0.35, maxWidth: 200 }}
+            sx={{ width: 0.5, maxWidth: 300 }}
             type="submit"
             id="submitButton"
             variant="contained"
