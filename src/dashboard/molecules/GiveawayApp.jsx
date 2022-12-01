@@ -59,34 +59,34 @@ function ScrollableTabsButtonAuto(props) {
 
   const handleActiveToggle = (id) => {
     const data = { toggle: { key: id } };
-    window.nodecg.sendMessageToBundle('giveaway', 'autonorama-bundle', data);
+    window.nodecg.sendMessage('giveaway', data);
   };
 
   const handleAnnouncement = (id) => {
     const data = { announce: { key: id } };
-    window.nodecg.sendMessageToBundle('giveaway', 'autonorama-bundle', data);
+    window.nodecg.sendMessage('giveaway', data);
   };
 
   const handleWinnerAnnounce = (key, user) => {
     const data = { announceWinner: { key, user } };
-    window.nodecg.sendMessageToBundle('giveaway', 'autonorama-bundle', data);
+    window.nodecg.sendMessage('giveaway', data);
   };
 
   const handleDraw = (id) => {
     const data = { draw: { key: id } };
-    window.nodecg.sendMessageToBundle('giveaway', 'autonorama-bundle', data);
+    window.nodecg.sendMessage('giveaway', data);
   };
 
   const handleEdit = (id) => {
     const data = { set: { key: id } };
-    window.nodecg.sendMessageToBundle('giveaway', 'autonorama-bundle', data);
+    window.nodecg.sendMessage('giveaway', data);
   };
 
   const handleDelete = (id) => {
     // eslint-disable-next-line no-alert, no-restricted-globals
     if (confirm(`Delete giveaway "${id}"?`)) {
       const data = { delete: { key: id } };
-      window.nodecg.sendMessageToBundle('giveaway', 'autonorama-bundle', data);
+      window.nodecg.sendMessage('giveaway', data);
       setValue(-1);
     }
   };
@@ -98,7 +98,7 @@ function ScrollableTabsButtonAuto(props) {
     const keyword = formData.get('keyword');
 
     const data = { add: { key: keyword, name: fullName, active: false } };
-    window.nodecg.sendMessageToBundle('giveaway', 'autonorama-bundle', data);
+    window.nodecg.sendMessage('giveaway', data);
     setGiveawayName('');
     setValue(lastIndex + 1);
   };
@@ -247,7 +247,7 @@ function ScrollableTabsButtonAuto(props) {
             <Typography align="center" variant="h5">
               {name}
             </Typography>
-            <Grid container spacing={0}  sx={{ maxWidth: 600 }}>
+            <Grid container spacing={0} sx={{ maxWidth: 600 }}>
               <Grid item xs={12} align="center" sx={{ my: 1 }}>
                 <Typography variant="body1" color="error">
                   {errorMsg}

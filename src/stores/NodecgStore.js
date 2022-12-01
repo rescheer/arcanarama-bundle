@@ -1,5 +1,5 @@
 import { EventEmitter } from 'events';
-import dispatcher from '../dispatcher';
+import dispatcher from './dispatcher';
 
 /*
     This store is used for piping replicant values directly into your component state.

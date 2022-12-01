@@ -5,7 +5,9 @@ import { ThemeProvider, createTheme } from '@mui/material/styles';
 
 // Ours
 import GiveawayApp from './molecules/GiveawayApp';
-import NCGStore, { replicateFromBundle } from '../stores/NodecgStore';
+import NCGStore, { replicateMany } from '../stores/NodecgStore';
+
+const propReplicants = ['statusRep', 'giveawayRep'];
 
 const baseTheme = createTheme({
   palette: {
@@ -33,8 +35,7 @@ class App extends React.Component {
 
   componentDidMount() {
     // Subscribe to replicant changes
-    replicateFromBundle('statusRep', 'autonorama-bundle');
-    replicateFromBundle('giveawayRep', 'autonorama-bundle');
+    replicateMany(...propReplicants);
 
     // We keep all our subscribed replicants in a single "replicants" object
     NCGStore.on('change', () => {
