@@ -2,8 +2,8 @@ node_modules
 coverage
 dashboard
 extension
+extension/index.js
 graphics
 .parcel-cache
 
-!.empty_directory
 !src/**
