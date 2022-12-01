@@ -33,8 +33,8 @@ class App extends React.Component {
 
   componentDidMount() {
     // Subscribe to replicant changes
-    replicateFromBundle('giveawayRep', 'autonorama-bundle');
     replicateFromBundle('statusRep', 'autonorama-bundle');
+    replicateFromBundle('giveawayRep', 'autonorama-bundle');
 
     // We keep all our subscribed replicants in a single "replicants" object
     NCGStore.on('change', () => {

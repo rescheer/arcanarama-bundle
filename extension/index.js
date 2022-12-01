@@ -1,11 +1,5 @@
 /* eslint-disable no-unused-vars */
-const fs = require('fs');
-const path = require('path');
-const nodecgApiContext = require('./util/nodecg-api-context');
-
 module.exports = function (nodecg) {
-  nodecgApiContext.set(nodecg);
-
   const utilityItemList = nodecg.Replicant('utilityItemList', {
     defaultValue: [],
   });
@@ -18,9 +12,4 @@ module.exports = function (nodecg) {
     defaultValue: 'none',
     persistent: false,
   });
-
-  // Tests
-  utilityItemList.value = JSON.parse(
-    fs.readFileSync(path.resolve(__dirname, './test.json'))
-  );
 };

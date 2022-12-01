@@ -93,27 +93,10 @@
   },
   "scripts": {
     "watch": "parcel watch --public-url ./",
-    "build": "parcel build --public-url ./",
+    "build": "parcel build --public-url ./ --dist-dir ./dashboard/",
     "start": "npm --prefix ./../../ run start"
   },
-  "targets": {
-    "utilityController": {
-      "source": "src/dashboard/utilityController.html",
-      "distDir": "./dashboard"
-    },
-    "givewawayController": {
-      "source": "src/dashboard/giveawayController.html",
-      "distDir": "./dashboard"
-    },
-    "assetManager": {
-      "source": "src/dashboard/assetManager.html",
-      "distDir": "./dashboard"
-    },
-    "graphics": {
-      "source": "src/graphics/utilityGraphic.html",
-      "distDir": "./graphics"
-    }
-  },
+  "source": "./src/dashboard/giveawayController.html",
   "repository": "https://github.com/rescheer/arcanarama-bundle.git",
   "license": "MIT",
   "devDependencies": {

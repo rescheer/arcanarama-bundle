@@ -38,14 +38,14 @@ function ScrollableTabsButtonAuto(props) {
   const [giveawayName, setGiveawayName] = React.useState('');
 
   const { giveawayRep } = props;
-  const { chatConnected } = props.statusRep;
+  const { statusRep } = props;
   const keyArray = Object.keys(giveawayRep);
   const keyTabs = [];
   const tabPanels = [];
 
   const lastIndex = keyArray.length;
-  const chatStatusProp = !chatConnected;
-  const errorMsg = chatConnected
+  const chatStatusProp = !statusRep.chatConnected;
+  const errorMsg = statusRep.chatConnected
     ? ''
     : 'Chat not connected! Check NodeCG-IO Tab';
 
