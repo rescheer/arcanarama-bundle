@@ -78,8 +78,8 @@
       {
         "name": "giveawayController",
         "title": "Giveaway Controller",
-        "width": 4,
         "file": "giveawayController.html",
+        "fullbleed": true,
         "headerColor": "#2f3a4f"
       }
     ],
@@ -92,7 +92,7 @@
     ]
   },
   "scripts": {
-    "watch": "parcel watch --public-url ./",
+    "watch": "parcel watch --public-url ./ --dist-dir ./dashboard/",
     "build": "parcel build --public-url ./ --dist-dir ./dashboard/",
     "start": "npm --prefix ./../../ run start"
   },
