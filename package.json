@@ -77,7 +77,7 @@
     ],
     "dashboardPanels": [
       {
-        "name": "giveawayController",
+        "name": "Giveaways",
         "title": "Giveaway Controller",
         "file": "giveawayController.html",
         "fullbleed": true,

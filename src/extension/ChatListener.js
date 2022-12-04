@@ -6,6 +6,8 @@ import { getContext } from './util/nodecg-api-context';
 import { getVibeCheck } from './modules/CommonActions';
 import { setChatClient, setChatChannel } from './util/chatclient-context';
 
+// TODO: Build a new Handler module for commands from any source
+
 /**
  * Tests all incoming messages and passes them to handlers.
  * @param {ChatClient} client - Ref: https://twurple.js.org/reference/chat/classes/ChatClient.html
