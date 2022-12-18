@@ -107,9 +107,11 @@ function ScrollableTabsButtonAuto(props) {
   keyTabs.push(
     <Tab
       icon={<Icon>add</Icon>}
+      iconPosition="top"
+      label="Add New"
       key="addButton"
       value={-1}
-      sx={{ pl: 0, pr: 0, minWidth: 45 }}
+      sx={{ pl: 0, pr: 0, minWidth: 105 }}
     />
   );
 
@@ -232,7 +234,9 @@ function ScrollableTabsButtonAuto(props) {
       });
 
       // Build Tabs
-      keyTabs.push(<Tab label={key} key={key} value={index} />);
+      keyTabs.push(
+        <Tab icon={<Icon>key</Icon>} label={key} key={key} value={index} />
+      );
 
       // Build Panels
       tabPanels.push(
@@ -353,7 +357,7 @@ function ScrollableTabsButtonAuto(props) {
       align="center"
       sx={{
         bgcolor: '#525f78',
-        pt: 1,
+        pt: 0,
         color: 'text.primary',
       }}
     >
