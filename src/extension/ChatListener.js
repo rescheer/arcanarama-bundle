@@ -403,7 +403,7 @@ export default function ChatListener(nodecg) {
     );
 
     twitchChannels.forEach((channel) => {
-      client.say(channel, `connected to ${channel}! how wild is that`);
+      // client.say(channel, `connected to ${channel}! how wild is that`);
       setChatClient(client);
       setChatChannel(channel);
       statusRep.value.chatConnected = true;
