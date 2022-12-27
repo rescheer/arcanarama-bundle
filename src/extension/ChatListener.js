@@ -3,7 +3,7 @@
 import { requireService } from 'nodecg-io-core';
 import * as Giveaway from './modules/Giveaway';
 import { getContext } from './util/nodecg-api-context';
-import { getVibeCheck } from './modules/CommonActions';
+import { getVibeCheck } from './modules/VibeCheck';
 import { setChatClient, setChatChannel } from './util/chatclient-context';
 
 // TODO: Build a new Handler module for commands from any source
