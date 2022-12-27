@@ -54,6 +54,7 @@ function dashboardHandler(data) {
             `${winner} has been drawn for the ${name} giveaway!`
           );
           giveawayRep.value[key].finalWinner = winner;
+          Giveaway.setGiveaway(giveawayRep, key, { active: false });
         }
         break;
       default:
