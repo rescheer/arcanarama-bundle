@@ -40,7 +40,7 @@ export function getVibeCheck(user) {
       `${user} rolled a [1] on their vibe check and was tragically devoured by ${
         monsters[getRandomNumber(0, monsters.length - 1)]
       }. you hate to see it`,
-      `${user} critically fails the vibe check and is temporarily banished to ${
+      `${user} critically fails the vibe check and is banished to ${
         planes[getRandomNumber(0, planes.length - 1)]
       }.`,
     ],
