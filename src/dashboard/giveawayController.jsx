@@ -4,7 +4,7 @@ import ReactDOM from 'react-dom/client';
 import { ThemeProvider, createTheme } from '@mui/material/styles';
 
 // Ours
-import GiveawayApp from './molecules/GiveawayApp';
+import GiveawayApp from './apps/GiveawayApp';
 import NCGStore, { replicateMany } from '../stores/NodecgStore';
 
 const propReplicants = ['statusRep', 'giveawayRep'];

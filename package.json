@@ -78,9 +78,16 @@
     "dashboardPanels": [
       {
         "name": "Giveaways",
-        "title": "Giveaway Controller",
+        "title": "Giveaways",
         "file": "giveawayController.html",
-        "fullbleed": true,
+        "width": 3,
+        "headerColor": "#2f3a4f"
+      },
+      {
+        "name": "Chat",
+        "title": "Chat",
+        "file": "chatBox.html",
+        "width": 3,
         "headerColor": "#2f3a4f"
       }
     ],
@@ -103,7 +110,8 @@
   "targets": {
     "dashboard": {
       "source": [
-        "src/dashboard/giveawayController.html"
+        "src/dashboard/giveawayController.html",
+        "src/dashboard/chatBox.html"
       ],
       "context": "browser",
       "distDir": "dashboard/"
