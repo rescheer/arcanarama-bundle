@@ -87,7 +87,7 @@
         "name": "Chat",
         "title": "Chat",
         "file": "chatBox.html",
-        "width": 3,
+        "width": 4,
         "headerColor": "#2f3a4f"
       }
     ],
