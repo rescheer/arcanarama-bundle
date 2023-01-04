@@ -1,6 +1,6 @@
 {
   "name": "arcanarama-bundle",
-  "version": "0.8.0",
+  "version": "0.9.0",
   "description": "A NodeCG Bundle built for the Arcanarama Twitch livestream.",
   "homepage": "https://github.com/rescheer/arcanarama-bundle",
   "author": {
@@ -89,6 +89,13 @@
         "file": "chatBox.html",
         "width": 4,
         "headerColor": "#2f3a4f"
+      },
+      {
+        "name": "Vibes",
+        "title": "Vibes",
+        "file": "vibeCheckResults.html",
+        "width": 2,
+        "headerColor": "#2f3a4f"
       }
     ],
     "graphics": [
@@ -111,7 +118,8 @@
     "dashboard": {
       "source": [
         "src/dashboard/giveawayController.html",
-        "src/dashboard/chatBox.html"
+        "src/dashboard/chatBox.html",
+        "src/dashboard/vibeCheckResults.html"
       ],
       "context": "browser",
       "distDir": "dashboard/"

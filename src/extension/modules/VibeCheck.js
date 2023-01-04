@@ -1,3 +1,5 @@
+import { getContext } from '../util/nodecg-api-context';
+
 /**
  * Returns a random number between min and max
  * @param {number} min
@@ -8,9 +10,32 @@ export function getRandomNumber(min, max) {
   return Math.floor(Math.random() * (max - min + 1)) + min;
 }
 
+function updateVibesRep(vibesRep, user, roll) {
+  if (typeof user === 'string' && typeof roll === 'number') {
+    const data = { user, roll };
+
+    if (typeof vibesRep === 'object') {
+      vibesRep.value.forEach((el) => {
+        if (el.user === user) {
+          vibesRep.value.splice(el, 1);
+        }
+      });
+      vibesRep.value.push(data);
+    }
+  }
+}
+
 export function getVibeCheck(user) {
+  const nodecg = getContext();
+  const vibesRep = nodecg.Replicant('vibesRep', {
+    defaultValue: [],
+    persistent: false,
+  });
+
   const roll = getRandomNumber(1, 20);
   const randomMessage = getRandomNumber(0, 3);
+
+  updateVibesRep(vibesRep, user, roll);
 
   const article = `${roll === 8 || roll === 11 || roll === 18 ? 'an' : 'a'}`;
 

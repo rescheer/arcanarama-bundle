@@ -30,6 +30,11 @@ export default function (nodecg) {
     persistent: false,
   });
 
+  const vibesRep = nodecg.Replicant('vibesRep', {
+    defaultValue: [],
+    persistent: false,
+  });
+
   const giveawayRep = nodecg.Replicant('giveawayRep', {
     defaultValue: {
       defaultKeyword: {
