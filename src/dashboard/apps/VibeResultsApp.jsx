@@ -6,6 +6,11 @@ import TableCell from '@mui/material/TableCell';
 import TableContainer from '@mui/material/TableContainer';
 import TableRow from '@mui/material/TableRow';
 
+/**
+ * Builds the vibecheck result table
+ * @param {object} props
+ * @returns A mUI table containing each user's vibecheck result
+ */
 export default function VibeResultsApp(props) {
   const { vibesRep } = props;
 

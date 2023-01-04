@@ -10,6 +10,12 @@ export function getRandomNumber(min, max) {
   return Math.floor(Math.random() * (max - min + 1)) + min;
 }
 
+/**
+ * Adds a vibecheck to the replicant while avoiding duplicate rolls from one user
+ * @param {Replicant} vibesRep - The replicant holding each user's vibecheck result
+ * @param {string} user
+ * @param {number} roll
+ */
 function updateVibesRep(vibesRep, user, roll) {
   if (typeof user === 'string' && typeof roll === 'number') {
     const data = { user, roll };
@@ -25,6 +31,11 @@ function updateVibesRep(vibesRep, user, roll) {
   }
 }
 
+/**
+ * Rolls 1-20 and selects a random response in a range
+ * @param {string} user
+ * @returns a string ready to be sent to a chat
+ */
 export function getVibeCheck(user) {
   const nodecg = getContext();
   const vibesRep = nodecg.Replicant('vibesRep', {
