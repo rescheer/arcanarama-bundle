@@ -14,7 +14,7 @@ function updateVibesRep(vibesRep, user, roll) {
   if (typeof user === 'string' && typeof roll === 'number') {
     const data = { user, roll };
 
-    if (typeof vibesRep === 'object') {
+    if (typeof vibesRep.value === 'object') {
       vibesRep.value.forEach((el) => {
         if (el.user === user) {
           vibesRep.value.splice(el, 1);
