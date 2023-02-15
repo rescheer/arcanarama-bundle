@@ -29,7 +29,12 @@ export function keyExists(giveawayRep, key) {
 export function entryExists(giveawayRep, key, userName) {
   let result = false;
   if (keyExists(giveawayRep, key)) {
-    result = giveawayRep.value[key].entries.includes(userName);
+    if (
+      giveawayRep.value[key].entries.includes(userName) ||
+      giveawayRep.value[key].winner.includes(userName)
+    ) {
+      result = true;
+    }
   }
   return result;
 }
@@ -73,13 +78,10 @@ export function getActiveStatus(giveawayRep, key) {
  * @param {string} userName - The user to search for
  * @returns {array<string>}
  */
-export function getActiveWins(giveawayRep, userName) {
+export function getWinsForUser(giveawayRep, userName) {
   const winList = [];
   Object.keys(giveawayRep.value).forEach((key) => {
-    if (
-      giveawayRep.value[key].active &&
-      giveawayRep.value[key].winner.includes(userName)
-    ) {
+    if (giveawayRep.value[key].finalWinner === userName) {
       winList.push(key);
     }
   });

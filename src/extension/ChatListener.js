@@ -82,7 +82,7 @@ function handleMessage(client, channel, user, message, _msg) {
           break;
         case 'claim':
           {
-            const winKeys = Giveaway.getActiveWins(giveawayRep, user);
+            const winKeys = Giveaway.getWinsForUser(giveawayRep, user);
             const winNames = [];
 
             if (winKeys.length > 0) {
