@@ -313,23 +313,36 @@ export function getNewEntryCount(giveawayRep, key) {
  * Sends a message to the channel enumerating the new and total entries.
  * @param {ChatClient} client - Twurple ChatClient object
  * @param {string} channel - the channel to send the message to
- * @param {string} keyword - the keyword to enter the giveaway
- * @param {Replicant} giveaway - The replicant holding the giveaway objects
+ * @param {string} key - the keyword to enter the giveaway
+ * @param {Replicant} giveawayRep - The replicant holding the giveaway objects
  * @return {bool} Returns true on success
  */
-function announceEntries(client, channel, keyword, giveaway) {
-  if (giveaway?.newEntries?.length >= 1) {
-    client.say(
-      channel,
-      `Added ${giveaway.newEntries.length} new ${
-        giveaway.newEntries.length === 1 ? 'entry' : 'entries'
-      } to the ${giveaway.name} giveaway! 
-      (Total entries: ${
-        giveaway.entries.length
-      }) Type "${keyword}" to enter. You can check your entry status with !entries`
-    );
+function announceEntries(client, channel, key, giveawayRep) {
+  if (giveawayRep.value[key].newEntries?.length >= 1) {
+    const { newEntries } = giveawayRep.value[key];
+    const { entries } = giveawayRep.value[key];
+    const { name } = giveawayRep.value[key];
+
+    let chatMessageEntryText;
+
+    switch (newEntries.length) {
+      case 1:
+        chatMessageEntryText = `${newEntries[0]} entered`;
+        break;
+      case 2:
+        chatMessageEntryText = `${newEntries[0]} and ${newEntries[1]} entered`;
+        break;
+      default:
+        chatMessageEntryText = `Added ${newEntries.length} new entries to`;
+        break;
+    }
+
+    const chatMessage = `${chatMessageEntryText} the ${name} giveaway! 
+    (${entries.length} total entries) Type "${key}" to enter. You can check on your giveaway entries with !entries`;
+
+    client.say(channel, chatMessage);
     // eslint-disable-next-line no-param-reassign
-    giveaway.newEntries = [];
+    giveawayRep.value[key].newEntries = [];
     return true;
   }
   // Failstate
@@ -337,28 +350,56 @@ function announceEntries(client, channel, keyword, giveaway) {
 }
 
 /**
+ * Announces a given giveaway in chat
+ * @param {ChatClient} client - Twurple ChatClient object
+ * @param {string} channel - the channel to send the message to
+ * @param {string} key - the keyword to enter the giveaway
+ * @param {Replicant} giveawayRep - The replicant holding the giveaway objects
+ */
+export function announceGiveaway(client, channel, key, giveawayRep) {
+  const { name } = giveawayRep.value[key];
+  const entryCount = getEntryCount(giveawayRep, key);
+
+  if (entryCount === 0) {
+    client.say(
+      channel,
+      `The ${name} giveaway has started! Type "${key}" to enter. 
+      You must be a follower (it's free!) to be eligible to win`
+    );
+  } else {
+    client.say(
+      channel,
+      `The ${name} giveaway is currently running with ${entryCount} total entries! 
+      Type "${key}" to enter. You must be a follower (it's free!) to be eligible to win`
+    );
+  }
+
+  setGiveaway(giveawayRep, key, { active: true });
+}
+
+/**
  * Attempts to add a giveaway entry for the single corresponding keyword.
  * @param {ChatClient} client - a ChatClient object
  * @param {string} channel - Channel name prefixed with '#'
  * @param {string} user
- * @param {string} keyword - the keyword detected
+ * @param {string} key - the keyword detected
  * @param {TwitchPrivateMessage} _msg - Raw message data
  */
 // eslint-disable-next-line no-unused-vars
-export function handleEntry(client, channel, user, keyword, _msg) {
+export function handleEntry(client, channel, user, key, _msg) {
   const nodecg = getContext();
   const giveawayRep = nodecg.Replicant('giveawayRep');
 
-  if (giveawayRep.value[keyword]?.active) {
+  if (giveawayRep.value[key]?.active) {
     if (
-      !giveawayRep.value[keyword].entries.includes(user) &&
-      !giveawayRep.value[keyword].winner.includes(user)
+      !giveawayRep.value[key].entries.includes(user) &&
+      !giveawayRep.value[key].winner.includes(user)
     ) {
-      giveawayRep.value[keyword].entries.push(user);
-      giveawayRep.value[keyword].newEntries.push(user);
-      clearTimeout(announcerTimer?.[keyword]);
-      announcerTimer[keyword] = setTimeout(() => {
-        announceEntries(client, channel, keyword, giveawayRep.value[keyword]);
+      giveawayRep.value[key].entries.push(user);
+      giveawayRep.value[key].newEntries.push(user);
+      clearTimeout(announcerTimer?.[key]);
+      announcerTimer[key] = setTimeout(() => {
+        announceEntries(client, channel, key, giveawayRep);
       }, 4000);
     }
   }

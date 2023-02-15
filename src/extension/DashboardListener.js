@@ -15,7 +15,9 @@ function dashboardHandler(data) {
       case 'add':
         {
           const newGiveawayData = {};
-          newGiveawayData[key] = {
+          const lowercaseKey = key.toLowerCase();
+
+          newGiveawayData[lowercaseKey] = {
             name: data[command].name,
             active: data[command].active,
           };
@@ -32,13 +34,7 @@ function dashboardHandler(data) {
         break;
       case 'announce':
         if (client) {
-          const { name } = giveawayRep.value[key];
-          client.say(
-            channel,
-            `The ${name} giveaway is now open! Type "${key}" to enter!`
-          );
-
-          Giveaway.setGiveaway(giveawayRep, key, { active: true });
+          Giveaway.announceGiveaway(client, channel, key, giveawayRep);
         }
         break;
       case 'draw':

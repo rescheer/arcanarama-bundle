@@ -294,7 +294,7 @@ function ScrollableTabsButtonAuto(props) {
                   color="secondary"
                   onClick={(e) => handleDraw(key, e)}
                 >
-                  Draw
+                  Draw Winner
                 </Button>
               </Grid>
               <Grid
