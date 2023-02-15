@@ -48,11 +48,13 @@ export function entryExists(giveawayRep, key, userName) {
 export function getActiveEntries(giveawayRep, userName) {
   const entryList = [];
   Object.keys(giveawayRep.value).forEach((key) => {
-    if (
-      giveawayRep.value[key].active &&
-      giveawayRep.value[key].entries.includes(userName)
-    ) {
-      entryList.push(key);
+    if (giveawayRep.value[key].active) {
+      if (
+        giveawayRep.value[key].entries.includes(userName) ||
+        giveawayRep.value[key].winner.includes(userName)
+      ) {
+        entryList.push(key);
+      }
     }
   });
   return entryList;
@@ -284,7 +286,10 @@ export function finalizeGiveaway(giveawayRep, key, userName) {
  */
 export function getEntryCount(giveawayRep, key) {
   if (keyExists(giveawayRep, key)) {
-    return giveawayRep.value[key].entries.length;
+    return (
+      giveawayRep.value[key].entries.length +
+      giveawayRep.value[key].winner.length
+    );
   }
   // Failstate
   return false;
