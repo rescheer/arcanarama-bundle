@@ -196,7 +196,8 @@ function ScrollableTabsButtonAuto(props) {
       const index = keyArray.indexOf(key) + 1;
       const name = giveawayRep[key].name;
       const active = giveawayRep[key].active;
-      const numEntries = giveawayRep[key].entries.length;
+      const numEntries =
+        giveawayRep[key].entries.length + giveawayRep[key].winner.length;
       const winners = giveawayRep[key].winner;
       const winnerList = [];
       const finalWinner = giveawayRep[key].finalWinner;

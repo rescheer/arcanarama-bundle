@@ -350,7 +350,10 @@ export function handleEntry(client, channel, user, keyword, _msg) {
   const giveawayRep = nodecg.Replicant('giveawayRep');
 
   if (giveawayRep.value[keyword]?.active) {
-    if (!giveawayRep.value[keyword].entries.includes(user)) {
+    if (
+      !giveawayRep.value[keyword].entries.includes(user) &&
+      !giveawayRep.value[keyword].winner.includes(user)
+    ) {
       giveawayRep.value[keyword].entries.push(user);
       giveawayRep.value[keyword].newEntries.push(user);
       clearTimeout(announcerTimer?.[keyword]);
