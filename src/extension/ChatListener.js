@@ -62,11 +62,12 @@ function handleMessage(client, channel, user, message, _msg) {
             if (entryList.length !== 0) {
               const entryListNames = [];
               entryList.forEach((element) => {
-                entryListNames.push(giveawayRep.value[element].name);
+                entryListNames.push(` ${giveawayRep.value[element].name}`);
               });
+              entryListNames[0].trimStart();
               client.say(
                 channel,
-                `You are currently entered in ${entryList.length} active ${
+                `You're entered in ${entryList.length} active ${
                   entryList.length === 1 ? 'giveaway' : 'giveaways'
                 }: ${entryListNames.toString()}`,
                 { replyTo: _msg.id }
@@ -74,7 +75,7 @@ function handleMessage(client, channel, user, message, _msg) {
             } else {
               client.say(
                 channel,
-                `You are not currently entered in any active giveaways.`,
+                `You're not entered in any active giveaways`,
                 { replyTo: _msg.id }
               );
             }
