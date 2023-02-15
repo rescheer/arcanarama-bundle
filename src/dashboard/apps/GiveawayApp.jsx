@@ -288,7 +288,7 @@ function ScrollableTabsButtonAuto(props) {
                 sx={{ borderBottom: 1, borderColor: 'white', pb: 1 }}
               >
                 <Button
-                  sx={{ width: 0.35 }}
+                  sx={{ width: 0.5 }}
                   id={`${key}-draw`}
                   variant="contained"
                   color="secondary"
