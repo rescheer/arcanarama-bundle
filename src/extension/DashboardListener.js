@@ -2,7 +2,7 @@ import * as Giveaway from './modules/Giveaway';
 import { getContext } from './util/nodecg-api-context';
 import { getChatClient, getChatChannel } from './util/chatclient-context';
 
-function dashboardHandler(data) {
+function dashboardGiveawayHandler(data) {
   const nodecg = getContext();
   const client = getChatClient();
   const channel = getChatChannel();
@@ -42,15 +42,13 @@ function dashboardHandler(data) {
         break;
       case 'announceWinner':
         if (client) {
-          const { name } = giveawayRep.value[key];
-          const winner = data[command].user;
-
-          client.say(
+          Giveaway.announceWinner(
+            client,
             channel,
-            `${winner} has been drawn for the ${name} giveaway!`
+            data[command].user,
+            key,
+            giveawayRep
           );
-          giveawayRep.value[key].finalWinner = winner;
-          Giveaway.setGiveaway(giveawayRep, key, { active: false });
         }
         break;
       default:
@@ -60,5 +58,5 @@ function dashboardHandler(data) {
 }
 
 export default function dashboardListener(nodecg) {
-  nodecg.listenFor('giveaway', dashboardHandler);
+  nodecg.listenFor('giveaway', dashboardGiveawayHandler);
 }

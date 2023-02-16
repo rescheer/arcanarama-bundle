@@ -378,6 +378,24 @@ export function announceGiveaway(client, channel, key, giveawayRep) {
 }
 
 /**
+ * Finalizes a giveaway winner and announces the result to chat
+ * @param {ChatClient} client - Twurple ChatClient object
+ * @param {string} channel - the channel to send the message to
+ * @param {string} user - The winning user
+ * @param {string} key - the keyword to enter the giveaway
+ * @param {Replicant} giveawayRep - The replicant holding the giveaway objects
+ */
+export function announceWinner(client, channel, user, key, giveawayRep) {
+  const { name } = giveawayRep.value[key];
+  const winner = user;
+
+  client.say(channel, `${winner} has been drawn for the ${name} giveaway!`);
+
+  giveawayRep.value[key].finalWinner = winner;
+  setGiveaway(giveawayRep, key, { active: false });
+}
+
+/**
  * Attempts to add a giveaway entry for the single corresponding keyword.
  * @param {ChatClient} client - a ChatClient object
  * @param {string} channel - Channel name prefixed with '#'
