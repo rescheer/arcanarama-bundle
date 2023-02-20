@@ -13,12 +13,59 @@
         left: 50%;
         transform: translate(-50%, -50%);
       }
+      .giveawaytext {
+        text-align: center;
+        width: 80%;
+        position: fixed;
+        transform: translate(-50%, -50%);
+        color: white;
+        font-family: 'Josefin Sans', sans-serif;
+        font-size: 72px;
+      }
+      .background {
+        overflow: hidden;
+      }
+      .gImage {
+        width: 100%;
+        position: relative;
+        visibility: hidden;
+        opacity: 0;
+      }
+      #gWinner {
+        top: 30%;
+        left: 50%;
+        font-size: 162px;
+      }
+      #gText {
+        top: 50%;
+        left: 50%;
+      }
+      #gName {
+        width: 70%;
+        top: 65%;
+        left: 50%;
+        font-size: 102px;
+        transform: translate(-50%, 0);
+      }
     </style>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Josefin+Sans:wght@700&display=swap"
+      rel="stylesheet"
+    />
   </head>
-  <body style="overflow: hidden;">
-    <div id="root">
-      <img class="graphicitem" id="a" />
-      <img class="graphicitem" id="b" />
+  <body style="overflow: hidden">
+    <div id="background">
+      <img
+        class="gImage"
+        id="gDiceScroll"
+      />
+    </div>    
+    <div id="giveaway">
+      <span id="gWinner" class="giveawaytext"></span>
+      <span id="gText" class="giveawaytext"></span>
+      <span id="gName" class="giveawaytext"></span>
     </div>
     <script type="module" src="./utilityGraphic.jsx"></script>
   </body>

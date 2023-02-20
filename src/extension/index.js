@@ -2,28 +2,10 @@
 import { setContext } from './util/nodecg-api-context';
 import ChatListener from './ChatListener';
 import DashboardListener from './DashboardListener';
+import debugListener from './debugListener';
 
 export default function (nodecg) {
   setContext(nodecg);
-
-  const utilityItemList = nodecg.Replicant('utilityItemList', {
-    defaultValue: [],
-  });
-
-  // TODO: currentUtilityItem needs a default, and should not persist
-  const currentUtilityItem = nodecg.Replicant('currentUtilityItem', {
-    defaultValue: {},
-  });
-
-  const lastUtilityItem = nodecg.Replicant('lastUtilityItem', {
-    defaultValue: 'none',
-    persistent: false,
-  });
-
-  const debugMessageRep = nodecg.Replicant('debugMessageRep', {
-    defaultValue: { active: true, destination: 'log', msg: '' },
-    persistent: false,
-  });
 
   const statusRep = nodecg.Replicant('statusRep', {
     defaultValue: { chatConnected: null },
@@ -48,8 +30,16 @@ export default function (nodecg) {
     },
   });
 
+  const giveawaySettingsRep = nodecg.Replicant('settings:giveaway', {
+    defaultValue: {
+      diceBackgroundScrollAsset: 'WINNER_dice_BG',
+      otherBackgroundScrollAsset: 'WINNER_minis_BG',
+    },
+  });
+
   ChatListener(nodecg);
   DashboardListener(nodecg);
+  debugListener(nodecg);
 
   // TODO: debugMessageRep event listener
 

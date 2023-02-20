@@ -377,6 +377,38 @@ export function announceGiveaway(client, channel, key, giveawayRep) {
   setGiveaway(giveawayRep, key, { active: true });
 }
 
+function getBackgroundAsset(giveaway) {
+  const nodecg = getContext();
+  const settingsRep = nodecg.Replicant('settings:giveaway');
+  const assetsRep = nodecg.Replicant('assets:giveaway');
+  const { name } = giveaway;
+  const assets = assetsRep.value;
+  let isDiceGiveaway = false;
+
+  const diceAssetName = settingsRep.value.diceBackgroundScrollAsset;
+  const otherAssetName = settingsRep.value.otherBackgroundScrollAsset;
+
+  if (typeof name === 'string' && name.toLowerCase().includes('dice')) {
+    isDiceGiveaway = true;
+  }
+
+  function checkAssetName(asset) {
+    if (isDiceGiveaway) {
+      return asset.name === diceAssetName;
+    }
+    return asset.name === otherAssetName;
+  }
+
+  if (Array.isArray(assets)) {
+    const asset = assets.find(checkAssetName);
+    if (asset) {
+      const { url } = asset;
+      return url;
+    }
+  }
+  return undefined;
+}
+
 /**
  * Finalizes a giveaway winner and announces the result to chat
  * @param {ChatClient} client - Twurple ChatClient object
@@ -386,10 +418,18 @@ export function announceGiveaway(client, channel, key, giveawayRep) {
  * @param {Replicant} giveawayRep - The replicant holding the giveaway objects
  */
 export function announceWinner(client, channel, user, key, giveawayRep) {
+  const nodecg = getContext();
   const { name } = giveawayRep.value[key];
   const winner = user;
+  const url = getBackgroundAsset(giveawayRep.value[key]);
+  const data = {
+    name,
+    winner,
+    url,
+  };
 
   client.say(channel, `${winner} has been drawn for the ${name} giveaway!`);
+  nodecg.sendMessage('giveaway:winnerAnnounced', data);
 
   giveawayRep.value[key].finalWinner = winner;
   setGiveaway(giveawayRep, key, { active: false });

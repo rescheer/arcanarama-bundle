@@ -26,44 +26,8 @@
     "compatibleRange": "^1.1.1",
     "assetCategories": [
       {
-        "name": "assetUtilSponsors",
-        "title": "Utility - Sponsors",
-        "allowedTypes": [
-          "jpg",
-          "jpeg",
-          "gif",
-          "png",
-          "mp4",
-          "ogg",
-          "webm"
-        ]
-      },
-      {
-        "name": "assetUtilGiveaways",
+        "name": "giveaway",
         "title": "Utility - Giveaways",
-        "allowedTypes": [
-          "jpg",
-          "jpeg",
-          "gif",
-          "png",
-          "mp4",
-          "ogg",
-          "webm"
-        ]
-      },
-      {
-        "name": "assetUtilCharacters",
-        "title": "Utility - Character Cards",
-        "allowedTypes": [
-          "jpg",
-          "jpeg",
-          "gif",
-          "png"
-        ]
-      },
-      {
-        "name": "assetUtilMisc",
-        "title": "Utility - Misc",
         "allowedTypes": [
           "jpg",
           "jpeg",
@@ -151,7 +115,7 @@
     "eslint-plugin-react": "^7.30.1",
     "eslint-plugin-react-hooks": "^4.6.0",
     "events": "^3.3.0",
-    "parcel": "^2.7.0",
+    "parcel": "^2.8.3",
     "path-browserify": "^1.0.1",
     "prettier": "^2.7.1"
   },
