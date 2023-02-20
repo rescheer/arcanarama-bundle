@@ -1,6 +1,6 @@
 {
   "name": "arcanarama-bundle",
-  "version": "0.11.0",
+  "version": "0.10.0",
   "description": "A NodeCG Bundle built for the Arcanarama Twitch livestream.",
   "homepage": "https://github.com/rescheer/arcanarama-bundle",
   "author": {
