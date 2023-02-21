@@ -7,7 +7,7 @@ import { ThemeProvider, createTheme } from '@mui/material/styles';
 import VibeResultsApp from './apps/VibeResultsApp';
 import NCGStore, { replicateMany } from '../stores/NodecgStore';
 
-const propReplicants = ['vibesRep'];
+const propReplicants = ['vibesData'];
 
 const baseTheme = createTheme({
   palette: {

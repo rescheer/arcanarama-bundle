@@ -7,7 +7,7 @@ import { ThemeProvider, createTheme } from '@mui/material/styles';
 import GiveawayApp from './apps/GiveawayApp';
 import NCGStore, { replicateMany } from '../stores/NodecgStore';
 
-const propReplicants = ['statusRep', 'giveawayRep'];
+const propReplicants = ['coreStatus', 'giveawayData'];
 
 const baseTheme = createTheme({
   palette: {

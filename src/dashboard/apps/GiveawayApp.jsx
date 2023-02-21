@@ -37,15 +37,15 @@ function ScrollableTabsButtonAuto(props) {
   const [value, setValue] = React.useState(-1);
   const [giveawayName, setGiveawayName] = React.useState('');
 
-  const { giveawayRep } = props;
-  const { statusRep } = props;
-  const keyArray = Object.keys(giveawayRep);
+  const { giveawayData } = props;
+  const { coreStatus } = props;
+  const keyArray = Object.keys(giveawayData);
   const keyTabs = [];
   const tabPanels = [];
 
   const lastIndex = keyArray.length;
-  const chatStatusProp = !statusRep.chatConnected;
-  const errorMsg = statusRep.chatConnected
+  const chatStatusProp = !coreStatus.chatConnected;
+  const errorMsg = coreStatus.chatConnected
     ? ''
     : 'Chat not connected! Check NodeCG-IO Tab';
 
@@ -194,13 +194,13 @@ function ScrollableTabsButtonAuto(props) {
   if (keyArray.length !== 0) {
     keyArray.forEach((key) => {
       const index = keyArray.indexOf(key) + 1;
-      const name = giveawayRep[key].name;
-      const active = giveawayRep[key].active;
+      const name = giveawayData[key].name;
+      const active = giveawayData[key].active;
       const numEntries =
-        giveawayRep[key].entries.length + giveawayRep[key].winner.length;
-      const winners = giveawayRep[key].winner;
+        giveawayData[key].entries.length + giveawayData[key].winner.length;
+      const winners = giveawayData[key].winner;
       const winnerList = [];
-      const finalWinner = giveawayRep[key].finalWinner;
+      const finalWinner = giveawayData[key].finalWinner;
       const winnerText = winners.length !== 0 ? 'Winners' : '';
 
       // Build winner list
@@ -384,8 +384,8 @@ function ScrollableTabsButtonAuto(props) {
 }
 
 export default function GiveawayApp(props) {
-  const { giveawayRep } = props;
-  if (typeof giveawayRep === 'object') {
+  const { giveawayData } = props;
+  if (typeof giveawayData === 'object') {
     return <ScrollableTabsButtonAuto {...props} />;
   }
 }

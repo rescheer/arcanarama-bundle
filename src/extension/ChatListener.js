@@ -18,7 +18,7 @@ import { setChatClient, setChatChannel } from './util/chatclient-context';
  */
 function handleMessage(client, channel, user, message, _msg) {
   const nodecg = getContext();
-  const giveawayRep = nodecg.Replicant('giveawayRep');
+  const giveawayData = nodecg.Replicant('giveawayData');
 
   // First, check for commands
   if (
@@ -58,11 +58,11 @@ function handleMessage(client, channel, user, message, _msg) {
           break;
         case 'entries':
           {
-            const entryList = Giveaway.getActiveEntries(giveawayRep, user);
+            const entryList = Giveaway.getActiveEntries(giveawayData, user);
             if (entryList.length !== 0) {
               const entryListNames = [];
               entryList.forEach((element) => {
-                entryListNames.push(` ${giveawayRep.value[element].name}`);
+                entryListNames.push(` ${giveawayData.value[element].name}`);
               });
               entryListNames[0].trimStart();
               client.say(
@@ -83,13 +83,13 @@ function handleMessage(client, channel, user, message, _msg) {
           break;
         case 'claim':
           {
-            const winKeys = Giveaway.getWinsForUser(giveawayRep, user);
+            const winKeys = Giveaway.getWinsForUser(giveawayData, user);
             const winNames = [];
 
             if (winKeys.length > 0) {
               winKeys.forEach((key) => {
-                winNames.push(giveawayRep.value[key].name);
-                Giveaway.finalizeGiveaway(giveawayRep, key, user);
+                winNames.push(giveawayData.value[key].name);
+                Giveaway.finalizeGiveaway(giveawayData, key, user);
               });
               client.say(
                 channel,
@@ -111,12 +111,12 @@ function handleMessage(client, channel, user, message, _msg) {
                 case 'list':
                 case 'l':
                   {
-                    const keys = Giveaway.getKeys(giveawayRep);
+                    const keys = Giveaway.getKeys(giveawayData);
                     const activeKeys = [];
                     const inactiveKeys = [];
 
                     keys.forEach((key) => {
-                      if (giveawayRep.value[key]?.active) {
+                      if (giveawayData.value[key]?.active) {
                         activeKeys.push(key);
                       } else {
                         inactiveKeys.push(key);
@@ -154,11 +154,11 @@ function handleMessage(client, channel, user, message, _msg) {
                 case 'info':
                 case 'i':
                   if (params.length > 1) {
-                    if (Giveaway.keyExists(giveawayRep, params[1])) {
+                    if (Giveaway.keyExists(giveawayData, params[1])) {
                       const key = params[1];
-                      const fullName = giveawayRep.value[key].name;
-                      const status = giveawayRep.value[key].active;
-                      const numEntries = giveawayRep.value[key].entries.length;
+                      const fullName = giveawayData.value[key].name;
+                      const status = giveawayData.value[key].active;
+                      const numEntries = giveawayData.value[key].entries.length;
 
                       client.say(
                         channel,
@@ -172,7 +172,7 @@ function handleMessage(client, channel, user, message, _msg) {
                         channel,
                         `Giveaway with key ${params[1]} not found. 
                         Current keys are: ${Object.keys(
-                          giveawayRep.value
+                          giveawayData.value
                         ).toString()}`
                       );
                     }
@@ -184,16 +184,16 @@ function handleMessage(client, channel, user, message, _msg) {
                 case 'd':
                   if (params.length > 1) {
                     const key = params[1];
-                    if (Giveaway.drawGiveaway(giveawayRep, key)) {
-                      const winner = giveawayRep.value[key].winner.slice(-1);
-                      const giveawayName = giveawayRep.value[key].name;
+                    if (Giveaway.drawGiveaway(giveawayData, key)) {
+                      const winner = giveawayData.value[key].winner.slice(-1);
+                      const giveawayName = giveawayData.value[key].name;
                       client.say(
                         channel,
                         `${winner} was drawn for the ${giveawayName} giveaway! 
                         ${winner}, please type "!claim" in chat to confirm`
                       );
-                    } else if (Giveaway.keyExists(giveawayRep, key)) {
-                      const giveawayName = giveawayRep.value[key].name;
+                    } else if (Giveaway.keyExists(giveawayData, key)) {
+                      const giveawayName = giveawayData.value[key].name;
                       client.say(
                         channel,
                         `${giveawayName} giveaway drawing failed: No entries`
@@ -205,7 +205,7 @@ function handleMessage(client, channel, user, message, _msg) {
                 case 'r':
                   switch (params[1]) {
                     case 'all':
-                      if (Giveaway.resetAllActiveGiveaways(giveawayRep)) {
+                      if (Giveaway.resetAllActiveGiveaways(giveawayData)) {
                         client.say(channel, `Resetting all giveaways.`);
                       } else {
                         // TODO: DEBUGMSG
@@ -214,7 +214,7 @@ function handleMessage(client, channel, user, message, _msg) {
                     default:
                       if (params[1] !== undefined) {
                         const key = params[1];
-                        if (Giveaway.resetGiveaway(giveawayRep, key)) {
+                        if (Giveaway.resetGiveaway(giveawayData, key)) {
                           client.say(
                             channel,
                             `Resetting giveaway with key ${key}.`
@@ -225,7 +225,7 @@ function handleMessage(client, channel, user, message, _msg) {
                             `Giveaway with key ${
                               params[1]
                             } not found. Current keys are: ${Object.keys(
-                              giveawayRep.value
+                              giveawayData.value
                             ).toString()}`
                           );
                         }
@@ -243,12 +243,12 @@ function handleMessage(client, channel, user, message, _msg) {
                       case 'a':
                       case 'on':
                         newActiveState = true;
-                        if (Object.keys(giveawayRep.value).includes(key)) {
-                          giveawayRep.value[key].active = newActiveState;
+                        if (Object.keys(giveawayData.value).includes(key)) {
+                          giveawayData.value[key].active = newActiveState;
                           client.say(
                             channel,
                             `Giveaway with key ${key} is now ${
-                              giveawayRep.value[key].active
+                              giveawayData.value[key].active
                                 ? 'active'
                                 : 'inactive'
                             }.`
@@ -259,12 +259,12 @@ function handleMessage(client, channel, user, message, _msg) {
                       case 'i':
                       case 'off':
                         newActiveState = false;
-                        if (Object.keys(giveawayRep.value).includes(key)) {
-                          giveawayRep.value[key].active = newActiveState;
+                        if (Object.keys(giveawayData.value).includes(key)) {
+                          giveawayData.value[key].active = newActiveState;
                           client.say(
                             channel,
                             `Giveaway with key ${key} is now ${
-                              giveawayRep.value[key].active
+                              giveawayData.value[key].active
                                 ? 'Active'
                                 : 'Inactive'
                             }`
@@ -301,7 +301,7 @@ function handleMessage(client, channel, user, message, _msg) {
                       data[key].active = true;
                     }
 
-                    if (Giveaway.addGiveaway(giveawayRep, data)) {
+                    if (Giveaway.addGiveaway(giveawayData, data)) {
                       client.say(
                         channel,
                         `Added ${
@@ -326,12 +326,12 @@ function handleMessage(client, channel, user, message, _msg) {
                   if (params.length > 1) {
                     const key = params[1];
                     if (key === 'all') {
-                      if (Giveaway.deleteAllGiveaways(giveawayRep)) {
+                      if (Giveaway.deleteAllGiveaways(giveawayData)) {
                         client.say(channel, `All giveaways deleted`);
                       } else {
                         client.say(channel, `No giveaways found to delete`);
                       }
-                    } else if (Giveaway.deleteGiveaway(giveawayRep, key)) {
+                    } else if (Giveaway.deleteGiveaway(giveawayData, key)) {
                       client.say(
                         channel,
                         `Giveaway with keyword ${key} deleted`
@@ -340,7 +340,7 @@ function handleMessage(client, channel, user, message, _msg) {
                       client.say(
                         channel,
                         `Giveaway with keyword ${key} not found.  Current keywords are:
-                        ${Object.keys(giveawayRep.value).toString()}`
+                        ${Object.keys(giveawayData.value).toString()}`
                       );
                     }
                   }
@@ -359,7 +359,7 @@ function handleMessage(client, channel, user, message, _msg) {
     // Other tests run here
 
     // Giveaway Keyword Check
-    Object.keys(giveawayRep.value).forEach((key) => {
+    Object.keys(giveawayData.value).forEach((key) => {
       // Check for the keyword, but ignore the keyword if part of a command
       if (
         message.toLowerCase().includes(key.toLowerCase()) &&
@@ -391,7 +391,7 @@ function addListeners(nodecg, client, channel) {
 export default function ChatListener(nodecg) {
   // Require the twitch service.
   const twitch = requireService(nodecg, 'twitch-chat');
-  const statusRep = nodecg.Replicant('statusRep');
+  const coreStatus = nodecg.Replicant('coreStatus');
 
   // Hardcoded channels for testing purposes.
   // Note that this does need a # before the channel name and is case-insensitive.
@@ -407,7 +407,7 @@ export default function ChatListener(nodecg) {
       // client.say(channel, `connected to ${channel}! how wild is that`);
       setChatClient(client);
       setChatChannel(channel);
-      statusRep.value.chatConnected = true;
+      coreStatus.value.chatConnected = true;
     });
 
     twitchChannels.forEach((channel) => {
@@ -419,6 +419,6 @@ export default function ChatListener(nodecg) {
     nodecg.log.info('Twitch chat client has been unset.');
     setChatClient(undefined);
     setChatChannel(undefined);
-    statusRep.value.chatConnected = false;
+    coreStatus.value.chatConnected = false;
   });
 }

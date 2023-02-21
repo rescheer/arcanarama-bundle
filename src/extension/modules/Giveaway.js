@@ -1,37 +1,65 @@
 /* eslint-disable no-param-reassign */
 import { getContext } from '../util/nodecg-api-context';
 
-// Since we aren't declaring nodecg globally, declare it inside the debug message func
-// const debugMessageRep = nodecg.Replicant('debugMessageRep');
-
 const announcerTimer = {};
+const giveawayReps = {};
+
+export function initGiveaway(nodecg) {
+  const giveawayData = nodecg.Replicant('giveawayData', {
+    defaultValue: {
+      defaultKeyword: {
+        name: 'Example',
+        active: false,
+        winner: [],
+        finalWinner: [],
+        entries: [],
+        newEntries: [],
+      },
+    },
+  });
+
+  const giveawaySettings = nodecg.Replicant('giveawaySettings', {
+    defaultValue: {
+      diceBackgroundScrollAsset: 'WINNER_dice_BG',
+      otherBackgroundScrollAsset: 'WINNER_minis_BG',
+    },
+  });
+
+  const giveawayStatus = nodecg.Replicant('giveawayStatus', {
+    persistent: false,
+  });
+
+  giveawayReps.data = giveawayData;
+  giveawayReps.settings = giveawaySettings;
+  giveawayReps.status = giveawayStatus;
+}
 
 function getRandomNumber(min, max) {
   return Math.floor(Math.random() * (max - min + 1)) + min;
 }
 
 /**
- * Checks if a given key exists in the giveawayRep Replicant
- * @param {Replicant} giveawayRep - The replicant holding the giveaway objects
+ * Checks if a given key exists in the rep Replicant
+ * @param {Replicant} rep - The replicant holding the giveaway objects
  * @param {string} key - the keyword for the giveaway
  */
-export function keyExists(giveawayRep, key) {
-  return Object.keys(giveawayRep.value).includes(key);
+export function keyExists(rep, key) {
+  return Object.keys(rep.value).includes(key);
 }
 
 /**
  * Checks if a user already has an entry in the specified giveaway
- * @param {Replicant} giveawayRep - The replicant holding the giveaway objects
+ * @param {Replicant} rep - The replicant holding the giveaway objects
  * @param {string} key - the keyword for the giveaway
  * @param {string} userName - the username to be searched for
  * @returns {bool}
  */
-export function entryExists(giveawayRep, key, userName) {
+export function entryExists(rep, key, userName) {
   let result = false;
-  if (keyExists(giveawayRep, key)) {
+  if (keyExists(rep, key)) {
     if (
-      giveawayRep.value[key].entries.includes(userName) ||
-      giveawayRep.value[key].winner.includes(userName)
+      rep.value[key].entries.includes(userName) ||
+      rep.value[key].winner.includes(userName)
     ) {
       result = true;
     }
@@ -41,17 +69,17 @@ export function entryExists(giveawayRep, key, userName) {
 
 /**
  * Returns an array containing keys for each giveaway the user has entered
- * @param {Replicant} giveawayRep - The replicant holding the giveaway objects
+ * @param {Replicant} rep - The replicant holding the giveaway objects
  * @param {string} userName - The user to search for
  * @returns {array<string>} The keys of each active giveaway the user has entered
  */
-export function getActiveEntries(giveawayRep, userName) {
+export function getActiveEntries(rep, userName) {
   const entryList = [];
-  Object.keys(giveawayRep.value).forEach((key) => {
-    if (giveawayRep.value[key].active) {
+  Object.keys(rep.value).forEach((key) => {
+    if (rep.value[key].active) {
       if (
-        giveawayRep.value[key].entries.includes(userName) ||
-        giveawayRep.value[key].winner.includes(userName)
+        rep.value[key].entries.includes(userName) ||
+        rep.value[key].winner.includes(userName)
       ) {
         entryList.push(key);
       }
@@ -62,13 +90,13 @@ export function getActiveEntries(giveawayRep, userName) {
 
 /**
  * Returns a bool for the active status of a giveaway
- * @param {Replicant} giveawayRep - The replicant holding the giveaway objects
+ * @param {Replicant} rep - The replicant holding the giveaway objects
  * @param {string} key - the keyword for the giveaway
  * @return {bool} Returns true if the giveaway is active
  */
-export function getActiveStatus(giveawayRep, key) {
-  if (keyExists(giveawayRep, key)) {
-    return giveawayRep.value[key].active;
+export function getActiveStatus(rep, key) {
+  if (keyExists(rep, key)) {
+    return rep.value[key].active;
   }
   // Failstate
   return false;
@@ -76,14 +104,14 @@ export function getActiveStatus(giveawayRep, key) {
 
 /**
  * Gets an array of keys for giveaways that the user was drawn for
- * @param {Replicant} giveawayRep  The replicant holding the giveaway objects
+ * @param {Replicant} rep  The replicant holding the giveaway objects
  * @param {string} userName - The user to search for
  * @returns {array<string>}
  */
-export function getWinsForUser(giveawayRep, userName) {
+export function getWinsForUser(rep, userName) {
   const winList = [];
-  Object.keys(giveawayRep.value).forEach((key) => {
-    if (giveawayRep.value[key].finalWinner === userName) {
+  Object.keys(rep.value).forEach((key) => {
+    if (rep.value[key].finalWinner === userName) {
       winList.push(key);
     }
   });
@@ -92,16 +120,16 @@ export function getWinsForUser(giveawayRep, userName) {
 
 /**
  * Deletes a specified user's entry from the specified giveaway
- * @param {Replicant} giveawayRep - The replicant holding the giveaway objects
+ * @param {Replicant} rep - The replicant holding the giveaway objects
  * @param {string} key - the keyword for the giveaway
  * @param {string} userName - the user whose entry should be deleted
  * @return {bool} Returns true on success
  */
-export function deleteEntry(giveawayRep, key, userName) {
-  if (entryExists(giveawayRep, key, userName)) {
-    const index = giveawayRep.value[key].entries.indexOf(userName);
+export function deleteEntry(rep, key, userName) {
+  if (entryExists(rep, key, userName)) {
+    const index = rep.value[key].entries.indexOf(userName);
     if (index !== -1) {
-      giveawayRep.value[key].entries.splice(index, 1);
+      rep.value[key].entries.splice(index, 1);
       return true;
     }
   }
@@ -111,24 +139,24 @@ export function deleteEntry(giveawayRep, key, userName) {
 
 /**
  * Returns an array containing each key for all stored giveaway objects
- * @param {Replicant} giveawayRep - The replicant holding the giveaway objects
+ * @param {Replicant} rep - The replicant holding the giveaway objects
  * @returns {array<string>} A list of the keywords for each stored giveaway
  */
-export function getKeys(giveawayRep) {
-  return Object.keys(giveawayRep?.value);
+export function getKeys(rep) {
+  return Object.keys(rep?.value);
 }
 
 /**
  * Adds a giveaway with the provided data
- * @param {Replicant} giveawayRep - The replicant holding the giveaway objects
+ * @param {Replicant} rep - The replicant holding the giveaway objects
  * @param {Object} data - An object containing properties for the new giveaway
  * @return {bool} Returns true on success
  */
-export function addGiveaway(giveawayRep, data) {
+export function addGiveaway(rep, data) {
   const keyArray = Object.keys(data);
   if (keyArray.length === 1) {
     const key = keyArray[0];
-    if (!keyExists(giveawayRep, key)) {
+    if (!keyExists(rep, key)) {
       const defaultGiveaway = {
         active: false,
         name: 'Default',
@@ -139,7 +167,7 @@ export function addGiveaway(giveawayRep, data) {
       };
 
       const newGiveaway = Object.assign(defaultGiveaway, data[key]);
-      giveawayRep.value[key] = newGiveaway;
+      rep.value[key] = newGiveaway;
       return true;
     }
     // say A giveaway with this key already exists
@@ -150,14 +178,14 @@ export function addGiveaway(giveawayRep, data) {
 
 /**
  * Sets a giveaway's properties using the data provided
- * @param {Replicant} giveawayRep - The replicant holding the giveaway objects
+ * @param {Replicant} rep - The replicant holding the giveaway objects
  * @param {string} key - the keyword for the giveaway
  * @param {Object} data - and object containing the desired changes
  * @return {bool} Returns true on success
  */
-export function setGiveaway(giveawayRep, key, data) {
-  if (keyExists(giveawayRep, key)) {
-    Object.assign(giveawayRep.value[key], data);
+export function setGiveaway(rep, key, data) {
+  if (keyExists(rep, key)) {
+    Object.assign(rep.value[key], data);
     return true;
   }
   // Failstate
@@ -166,13 +194,13 @@ export function setGiveaway(giveawayRep, key, data) {
 
 /**
  * Deletes a giveaway
- * @param {Replicant} giveawayRep - The replicant holding the giveaway objects
+ * @param {Replicant} rep - The replicant holding the giveaway objects
  * @param {string} key - the keyword for the giveaway
  * @return {bool} Returns true on success
  */
-export function deleteGiveaway(giveawayRep, key) {
-  if (keyExists(giveawayRep, key)) {
-    delete giveawayRep.value[key];
+export function deleteGiveaway(rep, key) {
+  if (keyExists(rep, key)) {
+    delete rep.value[key];
     return true;
   }
   // Failstate
@@ -181,14 +209,14 @@ export function deleteGiveaway(giveawayRep, key) {
 
 /**
  * Deletes all giveaways
- * @param {Replicant} giveawayRep - The replicant holding the giveaway objects
+ * @param {Replicant} rep - The replicant holding the giveaway objects
  * @return {bool} Returns true on success
  */
-export function deleteAllGiveaways(giveawayRep) {
-  const keys = getKeys(giveawayRep);
+export function deleteAllGiveaways(rep) {
+  const keys = getKeys(rep);
   const successes = [];
   keys.forEach((element) => {
-    const result = deleteGiveaway(giveawayRep, element);
+    const result = deleteGiveaway(rep, element);
     successes.push(result);
   });
   if (successes.length !== 0 && !successes.includes(false)) {
@@ -200,16 +228,16 @@ export function deleteAllGiveaways(giveawayRep) {
 
 /**
  * Removes all entries from a giveaway
- * @param {Replicant} giveawayRep - The replicant holding the giveaway objects
+ * @param {Replicant} rep - The replicant holding the giveaway objects
  * @param {string} key - the keyword for the giveaway
  * @return {bool} Returns true on success
  */
-export function resetGiveaway(giveawayRep, key) {
-  if (keyExists(giveawayRep, key)) {
-    giveawayRep.value[key].entries = [];
-    giveawayRep.value[key].newEntries = [];
-    giveawayRep.value[key].winner = [];
-    giveawayRep.value[key].finalWinner = '';
+export function resetGiveaway(rep, key) {
+  if (keyExists(rep, key)) {
+    rep.value[key].entries = [];
+    rep.value[key].newEntries = [];
+    rep.value[key].winner = [];
+    rep.value[key].finalWinner = '';
     return true;
   }
   // Failstate
@@ -218,15 +246,15 @@ export function resetGiveaway(giveawayRep, key) {
 
 /**
  * Removes all entries from all active giveaways
- * @param {Replicant} giveawayRep - The replicant holding the giveaway objects
+ * @param {Replicant} rep - The replicant holding the giveaway objects
  * @return {bool} Returns true on success
  */
-export function resetAllActiveGiveaways(giveawayRep) {
-  const keys = getKeys(giveawayRep);
+export function resetAllActiveGiveaways(rep) {
+  const keys = getKeys(rep);
   const successes = [];
   keys.forEach((key) => {
-    if (getActiveStatus(giveawayRep, key)) {
-      const result = resetGiveaway(giveawayRep, key);
+    if (getActiveStatus(rep, key)) {
+      const result = resetGiveaway(rep, key);
       successes.push(result);
     }
   });
@@ -239,21 +267,19 @@ export function resetAllActiveGiveaways(giveawayRep) {
 
 /**
  * Draws a random winner and updates the giveaway object
- * @param {Replicant} giveawayRep - The replicant holding the giveaway objects
+ * @param {Replicant} rep - The replicant holding the giveaway objects
  * @param {string} key - The keyword for the giveaway
  * @returns {bool} Returns true if successful
  */
-export function drawGiveaway(giveawayRep, key) {
-  if (keyExists(giveawayRep, key)) {
-    const numEntries = giveawayRep.value[key].entries.length;
+export function drawGiveaway(rep, key) {
+  if (keyExists(rep, key)) {
+    const numEntries = rep.value[key].entries.length;
     let winningIndex;
 
     if (numEntries !== 0) {
       winningIndex = getRandomNumber(0, numEntries - 1);
-      giveawayRep.value[key].winner.push(
-        giveawayRep.value[key].entries[winningIndex]
-      );
-      giveawayRep.value[key].entries.splice(winningIndex, 1);
+      rep.value[key].winner.push(rep.value[key].entries[winningIndex]);
+      rep.value[key].entries.splice(winningIndex, 1);
       return true;
     }
   }
@@ -263,15 +289,15 @@ export function drawGiveaway(giveawayRep, key) {
 
 /**
  * Confirms a giveaway winner and sets the giveaway inactive
- * @param {Replicant} giveawayRep - The replicant holding the giveaway objects
+ * @param {Replicant} rep - The replicant holding the giveaway objects
  * @param {string} key - The key of the giveaway to finalize
  * @param {string} userName - The winning user
  * @returns {bool} Returns true if successful
  */
-export function finalizeGiveaway(giveawayRep, key, userName) {
-  if (keyExists(giveawayRep, key)) {
-    giveawayRep.value[key].finalWinner = userName;
-    giveawayRep.value[key].active = false;
+export function finalizeGiveaway(rep, key, userName) {
+  if (keyExists(rep, key)) {
+    rep.value[key].finalWinner = userName;
+    rep.value[key].active = false;
     return true;
   }
   // Failstate
@@ -280,16 +306,13 @@ export function finalizeGiveaway(giveawayRep, key, userName) {
 
 /**
  * Returns the number of entries for a giveaway
- * @param {Replicant} giveawayRep - The replicant holding the giveaway objects
+ * @param {Replicant} rep - The replicant holding the giveaway objects
  * @param {string} key - the keyword for the giveaway
  * @return {number}
  */
-export function getEntryCount(giveawayRep, key) {
-  if (keyExists(giveawayRep, key)) {
-    return (
-      giveawayRep.value[key].entries.length +
-      giveawayRep.value[key].winner.length
-    );
+export function getEntryCount(rep, key) {
+  if (keyExists(rep, key)) {
+    return rep.value[key].entries.length + rep.value[key].winner.length;
   }
   // Failstate
   return false;
@@ -297,13 +320,13 @@ export function getEntryCount(giveawayRep, key) {
 
 /**
  * Returns the number of new (unannounced) entries for a giveaway
- * @param {Replicant} giveawayRep - The replicant holding the giveaway objects
+ * @param {Replicant} rep - The replicant holding the giveaway objects
  * @param {string} key - the keyword for the giveaway
  * @return {number}
  */
-export function getNewEntryCount(giveawayRep, key) {
-  if (keyExists(giveawayRep, key)) {
-    return giveawayRep.value[key].newEntries.length;
+export function getNewEntryCount(rep, key) {
+  if (keyExists(rep, key)) {
+    return rep.value[key].newEntries.length;
   }
   // Failstate
   return false;
@@ -314,14 +337,15 @@ export function getNewEntryCount(giveawayRep, key) {
  * @param {ChatClient} client - Twurple ChatClient object
  * @param {string} channel - the channel to send the message to
  * @param {string} key - the keyword to enter the giveaway
- * @param {Replicant} giveawayRep - The replicant holding the giveaway objects
+ * @param {Replicant} rep - The replicant holding the giveaway objects
  * @return {bool} Returns true on success
  */
-function announceEntries(client, channel, key, giveawayRep) {
-  if (giveawayRep.value[key].newEntries?.length >= 1) {
-    const { newEntries } = giveawayRep.value[key];
-    const { entries } = giveawayRep.value[key];
-    const { name } = giveawayRep.value[key];
+function announceEntries(client, channel, key, rep) {
+  if (rep.value[key].newEntries?.length >= 1) {
+    const { newEntries } = rep.value[key];
+    const { entries } = rep.value[key];
+    const entryCount = entries.length;
+    const { name } = rep.value[key];
 
     let chatMessageEntryText;
 
@@ -338,11 +362,26 @@ function announceEntries(client, channel, key, giveawayRep) {
     }
 
     const chatMessage = `${chatMessageEntryText} the ${name} giveaway! 
-    (${entries.length} total entries) Type "${key}" to enter. You can check on your giveaway entries with !entries`;
+    (${entryCount} total ${
+      entryCount !== 1 ? 'entries' : 'entry'
+    }) Type "${key}" to enter. You can check on your giveaway entries with !entries`;
+
+    // Bug Hunting
+    if (entryCount === 0) {
+      const nodecg = getContext();
+      nodecg.sendMessage('console', {
+        type: 'warn',
+        msg: `[Giveaway] Total Entries bug happened. Replicant:`,
+      });
+      nodecg.sendMessage('console', {
+        type: 'warn',
+        msg: rep.value[key],
+      });
+    }
 
     client.say(channel, chatMessage);
     // eslint-disable-next-line no-param-reassign
-    giveawayRep.value[key].newEntries = [];
+    rep.value[key].newEntries = [];
     return true;
   }
   // Failstate
@@ -354,11 +393,11 @@ function announceEntries(client, channel, key, giveawayRep) {
  * @param {ChatClient} client - Twurple ChatClient object
  * @param {string} channel - the channel to send the message to
  * @param {string} key - the keyword to enter the giveaway
- * @param {Replicant} giveawayRep - The replicant holding the giveaway objects
+ * @param {Replicant} rep - The replicant holding the giveaway objects
  */
-export function announceGiveaway(client, channel, key, giveawayRep) {
-  const { name } = giveawayRep.value[key];
-  const entryCount = getEntryCount(giveawayRep, key);
+export function announceGiveaway(client, channel, key, rep) {
+  const { name } = rep.value[key];
+  const entryCount = getEntryCount(rep, key);
 
   if (entryCount === 0) {
     client.say(
@@ -369,17 +408,19 @@ export function announceGiveaway(client, channel, key, giveawayRep) {
   } else {
     client.say(
       channel,
-      `The ${name} giveaway is currently running with ${entryCount} total entries! 
+      `The ${name} giveaway is currently running with ${entryCount} total ${
+        entryCount !== 1 ? 'entries' : 'entry'
+      }! 
       Type "${key}" to enter. You must be a follower (it's free!) to be eligible to win`
     );
   }
 
-  setGiveaway(giveawayRep, key, { active: true });
+  setGiveaway(rep, key, { active: true });
 }
 
 function getBackgroundAsset(giveaway) {
   const nodecg = getContext();
-  const settingsRep = nodecg.Replicant('settings:giveaway');
+  const settingsRep = nodecg.Replicant('giveawaySettings');
   const assetsRep = nodecg.Replicant('assets:giveaway');
   const { name } = giveaway;
   const assets = assetsRep.value;
@@ -415,13 +456,13 @@ function getBackgroundAsset(giveaway) {
  * @param {string} channel - the channel to send the message to
  * @param {string} user - The winning user
  * @param {string} key - the keyword to enter the giveaway
- * @param {Replicant} giveawayRep - The replicant holding the giveaway objects
+ * @param {Replicant} rep - The replicant holding the giveaway objects
  */
-export function announceWinner(client, channel, user, key, giveawayRep) {
+export function announceWinner(client, channel, user, key, rep) {
   const nodecg = getContext();
-  const { name } = giveawayRep.value[key];
+  const { name } = rep.value[key];
   const winner = user;
-  const url = getBackgroundAsset(giveawayRep.value[key]);
+  const url = getBackgroundAsset(rep.value[key]);
   const data = {
     name,
     winner,
@@ -431,8 +472,8 @@ export function announceWinner(client, channel, user, key, giveawayRep) {
   client.say(channel, `${winner} has been drawn for the ${name} giveaway!`);
   nodecg.sendMessage('giveaway:winnerAnnounced', data);
 
-  giveawayRep.value[key].finalWinner = winner;
-  setGiveaway(giveawayRep, key, { active: false });
+  rep.value[key].finalWinner = winner;
+  setGiveaway(rep, key, { active: false });
 }
 
 /**
@@ -446,18 +487,18 @@ export function announceWinner(client, channel, user, key, giveawayRep) {
 // eslint-disable-next-line no-unused-vars
 export function handleEntry(client, channel, user, key, _msg) {
   const nodecg = getContext();
-  const giveawayRep = nodecg.Replicant('giveawayRep');
+  const rep = nodecg.Replicant('giveawayData');
 
-  if (giveawayRep.value[key]?.active) {
+  if (rep.value[key]?.active) {
     if (
-      !giveawayRep.value[key].entries.includes(user) &&
-      !giveawayRep.value[key].winner.includes(user)
+      !rep.value[key].entries.includes(user) &&
+      !rep.value[key].winner.includes(user)
     ) {
-      giveawayRep.value[key].entries.push(user);
-      giveawayRep.value[key].newEntries.push(user);
+      rep.value[key].entries.push(user);
+      rep.value[key].newEntries.push(user);
       clearTimeout(announcerTimer?.[key]);
       announcerTimer[key] = setTimeout(() => {
-        announceEntries(client, channel, key, giveawayRep);
+        announceEntries(client, channel, key, rep);
       }, 4000);
     }
   }

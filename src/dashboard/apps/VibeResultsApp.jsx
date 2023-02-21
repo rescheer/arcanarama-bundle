@@ -12,14 +12,14 @@ import TableRow from '@mui/material/TableRow';
  * @returns A mUI table containing each user's vibecheck result
  */
 export default function VibeResultsApp(props) {
-  const { vibesRep } = props;
+  const { vibesData } = props;
 
-  if (typeof vibesRep === 'object') {
+  if (typeof vibesData === 'object') {
     return (
       <TableContainer>
         <Table sx={{ width: 1 }} size="small" aria-label="a dense table">
           <TableBody>
-            {vibesRep.map((row) => (
+            {vibesData.map((row) => (
               <TableRow
                 key={row.user}
                 sx={{ '&:last-child td, &:last-child th': { border: 0 } }}

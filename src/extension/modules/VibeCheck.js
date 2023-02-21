@@ -1,4 +1,15 @@
-import { getContext } from '../util/nodecg-api-context';
+// import { getContext } from '../util/nodecg-api-context';
+
+const vibesReps = {};
+
+export function initVibes(nodecg) {
+  const vibesData = nodecg.Replicant('vibesData', {
+    defaultValue: [],
+    persistent: false,
+  });
+
+  vibesReps.data = vibesData;
+}
 
 /**
  * Returns a random number between min and max
@@ -12,21 +23,22 @@ export function getRandomNumber(min, max) {
 
 /**
  * Adds a vibecheck to the replicant while avoiding duplicate rolls from one user
- * @param {Replicant} vibesRep - The replicant holding each user's vibecheck result
  * @param {string} user
  * @param {number} roll
  */
-function updateVibesRep(vibesRep, user, roll) {
+function updateVibesData(user, roll) {
   if (typeof user === 'string' && typeof roll === 'number') {
     const data = { user, roll };
 
-    if (typeof vibesRep.value === 'object') {
-      vibesRep.value.forEach((el, index) => {
+    // This is how we can use the Replicants stored in the global
+    // object. Destructuring won't work.
+    if (typeof vibesReps.data.value === 'object') {
+      vibesReps.data.value.forEach((el, index) => {
         if (el.user === user) {
-          vibesRep.value.splice(index, 1);
+          vibesReps.data.value.splice(index, 1);
         }
       });
-      vibesRep.value.push(data);
+      vibesReps.data.value.push(data);
     }
   }
 }
@@ -37,16 +49,10 @@ function updateVibesRep(vibesRep, user, roll) {
  * @returns a string ready to be sent to a chat
  */
 export function getVibeCheck(user) {
-  const nodecg = getContext();
-  const vibesRep = nodecg.Replicant('vibesRep', {
-    defaultValue: [],
-    persistent: false,
-  });
-
   const roll = getRandomNumber(1, 20);
   const randomMessage = getRandomNumber(0, 3);
 
-  updateVibesRep(vibesRep, user, roll);
+  updateVibesData(user, roll);
 
   const article = `${roll === 8 || roll === 11 || roll === 18 ? 'an' : 'a'}`;
 

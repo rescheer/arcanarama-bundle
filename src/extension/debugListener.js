@@ -25,5 +25,5 @@ function debugHandler(data) {
 }
 
 export default function debugListener(nodecg) {
-  nodecg.listenFor('debug', debugHandler);
+  nodecg.listenFor('console', debugHandler);
 }
