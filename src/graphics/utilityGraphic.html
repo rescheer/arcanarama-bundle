@@ -6,46 +6,46 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Graphic: Utility</title>
     <style>
-      .graphicitem {
-        width: 80%;
+      .gText {
         position: absolute;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%);
-      }
-      .giveawaytext {
-        text-align: center;
-        width: 80%;
-        position: fixed;
-        transform: translate(-50%, -50%);
         color: white;
+        width:100%;
         font-family: 'Josefin Sans', sans-serif;
         font-size: 72px;
-      }
-      .background {
-        overflow: hidden;
+        opacity: 1;
+        left:50%;
+        transform: translateX(-50%);
       }
       .gImage {
         width: 100%;
-        position: relative;
-        visibility: hidden;
-        opacity: 0;
+        position: absolute;
+        left: 50%;
+        transform: translateX(-50%);
+      }
+      #background {
+        overflow: hidden;
+        height: 100vh;
+      }
+      #foreground {
+        text-align: center;
+        width: 80%;
+        height: 100vh;
+        top: 0;
+        left:50%;
+        transform: translateX(-50%);
+        position: absolute;
       }
       #gWinner {
-        top: 30%;
-        left: 50%;
-        font-size: 162px;
+        top: 10%;
+        font-size: 102px;
+        filter: blur(0px);
       }
-      #gText {
-        top: 50%;
-        left: 50%;
+      #gHasWon {
+        top: 37%;
       }
       #gName {
-        width: 70%;
-        top: 65%;
-        left: 50%;
+        top: 55%;
         font-size: 102px;
-        transform: translate(-50%, 0);
       }
     </style>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -57,15 +57,12 @@
   </head>
   <body style="overflow: hidden">
     <div id="background">
-      <img
-        class="gImage"
-        id="gDiceScroll"
-      />
-    </div>    
-    <div id="giveaway">
-      <span id="gWinner" class="giveawaytext"></span>
-      <span id="gText" class="giveawaytext"></span>
-      <span id="gName" class="giveawaytext"></span>
+      <img class="gImage" id="gScroll" />
+    </div>
+    <div id="foreground">
+      <p id="gWinner" class="gText"></p>
+      <p id="gHasWon" class="gText"></p>
+      <p id="gName" class="gText"></p>
     </div>
     <script type="module" src="./utilityGraphic.jsx"></script>
   </body>

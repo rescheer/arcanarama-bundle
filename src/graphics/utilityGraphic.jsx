@@ -1,39 +1,102 @@
-/* eslint-disable no-unused-vars */
 import gsap from 'gsap';
 
-function gStartAnim() {
-  const gDiceScrollDuration = 6;
+// TODO Put this in a replicant so we can disable the announce button
+// on the dashboard while the animation is playing
+let gIsAnimating = false;
 
-  // Get the img and clone it as a child
-  const target = document.querySelector('.gImage');
-  const clone = target.cloneNode(true);
-  target.after(clone);
+function gEndAnimation() {
+  const backgroundDiv = document.getElementById('background');
 
+  // Clear out old elements
+  backgroundDiv.innerHTML = '';
+  document.getElementById('gWinner').innerHTML = '';
+  document.getElementById('gHasWon').innerHTML = '';
+  document.getElementById('gName').innerHTML = '';
+
+  // Unfade the text container
+  gsap.set('#foreground', { opacity: 1 });
+
+  gIsAnimating = false;
+}
+
+function gStartAnimation() {
+  const gScrollDuration = 13;
+  const gTextDuration = 2;
+
+  // Text Animation
+  const gTextTimeline = gsap.timeline();
+
+  const gWinnerOffset = document.getElementById('gWinner').offsetTop;
+  const gHasWonOffset = document.getElementById('gHasWon').offsetTop;
+  const gNameOffset = document.getElementById('gName').offsetTop;
+
+  // Winner Name Animation
+  gTextTimeline.from('#gWinner', {
+    top: gWinnerOffset + 450,
+    scale: 5,
+    filter: 'blur(20px)',
+    opacity: 0,
+    ease: 'expo.in',
+    duration: gTextDuration / 2,
+  });
+
+  // 'has been drawn' animation
+  gTextTimeline.from(
+    '#gHasWon',
+    {
+      top: gHasWonOffset + 30,
+      opacity: 0,
+      duration: gTextDuration,
+      ease: `expo.out`,
+    },
+    `+=${gTextDuration / 8}`
+  );
+
+  // Giveaway Name animation
+  gTextTimeline.from(
+    '#gName',
+    {
+      top: gNameOffset + 30,
+      opacity: 0,
+      duration: gTextDuration,
+      ease: `expo.out`,
+    },
+    `-=${gTextDuration / 1.5}`
+  );
+
+  // Fade all text
+  gTextTimeline.to('#foreground', { opacity: 0, duration: 1 }, '+=3');
+
+  // Image Animation
   // Fade in
   gsap.to('.gImage', {
     opacity: 1,
-    duration: 2,
+    duration: 1,
   });
-  gsap.set('#gDiceScroll', { y: 1080 });
+  gsap.set('#gScroll', { y: 1100 });
 
   // Create the Timeline
   const giveawayScrollTimeline = gsap.timeline({
-    repeat: -1,
-  });
-  giveawayScrollTimeline.to('#gDiceScroll', {
-    yPercent: -120,
-    duration: gDiceScrollDuration,
-    ease: 'none',
+    delay: 0.5,
+    onComplete: gEndAnimation,
   });
 
-  // Reveal the child image instantly, while keeping the parent
-  // image hidden until it has passed outside the viewport
-  gsap.set(target, { visibility: 'visible' });
-  gsap.set(target, { visibility: 'visible', delay: gDiceScrollDuration / 2 });
+  giveawayScrollTimeline.to('#gScroll', {
+    yPercent: -130,
+    duration: gScrollDuration,
+    ease: 'power2.out',
+  });
 }
 
 async function loadImage(imageUrl) {
-  const img = document.getElementById('gDiceScroll');
+  const backgroundDiv = document.getElementById('background');
+
+  // Create a new img tag and set its attributes
+  const img = document.createElement('img');
+  img.setAttribute('class', 'gImage');
+  img.setAttribute('id', 'gScroll');
+  backgroundDiv.appendChild(img);
+
   const imageLoadPromise = new Promise((resolve) => {
     img.onload = resolve;
     img.src = imageUrl;
@@ -44,22 +107,25 @@ async function loadImage(imageUrl) {
 }
 
 function gWinHandler(data) {
-  const { winner } = data;
-  const { name: giveawayName } = data;
-  const { url } = data;
+  if (!gIsAnimating) {
+    const { winner } = data;
+    const { name: giveawayName } = data;
+    const { url } = data;
 
-  document.getElementById('gWinner').innerHTML = winner;
-  document.getElementById('gText').innerHTML = `has been drawn for the`;
-  document.getElementById('gName').innerHTML = `${giveawayName} Giveaway!`;
+    document.getElementById('gWinner').innerHTML = winner;
+    document.getElementById('gHasWon').innerHTML = `has been drawn for the`;
+    document.getElementById('gName').innerHTML = `${giveawayName} Giveaway!`;
 
-  if (url) {
-    loadImage(url).then(gStartAnim());
-  } else {
-    window.nodecg.sendMessage('debug', {
-      type: 'warn',
-      msg: 'Giveaway background image not found.',
-    });
-    gStartAnim();
+    if (url) {
+      loadImage(url).then(gStartAnimation());
+    } else {
+      window.nodecg.sendMessage('debug', {
+        type: 'warn',
+        msg: 'Giveaway background image not found.',
+      });
+      gStartAnimation();
+    }
+    gIsAnimating = true;
   }
 }
 
