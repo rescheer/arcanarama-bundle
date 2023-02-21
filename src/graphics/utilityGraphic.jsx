@@ -65,7 +65,11 @@ function gStartAnimation() {
   );
 
   // Fade all text
-  gTextTimeline.to('#foreground', { opacity: 0, duration: 1 }, '+=3');
+  gTextTimeline.to(
+    '#foreground',
+    { opacity: 0, duration: 1, onComplete: gEndAnimation },
+    '+=3'
+  );
 
   // Image Animation
   // Fade in
@@ -78,7 +82,6 @@ function gStartAnimation() {
   // Create the Timeline
   const giveawayScrollTimeline = gsap.timeline({
     delay: 0.5,
-    onComplete: gEndAnimation,
   });
 
   giveawayScrollTimeline.to('#gScroll', {
@@ -121,7 +124,7 @@ function gWinHandler(data) {
     } else {
       window.nodecg.sendMessage('debug', {
         type: 'warn',
-        msg: 'Giveaway background image not found.',
+        msg: `[Giveaway] File ${url} not found in assets!`,
       });
       gStartAnimation();
     }
