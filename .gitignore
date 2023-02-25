@@ -4,6 +4,7 @@ dashboard
 extension
 extension/index.js
 graphics
+.vscode
 .parcel-cache
 
 !src/**
