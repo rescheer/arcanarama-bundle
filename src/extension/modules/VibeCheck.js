@@ -1,4 +1,5 @@
-// import { getContext } from '../util/nodecg-api-context';
+import { get } from 'https';
+import { getContext } from '../util/nodecg-api-context';
 
 const vibesReps = {};
 
@@ -8,7 +9,10 @@ export function initVibes(nodecg) {
     persistent: false,
   });
 
+  const vibesResponses = nodecg.Replicant('vibesResponses');
+
   vibesReps.data = vibesData;
+  vibesReps.responses = vibesResponses;
 }
 
 /**
@@ -43,104 +47,199 @@ function updateVibesData(user, roll) {
   }
 }
 
+export function getResponsesFromDrive() {
+  const nodecg = getContext();
+
+  const responses = {};
+
+  if (
+    nodecg?.bundleConfig?.googleAPIKey &&
+    nodecg?.bundleConfig?.vibesResponseSheetID &&
+    nodecg?.bundleConfig?.vibesResponseSheetTabs
+  ) {
+    const apiKey = nodecg.bundleConfig.googleAPIKey;
+    const sheet = nodecg.bundleConfig.vibesResponseSheetID;
+    const tabsArray = nodecg.bundleConfig.vibesResponseSheetTabs;
+
+    tabsArray.forEach((tab) => {
+      const url = `https://sheets.googleapis.com/v4/spreadsheets/${sheet}/values/${tab}?majorDimension=COLUMNS&alt=json&key=${apiKey}`;
+
+      get(url, (res) => {
+        const { statusCode } = res;
+        const contentType = res.headers['content-type'];
+
+        let error;
+        // Any 2xx status code signals a successful response but
+        // here we're only checking for 200.
+        if (statusCode !== 200) {
+          error = new Error(`Request Failed with Status Code: ${statusCode}`);
+        } else if (!/^application\/json/.test(contentType)) {
+          error = new Error(
+            `Invalid content-type: Expected application/json but received ${contentType}`
+          );
+        }
+        if (error) {
+          nodecg.sendMessage('console', { type: 'error', msg: error.message });
+          // Consume response data to free up memory
+          res.resume();
+          return;
+        }
+
+        res.setEncoding('utf8');
+        let rawData = '';
+        res.on('data', (chunk) => {
+          rawData += chunk;
+        });
+        res.on('end', () => {
+          try {
+            const parsedData = JSON.parse(rawData);
+
+            if (parsedData.values[0][0] !== 'unordered') {
+              responses[tab] = {};
+              parsedData.values.forEach((element) => {
+                const key = element.shift();
+                const filteredItems = element.filter((n) => n);
+                responses[tab][key] = filteredItems;
+              });
+            } else {
+              parsedData.values[0].shift();
+              const filteredItems = parsedData.values[0].filter((n) => n);
+              responses[tab] = filteredItems;
+            }
+            vibesReps.responses.value = responses;
+          } catch (e) {
+            nodecg.sendMessage('console', { type: 'error', msg: e.message });
+          }
+        });
+      }).on('error', (e) => {
+        nodecg.sendMessage('console', { type: 'error', msg: e.message });
+      });
+    });
+    return true;
+  }
+  // else
+  nodecg.sendMessage('console', {
+    type: 'error',
+    msg: `[VibeCheck] Couldn't get responses from Google Sheets`,
+  });
+  return false;
+}
+
 /**
  * Rolls 1-20 and selects a random response in a range
  * @param {string} user
  * @returns a string ready to be sent to a chat
  */
 export function getVibeCheck(user) {
+  const nodecg = getContext();
   const roll = getRandomNumber(1, 20);
-  const randomMessage = getRandomNumber(0, 3);
 
   updateVibesData(user, roll);
 
-  const article = `${roll === 8 || roll === 11 || roll === 18 ? 'an' : 'a'}`;
+  const responsesRep = vibesReps.responses.value;
+  const eventIndex = getRandomNumber(0, responsesRep.events.length);
+  const monsterIndex = getRandomNumber(0, responsesRep.monsters.length);
+  const event = responsesRep.events[eventIndex];
 
-  const monsters = [
-    'a Shambling Mound',
-    'an Owlbear',
-    'a Purple Worm',
-    'a Gelatinous Cube',
-    'a Dragon',
-    'a Tarrasque',
-    'a Displacer Beast',
-  ];
-  const planes = [
-    'the Astral Plane',
-    'a warehouse in the middle of nowhere',
-    'Cleveland, Ohio',
-    'the Abyss',
-    'the Feywild',
-    'Pandemonium',
-  ];
+  let actionSet;
+  let placeSet;
+  let monster = responsesRep.monsters[monsterIndex];
 
-  const responses = [
-    // roll = 1
-    [
-      `${user} rolled a [1] on their vibe check :(`,
-      `quick, send <3 to ${user}! their vibe check was a 1`,
-      `${user} rolled a [1] on their vibe check and was tragically devoured by ${
-        monsters[getRandomNumber(0, monsters.length - 1)]
-      }. you hate to see it`,
-      `${user} critically fails the vibe check and is banished to ${
-        planes[getRandomNumber(0, planes.length - 1)]
-      }.`,
-    ],
-    // 2 <= roll <= 5
-    [
-      `${user} rolled a [${roll}] for their vibes! it could be worse (but not much)`,
-      `look on the bright side ${user}, a [${roll}] is better than a 1`,
-      `how about a [${roll}], ${user}? that's not the worst thing in the world`,
-      `${user}, your vibe check is a [${roll}]! at least you didn't roll a 1. sometimes ${
-        monsters[getRandomNumber(0, monsters.length - 1)]
-      } eats you when you roll a 1`,
-    ],
-    // 6 <= roll <= 10
-    [
-      `hey ${user}! you rolled ${article} [${roll}], but who cares what a robot thinks `,
-      `${user}, it's not a bad day. your vibe check is ${article} [${roll}]`,
-      `[${roll}]! i've seen worse vibes, ${user}`,
-      `${user} rolled ${article} [${roll}] for their vibes today`,
-    ],
-    // 11 <= roll <= 15
-    [
-      `hey ${user}! [${roll}]! that's pretty good`,
-      `${user}, it's a good day. your vibe check is ${article} [${roll}]`,
-      `[${roll}]! nice vibes, ${user}`,
-      `${user} rolled ${article} [${roll}] for their vibes today!`,
-    ],
-    // 15 <= roll <= 19
-    [
-      `hey ${user}! [${roll}]! nice!`,
-      `${user}, it's a great day! your vibe check is [${roll}]`,
-      `[${roll}]! well done, ${user}`,
-      `${user} rolled [${roll}] for their vibes today! very nice`,
-    ],
-    // roll = 20
-    [
-      `a nat [20] vibe check! well done, ${user}!`,
-      `${user} rolls a nat [20] on their vibe check! they become the temporary ruler of ${
-        planes[getRandomNumber(0, planes.length - 1)]
-      }.`,
-      `it's a beautiful day! that's a big ol' nat [20] there, ${user}`,
-      `${user} rolled a nat [20] for their vibes. everyone becomes deeply envious.`,
-    ],
-  ];
+  switch (monster.charAt(0)) {
+    case 'A':
+    case 'E':
+    case 'I':
+    case 'O':
+    case 'U':
+      monster = `an ${monster}`;
+      break;
+    default:
+      monster = `a ${monster}`;
+      break;
+  }
 
+  // roll = 20
+  // HIGHEST
   if (roll === 20) {
-    return `${responses[5][randomMessage]}`;
+    actionSet = 'highest';
+    placeSet = 'good';
   }
-  if (roll > 14) {
-    return `${responses[4][randomMessage]}`;
+  // roll = 17-19
+  // HIGHER
+  if (roll > 16) {
+    actionSet = 'higher';
+    placeSet = 'good';
   }
-  if (roll > 9) {
-    return `${responses[3][randomMessage]}`;
+  // roll = 14-16
+  // HIGH
+  if (roll > 13) {
+    actionSet = 'high';
+    placeSet = 'good';
   }
+  // roll = 11-13
+  // NEUTRALHIGH
+  if (roll > 10) {
+    actionSet = 'neutralhigh';
+    placeSet = 'neutral';
+  }
+  // roll = 8-10
+  // NEUTRALLOW
+  if (roll > 7) {
+    actionSet = 'neutralow';
+    placeSet = 'neutral';
+  }
+  // roll = 5-7
+  // LOW
   if (roll > 4) {
-    return `${responses[2][randomMessage]}`;
+    actionSet = 'low';
+    placeSet = 'bad';
   }
+  // roll = 2-4
+  // LOWER
   if (roll > 1) {
-    return `${responses[1][randomMessage]}`;
+    actionSet = 'lower';
+    placeSet = 'bad';
   }
-  return `${responses[0][randomMessage]}`;
+  // roll = 1
+  // LOWEST
+  if (roll === 1) {
+    actionSet = 'lowest';
+    placeSet = 'bad';
+  }
+
+  const placeIndex = getRandomNumber(0, placeSet.length);
+  const actionIndex = getRandomNumber(0, actionSet.length);
+  const place = responsesRep.places[placeSet][placeIndex];
+  let action = responsesRep.actions[actionSet][actionIndex];
+
+  try {
+    nodecg.sendMessage('console', { type: 'error', msg: `action: ${action}` });
+    nodecg.sendMessage('console', {
+      type: 'error',
+      msg: `actionSet: ${actionSet}`,
+    });
+    nodecg.sendMessage('console', {
+      type: 'error',
+      msg: `actionIndex: ${actionIndex}`,
+    });
+
+    action = action.replace(/MONSTER/g, monster);
+    action = action.replace(/PLACE/g, place);
+    action = action.replace(/EVENT/g, event);
+
+    return `[${roll}] ${user} has ${action}!`;
+  } catch (e) {
+    nodecg.sendMessage('console', { type: 'error', msg: e.message });
+    nodecg.sendMessage('console', { type: 'error', msg: `action: ${action}` });
+    nodecg.sendMessage('console', {
+      type: 'error',
+      msg: `actionSet: ${actionSet}`,
+    });
+    nodecg.sendMessage('console', {
+      type: 'error',
+      msg: `actionIndex: ${actionIndex}`,
+    });
+  }
+
+  return null;
 }

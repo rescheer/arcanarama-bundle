@@ -1,5 +1,10 @@
 import { getContext } from './util/nodecg-api-context';
 
+/*
+Usage:
+nodecg.sendMessage('console', {type, msg});
+*/
+
 function debugHandler(data) {
   const nodecg = getContext();
 
