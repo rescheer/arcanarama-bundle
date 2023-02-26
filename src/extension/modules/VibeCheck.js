@@ -1,5 +1,5 @@
-import { get } from 'https';
 import { getContext } from '../util/nodecg-api-context';
+import getSheetJSON from './GSheets';
 
 const vibesReps = {};
 
@@ -8,11 +8,21 @@ export function initVibes(nodecg) {
     defaultValue: [],
     persistent: false,
   });
-
+  const vibesDataPersistent = nodecg.Replicant('vibesDataPersistent');
   const vibesResponses = nodecg.Replicant('vibesResponses');
+  const vibesStatus = nodecg.Replicant('vibesStatus', {
+    defaultValue: { updateStatus: ['none', ''] },
+    persistent: false,
+  });
 
   vibesReps.data = vibesData;
+  vibesReps.persistent = vibesDataPersistent;
   vibesReps.responses = vibesResponses;
+  vibesReps.status = vibesStatus;
+}
+
+function setStatus(key, value) {
+  vibesReps.status.value[key] = value;
 }
 
 /**
@@ -25,104 +35,36 @@ export function getRandomNumber(min, max) {
   return Math.floor(Math.random() * (max - min + 1)) + min;
 }
 
-/**
- * Adds a vibecheck to the replicant while avoiding duplicate rolls from one user
- * @param {string} user
- * @param {number} roll
- */
-function updateVibesData(user, roll) {
-  if (typeof user === 'string' && typeof roll === 'number') {
-    const data = { user, roll };
+async function updateReplicantFromJSON() {
+  const nodecg = getContext();
+  const sheetId = nodecg.bundleConfig.vibesSheet.id;
+  const tabNames = nodecg.bundleConfig.vibesSheet.tabs;
+  let responses = {};
 
-    // This is how we can use the Replicants stored in the global
-    // object. Destructuring won't work.
-    if (typeof vibesReps.data.value === 'object') {
-      vibesReps.data.value.forEach((el, index) => {
-        if (el.user === user) {
-          vibesReps.data.value.splice(index, 1);
-        }
-      });
-      vibesReps.data.value.push(data);
-    }
+  try {
+    responses = await getSheetJSON(sheetId, tabNames);
+
+    vibesReps.responses.value = responses;
+  } catch (e) {
+    nodecg.sendMessage('console', {
+      type: 'error',
+      msg: `Function: [updateReplicantFromJSON] ${e.message}`,
+    });
   }
 }
 
-export function getResponsesFromDrive() {
+export function refreshVibeResponses() {
   const nodecg = getContext();
-
-  const responses = {};
-
-  if (
-    nodecg?.bundleConfig?.googleAPIKey &&
-    nodecg?.bundleConfig?.vibesResponseSheetID &&
-    nodecg?.bundleConfig?.vibesResponseSheetTabs
-  ) {
-    const apiKey = nodecg.bundleConfig.googleAPIKey;
-    const sheet = nodecg.bundleConfig.vibesResponseSheetID;
-    const tabsArray = nodecg.bundleConfig.vibesResponseSheetTabs;
-
-    tabsArray.forEach((tab) => {
-      const url = `https://sheets.googleapis.com/v4/spreadsheets/${sheet}/values/${tab}?majorDimension=COLUMNS&alt=json&key=${apiKey}`;
-
-      get(url, (res) => {
-        const { statusCode } = res;
-        const contentType = res.headers['content-type'];
-
-        let error;
-        // Any 2xx status code signals a successful response but
-        // here we're only checking for 200.
-        if (statusCode !== 200) {
-          error = new Error(`Request Failed with Status Code: ${statusCode}`);
-        } else if (!/^application\/json/.test(contentType)) {
-          error = new Error(
-            `Invalid content-type: Expected application/json but received ${contentType}`
-          );
-        }
-        if (error) {
-          nodecg.sendMessage('console', { type: 'error', msg: error.message });
-          // Consume response data to free up memory
-          res.resume();
-          return;
-        }
-
-        res.setEncoding('utf8');
-        let rawData = '';
-        res.on('data', (chunk) => {
-          rawData += chunk;
-        });
-        res.on('end', () => {
-          try {
-            const parsedData = JSON.parse(rawData);
-
-            if (parsedData.values[0][0] !== 'unordered') {
-              responses[tab] = {};
-              parsedData.values.forEach((element) => {
-                const key = element.shift();
-                const filteredItems = element.filter((n) => n);
-                responses[tab][key] = filteredItems;
-              });
-            } else {
-              parsedData.values[0].shift();
-              const filteredItems = parsedData.values[0].filter((n) => n);
-              responses[tab] = filteredItems;
-            }
-            vibesReps.responses.value = responses;
-          } catch (e) {
-            nodecg.sendMessage('console', { type: 'error', msg: e.message });
-          }
-        });
-      }).on('error', (e) => {
-        nodecg.sendMessage('console', { type: 'error', msg: e.message });
+  vibesReps.status.value.updateStatus = ['updating', 'Updating...'];
+  updateReplicantFromJSON()
+    .then(() => setStatus('updateStatus', ['success', 'Success']))
+    .catch((e) => {
+      setStatus('updateStatus', ['failure', `Update Failed: ${e.message}`]);
+      nodecg.sendMessage('console', {
+        type: 'error',
+        msg: `Function: [refreshVibeResponses] ${e.message}`,
       });
     });
-    return true;
-  }
-  // else
-  nodecg.sendMessage('console', {
-    type: 'error',
-    msg: `[VibeCheck] Couldn't get responses from Google Sheets`,
-  });
-  return false;
 }
 
 /**
@@ -131,10 +73,22 @@ export function getResponsesFromDrive() {
  * @returns a string ready to be sent to a chat
  */
 export function getVibeCheck(user) {
-  const nodecg = getContext();
   const roll = getRandomNumber(1, 20);
 
-  updateVibesData(user, roll);
+  // Update the temporary replicant
+  vibesReps.data.value.forEach((el, index) => {
+    if (el.user === user) {
+      vibesReps.data.value.splice(index, 1);
+    }
+  });
+  vibesReps.data.value.push({ user, roll });
+
+  // Update the permanent replicant
+  if (!vibesReps.vibesDataPersistent.value[user]) {
+    vibesReps.vibesDataPersistent.value[user] = {};
+  }
+  vibesReps.vibesDataPersistent.value[user].total += roll;
+  vibesReps.vibesDataPersistent.value[user].numRolls += 1;
 
   const responsesRep = vibesReps.responses.value;
   const eventIndex = getRandomNumber(0, responsesRep.events.length);
@@ -158,88 +112,64 @@ export function getVibeCheck(user) {
       break;
   }
 
-  // roll = 20
-  // HIGHEST
-  if (roll === 20) {
-    actionSet = 'highest';
-    placeSet = 'good';
-  }
-  // roll = 17-19
-  // HIGHER
-  if (roll > 16) {
-    actionSet = 'higher';
-    placeSet = 'good';
-  }
-  // roll = 14-16
-  // HIGH
-  if (roll > 13) {
-    actionSet = 'high';
-    placeSet = 'good';
-  }
-  // roll = 11-13
-  // NEUTRALHIGH
-  if (roll > 10) {
-    actionSet = 'neutralhigh';
-    placeSet = 'neutral';
-  }
-  // roll = 8-10
-  // NEUTRALLOW
-  if (roll > 7) {
-    actionSet = 'neutralow';
-    placeSet = 'neutral';
-  }
-  // roll = 5-7
-  // LOW
-  if (roll > 4) {
-    actionSet = 'low';
-    placeSet = 'bad';
-  }
-  // roll = 2-4
-  // LOWER
-  if (roll > 1) {
-    actionSet = 'lower';
-    placeSet = 'bad';
-  }
-  // roll = 1
-  // LOWEST
-  if (roll === 1) {
-    actionSet = 'lowest';
-    placeSet = 'bad';
+  switch (roll) {
+    case 20:
+      actionSet = 'highest';
+      placeSet = 'good';
+      break;
+    case 19:
+    case 18:
+    case 17:
+      actionSet = 'higher';
+      placeSet = 'good';
+      break;
+    case 16:
+    case 15:
+    case 14:
+      actionSet = 'high';
+      placeSet = 'good';
+      break;
+    case 13:
+    case 12:
+    case 11:
+      actionSet = 'neutralhigh';
+      placeSet = 'neutral';
+      break;
+    case 10:
+    case 9:
+    case 8:
+      actionSet = 'neutralow';
+      placeSet = 'neutral';
+      break;
+    case 7:
+    case 6:
+    case 5:
+      actionSet = 'low';
+      placeSet = 'bad';
+      break;
+    case 4:
+    case 3:
+    case 2:
+      actionSet = 'lower';
+      placeSet = 'bad';
+      break;
+    default:
+      actionSet = 'lowest';
+      placeSet = 'bad';
+      break;
   }
 
   const placeIndex = getRandomNumber(0, placeSet.length);
   const actionIndex = getRandomNumber(0, actionSet.length);
   const place = responsesRep.places[placeSet][placeIndex];
-  let action = responsesRep.actions[actionSet][actionIndex];
+  const action = responsesRep.actions[actionSet][actionIndex];
 
-  try {
-    nodecg.sendMessage('console', { type: 'error', msg: `action: ${action}` });
-    nodecg.sendMessage('console', {
-      type: 'error',
-      msg: `actionSet: ${actionSet}`,
-    });
-    nodecg.sendMessage('console', {
-      type: 'error',
-      msg: `actionIndex: ${actionIndex}`,
-    });
+  let message = `[${roll}] ${user} has ${action}!`;
 
-    action = action.replace(/MONSTER/g, monster);
-    action = action.replace(/PLACE/g, place);
-    action = action.replace(/EVENT/g, event);
+  message = message
+    .replace(/MONSTER/g, monster)
+    .replace(/PLACE/g, place)
+    .replace(/EVENT/g, event);
 
-    return `[${roll}] ${user} has ${action}!`;
-  } catch (e) {
-    nodecg.sendMessage('console', { type: 'error', msg: e.message });
-    nodecg.sendMessage('console', { type: 'error', msg: `action: ${action}` });
-    nodecg.sendMessage('console', {
-      type: 'error',
-      msg: `actionSet: ${actionSet}`,
-    });
-    nodecg.sendMessage('console', {
-      type: 'error',
-      msg: `actionIndex: ${actionIndex}`,
-    });
-  }
-
-  return null;
+  return message;
 }
