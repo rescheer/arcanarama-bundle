@@ -3,13 +3,21 @@ import getSheetJSON from './GSheets';
 
 const vibesReps = {};
 
+/**
+ * Declares needed replicants and stores them for later use
+ * @param {Object} nodecg - The nodecg context to use for initializing replicants
+ */
 export function initVibes(nodecg) {
   const vibesData = nodecg.Replicant('vibesData', {
     defaultValue: [],
     persistent: false,
   });
-  const vibesDataPersistent = nodecg.Replicant('vibesDataPersistent');
-  const vibesResponses = nodecg.Replicant('vibesResponses');
+  const vibesDataPersistent = nodecg.Replicant('vibesDataPersistent', {
+    defaultValue: {},
+  });
+  const vibesResponses = nodecg.Replicant('vibesResponses', {
+    defaultValue: {},
+  });
   const vibesStatus = nodecg.Replicant('vibesStatus', {
     defaultValue: { updateStatus: ['none', ''] },
     persistent: false,
@@ -21,6 +29,11 @@ export function initVibes(nodecg) {
   vibesReps.status = vibesStatus;
 }
 
+/**
+ * Updates the Status replicant
+ * @param {string} key - The key in the status replicant to change
+ * @param {string} value - New value
+ */
 function setStatus(key, value) {
   vibesReps.status.value[key] = value;
 }
@@ -35,6 +48,9 @@ export function getRandomNumber(min, max) {
   return Math.floor(Math.random() * (max - min + 1)) + min;
 }
 
+/**
+ * Awaits JSON data from GSheets, then handles the data
+ */
 async function updateReplicantFromJSON() {
   const nodecg = getContext();
   const sheetId = nodecg.bundleConfig.vibesSheet.id;
@@ -53,6 +69,9 @@ async function updateReplicantFromJSON() {
   }
 }
 
+/**
+ * Attempts to update the responses replicant while tracking its own progress in the status replicant
+ */
 export function refreshVibeResponses() {
   const nodecg = getContext();
   vibesReps.status.value.updateStatus = ['updating', 'Updating...'];
@@ -75,6 +94,13 @@ export function refreshVibeResponses() {
 export function getVibeCheck(user) {
   const roll = getRandomNumber(1, 20);
 
+  // Responses from Replicant
+  const { actions, places, events, monsters } = vibesReps.responses.value;
+
+  // Tiered items
+  let actionSet;
+  let placeSet;
+
   // Update the temporary replicant
   vibesReps.data.value.forEach((el, index) => {
     if (el.user === user) {
@@ -84,34 +110,13 @@ export function getVibeCheck(user) {
   vibesReps.data.value.push({ user, roll });
 
   // Update the permanent replicant
-  if (!vibesReps.vibesDataPersistent.value[user]) {
-    vibesReps.vibesDataPersistent.value[user] = {};
+  if (!vibesReps.persistent.value[user]) {
+    vibesReps.persistent.value[user] = {};
   }
-  vibesReps.vibesDataPersistent.value[user].total += roll;
-  vibesReps.vibesDataPersistent.value[user].numRolls += 1;
+  vibesReps.persistent.value[user].total += roll;
+  vibesReps.persistent.value[user].numRolls += 1;
 
-  const responsesRep = vibesReps.responses.value;
-  const eventIndex = getRandomNumber(0, responsesRep.events.length);
-  const monsterIndex = getRandomNumber(0, responsesRep.monsters.length);
-  const event = responsesRep.events[eventIndex];
-
-  let actionSet;
-  let placeSet;
-  let monster = responsesRep.monsters[monsterIndex];
-
-  switch (monster.charAt(0)) {
-    case 'A':
-    case 'E':
-    case 'I':
-    case 'O':
-    case 'U':
-      monster = `an ${monster}`;
-      break;
-    default:
-      monster = `a ${monster}`;
-      break;
-  }
-
+  // Set tiers based on roll
   switch (roll) {
     case 20:
       actionSet = 'highest';
@@ -138,7 +143,7 @@ export function getVibeCheck(user) {
     case 10:
     case 9:
     case 8:
-      actionSet = 'neutralow';
+      actionSet = 'neutrallow';
       placeSet = 'neutral';
       break;
     case 7:
@@ -159,13 +164,43 @@ export function getVibeCheck(user) {
       break;
   }
 
-  const placeIndex = getRandomNumber(0, placeSet.length);
-  const actionIndex = getRandomNumber(0, actionSet.length);
-  const place = responsesRep.places[placeSet][placeIndex];
-  const action = responsesRep.actions[actionSet][actionIndex];
+  const eventIndex = getRandomNumber(0, events.length - 1);
+  const monsterIndex = getRandomNumber(0, monsters.length - 1);
+  const placeIndex = getRandomNumber(0, places[placeSet].length - 1);
+  const actionIndex = getRandomNumber(0, actions[actionSet].length - 1);
+
+  let event;
+  let monster;
+  let place;
+  let action;
+
+  try {
+    event = events[eventIndex];
+    monster = monsters[monsterIndex];
+    place = places[placeSet][placeIndex];
+    action = actions[actionSet][actionIndex];
+  } catch (e) {
+    getContext().log.error(e);
+    return '';
+  }
+
+  // Dirty monster article assignment
+  switch (monster.charAt(0)) {
+    case 'A':
+    case 'E':
+    case 'I':
+    case 'O':
+    case 'U':
+      monster = `an ${monster}`;
+      break;
+    default:
+      monster = `a ${monster}`;
+      break;
+  }
 
   let message = `[${roll}] ${user} has ${action}!`;
 
+  // Replace all keywords
   message = message
     .replace(/MONSTER/g, monster)
     .replace(/PLACE/g, place)
