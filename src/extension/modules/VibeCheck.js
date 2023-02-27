@@ -1,33 +1,8 @@
+/* eslint-disable prefer-destructuring */
 import { getContext } from '../util/nodecg-api-context';
 import getSheetJSON from './GSheets';
 
 const vibesReps = {};
-
-/**
- * Declares needed replicants and stores them for later use
- * @param {Object} nodecg - The nodecg context to use for initializing replicants
- */
-export function initVibes(nodecg) {
-  const vibesData = nodecg.Replicant('vibesData', {
-    defaultValue: [],
-    persistent: false,
-  });
-  const vibesDataPersistent = nodecg.Replicant('vibesDataPersistent', {
-    defaultValue: {},
-  });
-  const vibesResponses = nodecg.Replicant('vibesResponses', {
-    defaultValue: {},
-  });
-  const vibesStatus = nodecg.Replicant('vibesStatus', {
-    defaultValue: { updateStatus: ['none', ''] },
-    persistent: false,
-  });
-
-  vibesReps.data = vibesData;
-  vibesReps.persistent = vibesDataPersistent;
-  vibesReps.responses = vibesResponses;
-  vibesReps.status = vibesStatus;
-}
 
 /**
  * Updates the Status replicant
@@ -48,6 +23,48 @@ export function getRandomNumber(min, max) {
   return Math.floor(Math.random() * (max - min + 1)) + min;
 }
 
+function replaceAllRands(msg) {
+  let text = msg;
+
+  function isNumeric(str) {
+    if (typeof str !== 'string') return false;
+    return !Number.isNaN(str) && !Number.isNaN(parseFloat(str));
+  }
+
+  while (text.search(/\$RAND/i) !== -1) {
+    let result;
+    const pos = text.search(/\$RAND/i);
+    const endPos = text.indexOf(')', pos);
+
+    if (text.charAt(pos + '$RAND'.length) === '(' && endPos !== -1) {
+      const argString = text.slice(pos + '$RAND'.length + 1, endPos);
+      const argArray = argString.split(',').map((el) => el.trim());
+
+      if (argArray.length === 2 && argArray.every((el) => isNumeric(el))) {
+        result = getRandomNumber(+argArray[0], +argArray[1]);
+      }
+    }
+
+    // Bad Syntax
+    if (!result) {
+      getContext().sendMessage('console', {
+        type: 'warn',
+        msg: `[VibeCheck] Bad $RAND(min,max) syntax in message: '${msg}'. Returning default message`,
+      });
+
+      return (
+        '$USER somehow triggered an error in the vibecheck code, ' +
+        'causing this boring default message to appear!'
+      );
+    }
+    // Replace the substring
+    const substrToReplace = text.slice(pos, endPos + 1);
+    text = text.replace(substrToReplace, result);
+  }
+
+  return text;
+}
+
 /**
  * Awaits JSON data from GSheets, then handles the data
  */
@@ -61,11 +78,13 @@ async function updateReplicantFromJSON() {
     responses = await getSheetJSON(sheetId, tabNames);
 
     vibesReps.responses.value = responses;
+    return true;
   } catch (e) {
     nodecg.sendMessage('console', {
       type: 'error',
       msg: `Function: [updateReplicantFromJSON] ${e.message}`,
     });
+    return e;
   }
 }
 
@@ -74,16 +93,57 @@ async function updateReplicantFromJSON() {
  */
 export function refreshVibeResponses() {
   const nodecg = getContext();
-  vibesReps.status.value.updateStatus = ['updating', 'Updating...'];
+  vibesReps.status.value.update = 'updating';
   updateReplicantFromJSON()
-    .then(() => setStatus('updateStatus', ['success', 'Success']))
+    .then(() => setStatus('update', 'success'))
     .catch((e) => {
-      setStatus('updateStatus', ['failure', `Update Failed: ${e.message}`]);
+      setStatus('update', 'failure');
       nodecg.sendMessage('console', {
         type: 'error',
         msg: `Function: [refreshVibeResponses] ${e.message}`,
       });
     });
+}
+
+/**
+ * Declares replicants and gets responses from GSheets
+ * @param {Object} nodecg - The nodecg context to use for initializing replicants
+ */
+export function initVibes(nodecg) {
+  const vibesData = nodecg.Replicant('vibesData', {
+    defaultValue: [],
+    persistent: false,
+  });
+  const vibesDataPersistent = nodecg.Replicant('vibesDataPersistent', {
+    defaultValue: {},
+  });
+  const vibesResponses = nodecg.Replicant('vibesResponses', {
+    defaultValue: {},
+  });
+  const vibesStatus = nodecg.Replicant('vibesStatus', {
+    defaultValue: { update: 'initializing' },
+    persistent: false,
+  });
+
+  vibesReps.data = vibesData;
+  vibesReps.persistent = vibesDataPersistent;
+  vibesReps.responses = vibesResponses;
+  vibesReps.status = vibesStatus;
+
+  refreshVibeResponses();
+
+  vibesStatus.on('change', (newValue) => {
+    switch (newValue.update) {
+      case 'success':
+        nodecg.log.info('[Vibecheck] Module loaded.');
+        break;
+      case 'failure':
+        nodecg.log.error('[Vibecheck] Module failed to load.');
+        break;
+      default:
+        break;
+    }
+  });
 }
 
 /**
@@ -94,12 +154,28 @@ export function refreshVibeResponses() {
 export function getVibeCheck(user) {
   const roll = getRandomNumber(1, 20);
 
+  if (vibesReps.status.value.update !== 'success') {
+    return '';
+  }
+
   // Responses from Replicant
-  const { actions, places, events, monsters } = vibesReps.responses.value;
+  const { actions, places, events, monsters, foods } =
+    vibesReps.responses.value;
 
   // Tiered items
   let actionSet;
   let placeSet;
+  const actionSetTiers = [
+    'lowest',
+    'lower',
+    'low',
+    'neutrallow',
+    'neutralhigh',
+    'high',
+    'higher',
+    'highest',
+  ];
+  const placeSetTiers = ['bad', 'neutral', 'good'];
 
   // Update the temporary replicant
   vibesReps.data.value.forEach((el, index) => {
@@ -111,7 +187,7 @@ export function getVibeCheck(user) {
 
   // Update the permanent replicant
   if (!vibesReps.persistent.value[user]) {
-    vibesReps.persistent.value[user] = {};
+    vibesReps.persistent.value[user] = { total: 0, numRolls: 0 };
   }
   vibesReps.persistent.value[user].total += roll;
   vibesReps.persistent.value[user].numRolls += 1;
@@ -119,64 +195,73 @@ export function getVibeCheck(user) {
   // Set tiers based on roll
   switch (roll) {
     case 20:
-      actionSet = 'highest';
-      placeSet = 'good';
+      actionSet = actionSetTiers[7];
+      placeSet = placeSetTiers[2];
       break;
     case 19:
     case 18:
     case 17:
-      actionSet = 'higher';
-      placeSet = 'good';
+      actionSet = actionSetTiers[6];
+      placeSet = placeSetTiers[2];
       break;
     case 16:
     case 15:
     case 14:
-      actionSet = 'high';
-      placeSet = 'good';
+      actionSet = actionSetTiers[5];
+      placeSet = placeSetTiers[2];
       break;
     case 13:
     case 12:
     case 11:
-      actionSet = 'neutralhigh';
-      placeSet = 'neutral';
+      actionSet = actionSetTiers[4];
+      placeSet = placeSetTiers[1];
       break;
     case 10:
     case 9:
     case 8:
-      actionSet = 'neutrallow';
-      placeSet = 'neutral';
+      actionSet = actionSetTiers[3];
+      placeSet = placeSetTiers[1];
       break;
     case 7:
     case 6:
     case 5:
-      actionSet = 'low';
-      placeSet = 'bad';
+      actionSet = actionSetTiers[2];
+      placeSet = placeSetTiers[0];
       break;
     case 4:
     case 3:
     case 2:
-      actionSet = 'lower';
-      placeSet = 'bad';
+      actionSet = actionSetTiers[1];
+      placeSet = placeSetTiers[0];
       break;
     default:
-      actionSet = 'lowest';
-      placeSet = 'bad';
+      actionSet = actionSetTiers[0];
+      placeSet = placeSetTiers[0];
       break;
   }
 
   const eventIndex = getRandomNumber(0, events.length - 1);
-  const monsterIndex = getRandomNumber(0, monsters.length - 1);
+  const foodsIndex = getRandomNumber(0, foods.length - 1);
+  const monsterIndex = getRandomNumber(0, monsters.singular.length - 1);
+  const monsterPluralIndex = getRandomNumber(0, monsters.plural.length - 1);
   const placeIndex = getRandomNumber(0, places[placeSet].length - 1);
   const actionIndex = getRandomNumber(0, actions[actionSet].length - 1);
 
   let event;
+  let food;
   let monster;
+  let monsterPlural;
   let place;
   let action;
+  const rollArticle = `${
+    roll === 8 || roll === 11 || roll === 18 ? 'an' : 'a'
+  }`;
 
   try {
     event = events[eventIndex];
-    monster = monsters[monsterIndex];
+    food = foods[foodsIndex];
+    monster = monsters.singular[monsterIndex];
+    monsterPlural = monsters.plural[monsterPluralIndex];
     place = places[placeSet][placeIndex];
     action = actions[actionSet][actionIndex];
   } catch (e) {
@@ -198,13 +283,25 @@ export function getVibeCheck(user) {
       break;
   }
 
-  let message = `[${roll}] ${user} has ${action}!`;
+  // Remove whitespace from action and put it in a new variable
+  let message = action.trim();
+
+  // Replace all the $RANDs in message with random numbers
+  replaceAllRands(message);
 
   // Replace all keywords
   message = message
-    .replace(/MONSTER/g, monster)
-    .replace(/PLACE/g, place)
-    .replace(/EVENT/g, event);
+    .replace(/\$USER/gi, `@${user}`)
+    .replace(/\$ROLL/gi, roll)
+    .replace(/\$ROLLARTICLE/gi, rollArticle)
+    .replace(/\$MONSTERS/gi, monsterPlural)
+    .replace(/\$MONSTER/gi, monster)
+    .replace(/\$FOOD/gi, food)
+    .replace(/\$PLACE/gi, place)
+    .replace(/\$EVENT/gi, event);
 
-  return message;
+  // Make the first character of message is uppercase
+  message[0] = message[0].toUpperCase;
+
+  return `[${roll}] ${message}`;
 }

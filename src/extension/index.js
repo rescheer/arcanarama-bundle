@@ -1,7 +1,7 @@
 /* eslint-disable no-unused-vars */
 import { setContext } from './util/nodecg-api-context';
 import { initGiveaway } from './modules/Giveaway';
-import { initVibes, refreshVibeResponses } from './modules/VibeCheck';
+import { initVibes } from './modules/VibeCheck';
 import ChatListener from './ChatListener';
 import DashboardListener from './DashboardListener';
 import debugListener from './debugListener';
@@ -15,7 +15,6 @@ export default function (nodecg) {
   });
 
   initVibes(nodecg);
-  refreshVibeResponses();
   initGiveaway(nodecg);
   ChatListener(nodecg);
   DashboardListener(nodecg);
