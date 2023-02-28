@@ -58,7 +58,7 @@
         "name": "Vibes",
         "title": "Vibes",
         "file": "vibeCheckResults.html",
-        "width": 2,
+        "fullbleed": true,
         "headerColor": "#2f3a4f"
       }
     ],

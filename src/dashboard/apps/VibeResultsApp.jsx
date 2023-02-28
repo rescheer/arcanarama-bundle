@@ -20,14 +20,18 @@ export default function VibeResultsApp(props) {
         <Table sx={{ width: 1 }} size="small" aria-label="a dense table">
           <TableBody>
             {vibesData.map((row) => (
-              <TableRow
-                key={row.user}
-                sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
-              >
-                <TableCell component="th" scope="row">
+              <TableRow key={row.user}>
+                <TableCell
+                  component="th"
+                  scope="row"
+                  align="right"
+                  sx={{ width: '25%', border: 2 }}
+                >
                   {row.user}
                 </TableCell>
-                <TableCell align="right">{row.roll}</TableCell>
+                <TableCell align="left" sx={{ border: 2 }}>
+                  {row.message}
+                </TableCell>
               </TableRow>
             ))}
           </TableBody>
