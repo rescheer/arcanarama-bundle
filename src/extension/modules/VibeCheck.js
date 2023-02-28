@@ -144,11 +144,13 @@ export function initVibes(nodecg) {
         break;
     }
   });
+  // Debug vibechecks
+  // setInterval(getVibeCheck, 10, 'testUser');
 }
 
 /**
- * Rolls 1-20 and selects a random response in a range
- * @param {string} user
+ * Rolls 1-20 and returns a randomly assembled response
+ * @param {string} user - the user requesting the vibe check
  * @returns a string ready to be sent to a chat
  */
 export function getVibeCheck(user) {
@@ -176,14 +178,6 @@ export function getVibeCheck(user) {
     'highest',
   ];
   const placeSetTiers = ['bad', 'neutral', 'good'];
-
-  // Update the temporary replicant
-  vibesReps.data.value.forEach((el, index) => {
-    if (el.user === user) {
-      vibesReps.data.value.splice(index, 1);
-    }
-  });
-  vibesReps.data.value.push({ user, roll });
 
   // Update the permanent replicant
   if (!vibesReps.persistent.value[user]) {
@@ -250,6 +244,7 @@ export function getVibeCheck(user) {
   let event;
   let food;
   let monster;
+  let aMonster;
   let monsterPlural;
   let place;
   let action;
@@ -276,10 +271,10 @@ export function getVibeCheck(user) {
     case 'I':
     case 'O':
     case 'U':
-      monster = `an ${monster}`;
+      aMonster = `an ${monster}`;
       break;
     default:
-      monster = `a ${monster}`;
+      aMonster = `a ${monster}`;
       break;
   }
 
@@ -287,21 +282,41 @@ export function getVibeCheck(user) {
   let message = action.trim();
 
   // Replace all the $RANDs in message with random numbers
-  replaceAllRands(message);
 
   // Replace all keywords
   message = message
     .replace(/\$USER/gi, `@${user}`)
+    .replace(/\$AROLL/gi, rollArticle)
     .replace(/\$ROLL/gi, roll)
-    .replace(/\$ROLLARTICLE/gi, rollArticle)
     .replace(/\$MONSTERS/gi, monsterPlural)
+    .replace(/\$AMONSTER/gi, aMonster)
     .replace(/\$MONSTER/gi, monster)
     .replace(/\$FOOD/gi, food)
     .replace(/\$PLACE/gi, place)
     .replace(/\$EVENT/gi, event);
 
-  // Make the first character of message is uppercase
-  message[0] = message[0].toUpperCase;
+  if (message.search(/\$RAND/gi)) {
+    message = replaceAllRands(message);
+  }
+
+  // Update the temporary replicant for dashboard display
+  vibesReps.data.value.forEach((el, index) => {
+    if (el.user === user) {
+      vibesReps.data.value.splice(index, 1);
+    }
+  });
+
+  // Catch the message if a keyword was not replaced for some reason
+  if (message.search(/\$/) !== -1) {
+    getContext().sendMessage('console', {
+      type: 'warn',
+      msg: `[Vibecheck] Keyword error in message: ${message}`,
+    });
+
+    message = `check out @${user} with the big ol' ${roll} vibe check`;
+  }
+
+  vibesReps.data.value.push({ user, roll, message: `[${roll}] ${message}` });
 
   return `[${roll}] ${message}`;
 }
