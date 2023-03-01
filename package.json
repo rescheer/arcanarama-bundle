@@ -76,7 +76,7 @@
   "scripts": {
     "watch": "parcel watch --public-url ./",
     "build": "parcel build --public-url ./",
-    "start": "npm --prefix ./../../ run start"
+    "start": "parcel build --public-url ./ && npm --prefix ./../../ run start"
   },
   "targets": {
     "dashboard": {
