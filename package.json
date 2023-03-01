@@ -1,6 +1,6 @@
 {
   "name": "arcanarama-bundle",
-  "version": "0.10.1",
+  "version": "0.11.0",
   "description": "A NodeCG Bundle built for the Arcanarama Twitch livestream.",
   "homepage": "https://github.com/rescheer/arcanarama-bundle",
   "author": {
@@ -58,7 +58,7 @@
         "name": "Vibes",
         "title": "Vibes",
         "file": "vibeCheckResults.html",
-        "width": 2,
+        "fullbleed": true,
         "headerColor": "#2f3a4f"
       }
     ],
@@ -123,6 +123,8 @@
     "@emotion/react": "^11.10.0",
     "@emotion/styled": "^11.10.0",
     "@mui/material": "^5.10.0",
+    "axios": "^1.3.4",
+    "beyond-importer": "^0.0.0",
     "flux": "^4.0.3",
     "gsap": "^3.10.4",
     "nodecg-io-core": "^0.2.0",
