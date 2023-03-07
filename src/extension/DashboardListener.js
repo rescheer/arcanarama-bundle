@@ -1,6 +1,7 @@
 import * as Giveaway from './modules/Giveaway';
 import { getContext } from './util/nodecg-api-context';
 import { getChatClient, getChatChannel } from './util/chatclient-context';
+import Character from './modules/classes/Character';
 
 function dashboardGiveawayHandler(data) {
   const nodecg = getContext();
@@ -57,6 +58,36 @@ function dashboardGiveawayHandler(data) {
   }
 }
 
+function dashboardCharacterHandler(data, ack) {
+  const nodecg = getContext();
+  const charactersRep = nodecg.Replicant('characters');
+
+  const command = Object.keys(data)[0];
+  const character = new Character(
+    data[command].name,
+    data[command].ddbID,
+    data[command].player
+  );
+  let isInvalid = false;
+
+  charactersRep.value.forEach((element) => {
+    if (character.ddbID === element.ddbID) {
+      ack(new Error('A character with this D&DBeyond ID already exists.'));
+      isInvalid = true;
+    }
+  });
+
+  if (isInvalid) {
+    return;
+  }
+
+  if (ack && !ack.handled) {
+    charactersRep.value.push(character);
+    ack(null, 'Character added successfully.');
+  }
+}
+
 export default function dashboardListener(nodecg) {
   nodecg.listenFor('giveaway', dashboardGiveawayHandler);
+  nodecg.listenFor('character', dashboardCharacterHandler);
 }

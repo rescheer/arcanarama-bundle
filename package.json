@@ -60,6 +60,13 @@
         "file": "vibeCheckResults.html",
         "fullbleed": true,
         "headerColor": "#2f3a4f"
+      },
+      {
+        "name": "Tracker",
+        "title": "Tracker",
+        "file": "tracker.html",
+        "fullbleed": true,
+        "headerColor": "#2f3a4f"
       }
     ],
     "graphics": [
@@ -76,14 +83,15 @@
   "scripts": {
     "watch": "parcel watch --public-url ./",
     "build": "parcel build --public-url ./",
-    "start": "parcel build --public-url ./ && npm --prefix ./../../ run start"
+    "start": "npm --prefix ./../../ run start"
   },
   "targets": {
     "dashboard": {
       "source": [
         "src/dashboard/giveawayController.html",
         "src/dashboard/chatBox.html",
-        "src/dashboard/vibeCheckResults.html"
+        "src/dashboard/vibeCheckResults.html",
+        "src/dashboard/tracker.html"
       ],
       "context": "browser",
       "distDir": "dashboard/"
@@ -131,6 +139,7 @@
     "nodecg-io-twitch-chat": "^0.2.0",
     "prop-types": "^15.8.1",
     "react": "^18.2.0",
-    "react-dom": "^18.2.0"
+    "react-dom": "^18.2.0",
+    "use-nodecg": "^0.4.0"
   }
 }
