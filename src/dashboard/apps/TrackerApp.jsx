@@ -62,7 +62,7 @@ export default function TrackerApp(props) {
   const [tempHp, setTempHpState] = React.useState(hp.temp);
   const [tempMax, setTempMaxState] = React.useState(0);
 
-  // Propogate changes to all connected clients
+  // When another client changes the replicant, update states from it
   React.useEffect(() => {
     setCurrentHpState(characters[characterIndex].data.hp.current);
     setTempHpState(characters[characterIndex].data.hp.temp);
@@ -72,28 +72,28 @@ export default function TrackerApp(props) {
 
   function setCurrentHp(newVal) {
     setCurrentHpState(newVal);
-    character.data.hp.current = newVal;
+    characters[characterIndex].data.hp.current = newVal;
   }
 
   function setTempHp(newVal) {
     setTempHpState(newVal);
-    character.data.hp.temp = newVal;
+    characters[characterIndex].data.hp.temp = newVal;
   }
 
   function setMaxHp(newVal) {
     if (currentHp < newVal) {
       setMaxHpState(newVal);
-      character.data.hp.max = newVal;
+      characters[characterIndex].data.hp.max = newVal;
     } else {
       setMaxHpState(newVal);
-      character.data.hp.max = newVal;
+      characters[characterIndex].data.hp.max = newVal;
       setCurrentHp(newVal);
     }
   }
 
   function setTempMax(newVal) {
     setTempMaxState(newVal);
-    character.data.hp.tempMax = newVal;
+    characters[characterIndex].data.hp.tempMax = newVal;
   }
 
   const handleOpen = () => setSpeedDialOpen(true);
@@ -145,7 +145,9 @@ export default function TrackerApp(props) {
     const multiplier = e.currentTarget.value;
     let deltaHp = inputValue * multiplier;
     const oldHp = currentHp;
+    let newHp = 0;
 
+    // Process temp hp
     if (tempHp > 0 && deltaHp < 0) {
       if (Math.abs(deltaHp) > +tempHp) {
         setTempHp(0);
@@ -156,7 +158,12 @@ export default function TrackerApp(props) {
       }
     }
 
-    const newHp = +oldHp + +deltaHp;
+    // Handle healing from negative HP
+    if (+oldHp <= 0 && +deltaHp > 0) {
+      newHp = +deltaHp;
+    } else {
+      newHp = +oldHp + +deltaHp;
+    }
 
     if (newHp > maxHp) {
       setCurrentHp(maxHp);
