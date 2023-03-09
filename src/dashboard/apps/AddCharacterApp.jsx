@@ -5,6 +5,7 @@ import Icon from '@mui/material/Icon';
 import Box from '@mui/material/Box';
 import TextField from '@mui/material/TextField';
 import Button from '@mui/material/Button';
+import Typography from '@mui/material/Typography';
 
 const baseTheme = createTheme({
   palette: {
@@ -65,26 +66,50 @@ export default function AddCharacterApp(props) {
     <ThemeProvider theme={baseTheme}>
       <Box component="form" onSubmit={handleSubmit} align="center">
         <Button
-          sx={{ position: 'absolute', left: 0, mb: 4 }}
+          sx={{
+            position: 'absolute',
+            left: -3,
+            mt: 1,
+            mb: 1,
+            py: 2,
+            zIndex: 90,
+          }}
           type="button"
           id="backButton"
           variant="contained"
-          color="secondary"
+          color="primary"
+          disabled={submitDisabled}
           onClick={(event) => handleBackButtonClick(event)}
         >
           <Icon>arrow_back</Icon>
         </Button>
+        <Box sx={{ color: 'text.primary' }}>
+          <Typography
+            align="center"
+            variant="h5"
+            sx={{ position: 'relative', top: 10 }}
+          >
+            Import a Character
+          </Typography>
+          <Typography
+            align="center"
+            variant="subtitle2"
+            sx={{ position: 'relative', top: 10 }}
+          >
+            from D&DBeyond
+          </Typography>
+        </Box>
         <TextField
-          id="name"
-          name="name"
-          label="Character Name"
+          id="ddbid"
+          name="ddbid"
+          label="D&DBeyond ID"
           required
-          helperText="Letters and numbers only"
-          inputProps={{ inputMode: 'text', pattern: '^[a-zA-Z0-9]+$' }}
+          helperText="Character must be set to Public - https://www.dndbeyond.com/characters/XXXXXXXX"
+          inputProps={{ inputMode: 'text', pattern: '^[0-9]+$' }}
+          InputLabelProps={{ shrink: true }}
           color="secondary"
           variant="filled"
-          InputLabelProps={{ shrink: true }}
-          sx={{ mt: 6, mb: 1, width: 1, maxWidth: 500 }}
+          sx={{ mt: 5, mb: 3, width: 1, maxWidth: 500 }}
         />
         <br />
         <TextField
@@ -92,20 +117,7 @@ export default function AddCharacterApp(props) {
           name="player"
           label="Player Name"
           required
-          helperText="Letters and numbers only"
-          inputProps={{ inputMode: 'text', pattern: '^[a-zA-Z0-9]+$' }}
-          InputLabelProps={{ shrink: true }}
-          color="secondary"
-          variant="filled"
-          sx={{ mb: 1, width: 1, maxWidth: 500 }}
-        />
-        <br />
-        <TextField
-          id="ddbid"
-          name="ddbid"
-          label="D&DBeyond ID"
-          required
-          inputProps={{ inputMode: 'text', pattern: '^[0-9]+$' }}
+          inputProps={{ inputMode: 'text' }}
           InputLabelProps={{ shrink: true }}
           color="secondary"
           variant="filled"
@@ -114,7 +126,7 @@ export default function AddCharacterApp(props) {
         <br />
         <br />
         <Button
-          sx={{ width: 0.5, maxWidth: 300 }}
+          sx={{ width: 0.75, minWidth: 150 }}
           type="submit"
           id="submitButton"
           variant="contained"

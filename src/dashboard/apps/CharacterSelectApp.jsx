@@ -40,7 +40,7 @@ const accordianTheme = createTheme({
       main: '#00bebe',
     },
     text: {
-      primary: 'rgba(0, 0, 0, 0.7)',
+      primary: 'rgba(0, 0, 0, 0.9)',
       secondary: 'rgba(0, 0, 0, 0.5)',
     },
     divider: 'rgba(255, 255, 255, 0.3)',
@@ -98,29 +98,48 @@ export default function CharacterSelectApp(props) {
     players.forEach((player) => {
       const characterChildren = [];
       sortedCharacters[player].forEach((char, index) => {
-        const hasDivider = index < sortedCharacters[player].length - 1;
-        characterChildren.push(
-          <ListItemButton
-            key={char.name}
-            alignItems="flex-start"
-            divider={hasDivider}
-            onClick={(event) =>
-              handleCharacterClick(sortedCharacters[player][index].ddbID, event)
-            }
-          >
-            <ListItemAvatar>
-              <Avatar
-                src="https://www.dndbeyond.com/Content/Skins/Waterdeep/images/characters/default-avatar-builder.png"
-                sx={{ height: 80, width: 80, mr: 2 }}
+        if (char?.data?.fullName) {
+          const hasDivider = index < sortedCharacters[player].length - 1;
+
+          const { fullName, race, totalLevel, classString } = char.data;
+
+          // Get avatar
+          let { avatarUrl } = char.data;
+          const defaultAvatarUrl =
+            'https://www.dndbeyond.com/Content/Skins/Waterdeep/images/characters/default-avatar-builder.png';
+          if (avatarUrl === '') {
+            avatarUrl = defaultAvatarUrl;
+          }
+
+          characterChildren.push(
+            <ListItemButton
+              key={char.ddbID}
+              alignItems="flex-start"
+              divider={hasDivider}
+              onClick={(event) =>
+                handleCharacterClick(
+                  sortedCharacters[player][index].ddbID,
+                  event
+                )
+              }
+            >
+              <ListItemAvatar>
+                <Avatar src={avatarUrl} sx={{ height: 80, width: 80, mr: 2 }} />
+              </ListItemAvatar>
+              <ListItemText
+                primary={fullName}
+                primaryTypographyProps={{ variant: 'h5' }}
+                secondary={
+                  <>
+                    <Typography>Level {totalLevel}</Typography>
+                    {race} {classString}
+                  </>
+                }
+                secondaryTypographyProps={{ variant: 'caption' }}
               />
-            </ListItemAvatar>
-            <ListItemText
-              primary={char.name}
-              secondary="Race, Level Class / Level Class"
-              primaryTypographyProps={{ variant: 'h5' }}
-            />
-          </ListItemButton>
-        );
+            </ListItemButton>
+          );
+        }
       });
 
       const playerName =
@@ -132,7 +151,7 @@ export default function CharacterSelectApp(props) {
             <AccordionSummary expandIcon={<Icon>expand_more</Icon>}>
               <Typography variant="h5">{playerName}</Typography>
             </AccordionSummary>
-            <AccordionDetails>
+            <AccordionDetails sx={{ bgcolor: '#7687a8', px: 0 }}>
               <List>{characterChildren}</List>
             </AccordionDetails>
           </Accordion>
@@ -142,21 +161,40 @@ export default function CharacterSelectApp(props) {
 
     return (
       <ThemeProvider theme={baseTheme}>
-        <Box>
-          <Box sx={{ textAlign: 'right' }}>
-            <Button
-              sx={{ mb: 2 }}
-              type="button"
-              id="addNewButton"
-              variant="contained"
-              color="secondary"
-              onClick={(event) => handleAddButtonClick(event)}
-            >
-              <Icon>add</Icon>
-            </Button>
-          </Box>
-          {playerChildren}
+        <Button
+          sx={{
+            position: 'absolute',
+            right: -3,
+            mt: 1,
+            mb: 1,
+            py: 2,
+            zIndex: 90,
+          }}
+          type="button"
+          id="addNewButton"
+          variant="contained"
+          color="secondary"
+          onClick={(event) => handleAddButtonClick(event)}
+        >
+          <Icon>add</Icon>
+        </Button>
+        <Box sx={{ color: 'text.primary' }}>
+          <Typography
+            align="center"
+            variant="h5"
+            sx={{ position: 'relative', top: 10 }}
+          >
+            Character Select
+          </Typography>
+          <Typography
+            align="center"
+            variant="subtitle2"
+            sx={{ position: 'relative', top: 10 }}
+          >
+            Grouped by Player
+          </Typography>
         </Box>
+        <Box sx={{ position: 'relative', top: 18 }}>{playerChildren}</Box>
       </ThemeProvider>
     );
   }

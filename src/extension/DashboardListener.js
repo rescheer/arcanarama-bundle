@@ -1,7 +1,7 @@
 import * as Giveaway from './modules/Giveaway';
 import { getContext } from './util/nodecg-api-context';
 import { getChatClient, getChatChannel } from './util/chatclient-context';
-import Character from './modules/classes/Character';
+import * as Character from './modules/Character';
 
 function dashboardGiveawayHandler(data) {
   const nodecg = getContext();
@@ -63,27 +63,42 @@ function dashboardCharacterHandler(data, ack) {
   const charactersRep = nodecg.Replicant('characters');
 
   const command = Object.keys(data)[0];
-  const character = new Character(
-    data[command].name,
-    data[command].ddbID,
-    data[command].player
-  );
-  let isInvalid = false;
 
-  charactersRep.value.forEach((element) => {
-    if (character.ddbID === element.ddbID) {
-      ack(new Error('A character with this D&DBeyond ID already exists.'));
-      isInvalid = true;
-    }
-  });
+  switch (command) {
+    case 'add':
+      {
+        const character = new Character.CharacterItem(
+          data[command].ddbID,
+          data[command].player
+        );
+        let isInvalid = false;
 
-  if (isInvalid) {
-    return;
-  }
+        charactersRep.value.forEach((element) => {
+          if (character.ddbID === element.ddbID) {
+            ack(
+              new Error('A character with this D&DBeyond ID already exists.')
+            );
+            isInvalid = true;
+          }
+        });
 
-  if (ack && !ack.handled) {
-    charactersRep.value.push(character);
-    ack(null, 'Character added successfully.');
+        if (isInvalid) {
+          return;
+        }
+
+        if (ack && !ack.handled) {
+          charactersRep.value.push(character);
+          Character.getBeyondData(character);
+          ack(null, 'Character added successfully.');
+        }
+      }
+      break;
+    case 'refresh':
+      Character.getBeyondData(data[command].character);
+      break;
+    default:
+      // unrecognized command
+      break;
   }
 }
 

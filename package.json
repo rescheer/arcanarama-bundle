@@ -114,6 +114,7 @@
   "repository": "https://github.com/rescheer/arcanarama-bundle.git",
   "license": "MIT",
   "devDependencies": {
+    "buffer": "^5.7.1",
     "eslint": "^8.21.0",
     "eslint-config-airbnb": "^19.0.4",
     "eslint-config-prettier": "^8.5.0",
