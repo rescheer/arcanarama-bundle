@@ -17,6 +17,22 @@
     .container {
       width: 100%;
     }
+    
+    .flashRed {
+      animation: flashRed 2s linear infinite 0s;
+    }
+
+    @keyframes flashRed {
+      0% {
+        background-color: hsl(0, 0%, 13%);
+      }
+      50% {
+        background-color: hsl(0, 40%, 50%);
+      }
+      100% {
+        background-color: hsl(0, 0%, 13%);
+      }
+    }
   </style>
 </head>
 <body style="background-color:#202837; margin:0px; overflow: hidden;">

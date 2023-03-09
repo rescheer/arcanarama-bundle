@@ -6,9 +6,14 @@ import Typography from '@mui/material/Typography';
 
 const HealthBar = React.memo((props) => {
   const { currentHp, maxHp, tempHp, tempMax } = props;
+  let barBackgroundClass = '';
 
   function normalize(val, maxValue, minResult, maxResult) {
     return ((val - minResult) / (maxValue - minResult)) * maxResult;
+  }
+
+  if (currentHp <= 0) {
+    barBackgroundClass = 'flashRed';
   }
 
   return (
@@ -17,6 +22,7 @@ const HealthBar = React.memo((props) => {
         variant="buffer"
         value={normalize(currentHp, maxHp, 0, 100)}
         valueBuffer={normalize(tempHp, tempMax, 0, 100)}
+        className={barBackgroundClass}
         sx={{
           position: 'absolute',
           left: 0,
@@ -28,7 +34,7 @@ const HealthBar = React.memo((props) => {
           display: 'inline-block',
           top: 75,
           height: 20,
-          backgroundColor: '#222',
+          backgroundColor: '#212121',
           borderRadius: 5,
           borderStyle: 'outset',
           borderWidth: 3,
