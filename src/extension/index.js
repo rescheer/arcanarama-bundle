@@ -10,8 +10,12 @@ export default function (nodecg) {
   setContext(nodecg);
 
   const coreStatus = nodecg.Replicant('coreStatus', {
-    defaultValue: { chatConnected: null },
+    defaultValue: { chatConnected: null, trackerPage: 'select' },
     persistent: false,
+  });
+
+  const charactersRep = nodecg.Replicant('characters', {
+    defaultValue: [],
   });
 
   initVibes(nodecg);
@@ -19,8 +23,6 @@ export default function (nodecg) {
   ChatListener(nodecg);
   DashboardListener(nodecg);
   debugListener(nodecg);
-
-  // TODO: debugMessageRep event listener
 
   // TODO: Commands/Timers
   // TODO: Nat 20/Nat 1 announcements with per-player stats
