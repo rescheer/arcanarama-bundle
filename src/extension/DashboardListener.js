@@ -87,14 +87,25 @@ function dashboardCharacterHandler(data, ack) {
         }
 
         if (ack && !ack.handled) {
-          charactersRep.value.push(character);
-          Character.getBeyondData(character);
-          ack(null, 'Character added successfully.');
+          Character.getBeyondData(character)
+            .then((result) => {
+              ack(null, result);
+            })
+            .catch((error) => {
+              ack(
+                new Error(
+                  `Could not get data from D&D Beyond. Make sure character is set to public (error: ${error})`
+                )
+              );
+            });
         }
       }
       break;
     case 'refresh':
       Character.getBeyondData(data[command].character);
+      break;
+    case 'reparse':
+      Character.parseRawData(data[command].character.ddbID);
       break;
     default:
       // unrecognized command

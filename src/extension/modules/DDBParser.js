@@ -98,7 +98,6 @@ export default function parseDDBData(id) {
       }
     });
   });
-
   Object.assign(parsedData.stats, computedStats);
 
   // Parse Classes
@@ -266,6 +265,17 @@ export default function parseDDBData(id) {
 
   // Description
   // Class strings
+  computedClasses.forEach((cls) => {
+    const { name, subName, level } = cls;
+
+    if (subName) {
+      parsedData.description.classes.full.push(`${subName} ${name} ${level}`);
+    } else {
+      parsedData.description.classes.full.push(`${name} ${level}`);
+    }
+    parsedData.description.classes.withLevel.push(`${name} ${level}`);
+    parsedData.description.classes.simple.push(`${name}`);
+  });
 
   return parsedData;
 }

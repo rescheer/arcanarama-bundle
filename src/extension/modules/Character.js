@@ -38,9 +38,9 @@ export function getComputedData(obj) {
 
 export function parseRawData(id) {
   const nodecg = getContext();
-  const characters = nodecg.Replicant('characters');
+  const charactersRep = nodecg.Replicant('characters');
   const index = getCharacterIndexById(id);
-  const char = characters.value[index];
+  const char = charactersRep.value[index];
   if (char) {
     char.data = {};
     Object.assign(char.data, parseDDBData(id));
@@ -55,31 +55,32 @@ export function resetOverrides(obj) {
 }
 
 export function getBeyondData(obj) {
+  const nodecg = getContext();
   const id = obj.ddbID;
   const characterUrl = `https://character-service.dndbeyond.com/character/v3/character/${id}/`;
+  const charactersRep = nodecg.Replicant('characters');
 
-  axios.get(characterUrl).then((res) => {
-    getContext().sendMessage('console', {
-      type: 'info',
-      msg: `[getBeyondData] Successfully got DDB data for ${res.data.data.name} (id ${obj.ddbID})`,
-    });
-    const newRep = getContext().Replicant(id);
-    obj.timestamp = Date.now();
-    newRep.value = res.data.data;
-    parseRawData(id);
-  });
-  /*     .catch((error) => {
-      getContext().sendMessage('console', {
-        type: 'warn',
-        msg: `[getBeyondData] Failed to get JSON: ${error}`,
+  return new Promise((resolve, reject) => {
+    axios
+      .get(characterUrl)
+      .then((res) => {
+        charactersRep.value.push(obj);
+        getContext().sendMessage('console', {
+          type: 'info',
+          msg: `[getBeyondData] Successfully got DDB data for ${res.data.data.name} (id ${obj.ddbID})`,
+        });
+        const newRep = getContext().Replicant(id);
+        obj.timestamp = Date.now();
+        newRep.value = res.data.data;
+        parseRawData(id);
+        resolve('Character added successfully');
+      })
+      .catch((error) => {
+        reject(error);
+        getContext().sendMessage('console', {
+          type: 'warn',
+          msg: `[getBeyondData] Failed to get JSON: ${error}`,
+        });
       });
-    }); */
-}
-
-export function resetAll(obj) {
-  getBeyondData(obj);
-  obj.data = {};
-  obj.override = {};
-  obj.computedData = {};
-  parseRawData(obj);
+  });
 }

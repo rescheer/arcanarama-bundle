@@ -112,6 +112,13 @@ export default function TrackerApp(props) {
     }
   }
 
+  function handleReparseButtonClick() {
+    if (character) {
+      window.nodecg.sendMessage('character', { reparse: { character } });
+      handleClose();
+    }
+  }
+
   function handleKeypadClick(e) {
     const newValue = e.currentTarget.value;
 
@@ -211,6 +218,14 @@ export default function TrackerApp(props) {
             tooltipOpen
             sx={{ color: 'black' }}
             onClick={(event) => handleRefreshButtonClick(event)}
+          />
+          <SpeedDialAction
+            key="reparse"
+            icon={<Icon>refresh</Icon>}
+            tooltipTitle="Reparse"
+            tooltipOpen
+            sx={{ color: 'black' }}
+            onClick={(event) => handleReparseButtonClick(event)}
           />
         </SpeedDial>
         <Button

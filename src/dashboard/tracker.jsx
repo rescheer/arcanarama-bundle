@@ -15,12 +15,6 @@ function App() {
   const [characters, updateCharacters] = useReplicant('characters');
   const [activeApp, setActiveApp] = React.useState('select');
   const [activeChar, setActiveChar] = React.useState('');
-  const storedChar = window.localStorage.getItem('storedChar');
-
-  if (storedChar && activeChar === '') {
-    setActiveChar(storedChar);
-    setActiveApp('tracker');
-  }
 
   if (characters) {
     let component;
