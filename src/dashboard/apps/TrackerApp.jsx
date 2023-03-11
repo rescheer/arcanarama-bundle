@@ -112,7 +112,7 @@ export default function TrackerApp(props) {
     }
   }
 
-  function handleReparseButtonClick() {
+  function handleResetButtonClick() {
     if (character) {
       window.nodecg.sendMessage('character', { reparse: { character } });
       handleClose();
@@ -224,26 +224,27 @@ export default function TrackerApp(props) {
         >
           <SpeedDialAction
             key="refresh"
-            icon={<Icon>refresh</Icon>}
+            icon={<Icon>sync</Icon>}
             tooltipTitle="Refresh"
             tooltipOpen
-            sx={{ color: 'black' }}
             onClick={(event) => handleRefreshButtonClick(event)}
           />
           <SpeedDialAction
-            key="reparse"
-            icon={<Icon>refresh</Icon>}
-            tooltipTitle="Reparse"
+            key="reset"
+            icon={<Icon>replay</Icon>}
+            tooltipTitle="Reset"
             tooltipOpen
-            sx={{ color: 'black' }}
-            onClick={(event) => handleReparseButtonClick(event)}
+            onClick={(event) => handleResetButtonClick(event)}
           />
           <SpeedDialAction
             key="remove"
-            icon={<Icon>refresh</Icon>}
+            icon={<Icon color="error">delete</Icon>}
             tooltipTitle="Remove"
             tooltipOpen
-            sx={{ color: 'red' }}
+            FabProps={{
+              color: 'red',
+              size: 'small',
+            }}
             onClick={(event) => handleRemoveButtonClick(event)}
           />
         </SpeedDial>
