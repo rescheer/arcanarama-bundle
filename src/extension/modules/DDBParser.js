@@ -63,175 +63,165 @@ export default function parseDDBData(id) {
   // Parse AC
 
   // Parse Stats
-  const computedStats = () => {
-    const statMod = [0, 0, 0, 0, 0, 0];
-
-    modsArray.forEach((modType) => {
-      modType.forEach((mod) => {
-        switch (mod.subType) {
-          case 'strength-score':
-            statMod[0] += mod.value;
-            break;
-          case 'dexterity-score':
-            statMod[1] += mod.value;
-            break;
-          case 'constitution-score':
-            statMod[2] += mod.value;
-            break;
-          case 'intelligence-score':
-            statMod[3] += mod.value;
-            break;
-          case 'wisdom-score':
-            statMod[4] += mod.value;
-            break;
-          case 'charisma-score':
-            statMod[5] += mod.value;
-            break;
-          default:
-            break;
-        }
-      });
-    });
-
-    return {
-      str: rawData.stats[0].value + statMod[0],
-      dex: rawData.stats[1].value + statMod[1],
-      con: rawData.stats[2].value + statMod[2],
-      int: rawData.stats[3].value + statMod[3],
-      wis: rawData.stats[4].value + statMod[4],
-      cha: rawData.stats[5].value + statMod[5],
-    };
+  const computedStats = {
+    str: rawData.stats[0].value,
+    dex: rawData.stats[1].value,
+    con: rawData.stats[2].value,
+    int: rawData.stats[3].value,
+    wis: rawData.stats[4].value,
+    cha: rawData.stats[5].value,
   };
+
+  modsArray.forEach((modType) => {
+    modType.forEach((mod) => {
+      switch (mod.subType) {
+        case 'strength-score':
+          computedStats.str += mod.value;
+          break;
+        case 'dexterity-score':
+          computedStats.str += mod.value;
+          break;
+        case 'constitution-score':
+          computedStats.str += mod.value;
+          break;
+        case 'intelligence-score':
+          computedStats.str += mod.value;
+          break;
+        case 'wisdom-score':
+          computedStats.str += mod.value;
+          break;
+        case 'charisma-score':
+          computedStats.str += mod.value;
+          break;
+        default:
+          break;
+      }
+    });
+  });
+
   Object.assign(parsedData.stats, computedStats);
 
   // Parse Classes
-  const [computedClasses] = () => {
-    rawData.classes.forEach((cls) => {
-      const { name: baseName, hitDice, canCastSpells } = cls.definition;
-      const { level, isStartingClass } = cls;
-      let spellSlots;
-      let multiClassSpellSlotDivisor;
+  const computedClasses = [];
+  rawData.classes.forEach((cls) => {
+    const { name: baseName, hitDice, canCastSpells } = cls.definition;
+    const { level, isStartingClass } = cls;
+    let spellSlots;
+    let multiClassSpellSlotDivisor;
 
-      if (canCastSpells) {
-        spellSlots = cls.definition.spellRules.levelSpellSlots[level].slice(0);
-        multiClassSpellSlotDivisor =
-          cls.definition.spellRules.multiClassSpellSlotDivisor;
-      }
+    if (canCastSpells) {
+      spellSlots = cls.definition.spellRules.levelSpellSlots[level].slice(0);
+      multiClassSpellSlotDivisor =
+        cls.definition.spellRules.multiClassSpellSlotDivisor;
+    }
 
-      let subName;
-      if (cls.subclassDefinition?.name) {
-        subName = cls.subclassDefinition.name;
-      }
+    let subName;
+    if (cls.subclassDefinition?.name) {
+      subName = cls.subclassDefinition.name;
+    }
 
-      const newClassObject = {
-        name: baseName,
-        subName,
-        level,
-        canCastSpells,
-        isStartingClass,
-        hitDice,
-        spellSlots,
-        multiClassSpellSlotDivisor,
-      };
+    const newClassObject = {
+      name: baseName,
+      subName,
+      level,
+      canCastSpells,
+      isStartingClass,
+      hitDice,
+      spellSlots,
+      multiClassSpellSlotDivisor,
+    };
 
-      computedClasses.push(newClassObject);
-    });
-
-    return computedClasses;
-  };
+    computedClasses.push(newClassObject);
+  });
   parsedData.classes = computedClasses.slice(0);
 
   // Check for spellcaster classes
   parsedData.isSpellcaster = computedClasses.some((cls) => cls.canCastSpells);
 
   // Parse Spellslots
-  const computedSpellSlots = () => {
-    const spellcasterClasses = [];
-    let spellcasterLevels = 0;
-    const spellSlots = { max: [], current: [] };
+  const spellcasterClasses = [];
+  let spellcasterLevels = 0;
+  const computedSpellSlots = { max: [], current: [] };
 
-    // Pull all caster classes
-    computedClasses.forEach((cls) => {
-      if (cls.canCastSpells) {
-        const divisor = cls.multiClassSpellSlotDivisor;
-        const { level } = cls;
-        spellcasterClasses.push(cls);
-        spellcasterLevels += Math.floor(level / divisor);
-      }
-    });
-
-    if (spellcasterClasses.length > 0) {
-      // Is a caster
-      if (spellcasterClasses.length === 1) {
-        // Has only a single caster class
-        spellSlots.max = computedClasses.spellSlots.slice(0);
-        spellSlots.current = computedClasses.spellSlots.slice(0);
-      } else {
-        // Has multiple caster classes
-        let multiclassSpellSlots;
-        switch (spellcasterLevels) {
-          case 20:
-            multiclassSpellSlots = [4, 3, 3, 3, 3, 2, 2, 1, 1];
-            break;
-          case 19:
-            multiclassSpellSlots = [4, 3, 3, 3, 3, 2, 1, 1, 1];
-            break;
-          case 18:
-            multiclassSpellSlots = [4, 3, 3, 3, 3, 1, 1, 1, 1];
-            break;
-          case 17:
-            multiclassSpellSlots = [4, 3, 3, 3, 2, 1, 1, 1, 1];
-            break;
-          case 16:
-          case 15:
-            multiclassSpellSlots = [4, 3, 3, 3, 2, 1, 1, 1, 0];
-            break;
-          case 14:
-          case 13:
-            multiclassSpellSlots = [4, 3, 3, 3, 2, 1, 1, 0, 0];
-            break;
-          case 12:
-          case 11:
-            multiclassSpellSlots = [4, 3, 3, 3, 2, 1, 0, 0, 0];
-            break;
-          case 10:
-            multiclassSpellSlots = [4, 3, 3, 3, 2, 0, 0, 0, 0];
-            break;
-          case 9:
-            multiclassSpellSlots = [4, 3, 3, 3, 1, 0, 0, 0, 0];
-            break;
-          case 8:
-            multiclassSpellSlots = [4, 3, 3, 2, 0, 0, 0, 0, 0];
-            break;
-          case 7:
-            multiclassSpellSlots = [4, 3, 3, 1, 0, 0, 0, 0, 0];
-            break;
-          case 6:
-            multiclassSpellSlots = [4, 3, 3, 0, 0, 0, 0, 0, 0];
-            break;
-          case 5:
-            multiclassSpellSlots = [4, 3, 2, 0, 0, 0, 0, 0, 0];
-            break;
-          case 4:
-            multiclassSpellSlots = [4, 3, 0, 0, 0, 0, 0, 0, 0];
-            break;
-          case 3:
-            multiclassSpellSlots = [4, 2, 0, 0, 0, 0, 0, 0, 0];
-            break;
-          case 2:
-            multiclassSpellSlots = [3, 0, 0, 0, 0, 0, 0, 0, 0];
-            break;
-          default:
-            multiclassSpellSlots = [2, 0, 0, 0, 0, 0, 0, 0, 0];
-            break;
-        }
-        spellSlots.max = multiclassSpellSlots.slice(0);
-        spellSlots.current = multiclassSpellSlots.slice(0);
-      }
+  // Pull all caster classes
+  computedClasses.forEach((cls) => {
+    if (cls.canCastSpells) {
+      const divisor = cls.multiClassSpellSlotDivisor;
+      const { level } = cls;
+      spellcasterClasses.push(cls);
+      spellcasterLevels += Math.floor(level / divisor);
     }
+  });
 
-    return spellSlots;
-  };
+  if (spellcasterClasses.length > 0) {
+    // Is a caster
+    if (spellcasterClasses.length === 1) {
+      // Has only a single caster class
+      computedSpellSlots.max = computedClasses.spellSlots.slice(0);
+      computedSpellSlots.current = computedClasses.spellSlots.slice(0);
+    } else {
+      // Has multiple caster classes
+      let multiclassSpellSlots;
+      switch (spellcasterLevels) {
+        case 20:
+          multiclassSpellSlots = [4, 3, 3, 3, 3, 2, 2, 1, 1];
+          break;
+        case 19:
+          multiclassSpellSlots = [4, 3, 3, 3, 3, 2, 1, 1, 1];
+          break;
+        case 18:
+          multiclassSpellSlots = [4, 3, 3, 3, 3, 1, 1, 1, 1];
+          break;
+        case 17:
+          multiclassSpellSlots = [4, 3, 3, 3, 2, 1, 1, 1, 1];
+          break;
+        case 16:
+        case 15:
+          multiclassSpellSlots = [4, 3, 3, 3, 2, 1, 1, 1, 0];
+          break;
+        case 14:
+        case 13:
+          multiclassSpellSlots = [4, 3, 3, 3, 2, 1, 1, 0, 0];
+          break;
+        case 12:
+        case 11:
+          multiclassSpellSlots = [4, 3, 3, 3, 2, 1, 0, 0, 0];
+          break;
+        case 10:
+          multiclassSpellSlots = [4, 3, 3, 3, 2, 0, 0, 0, 0];
+          break;
+        case 9:
+          multiclassSpellSlots = [4, 3, 3, 3, 1, 0, 0, 0, 0];
+          break;
+        case 8:
+          multiclassSpellSlots = [4, 3, 3, 2, 0, 0, 0, 0, 0];
+          break;
+        case 7:
+          multiclassSpellSlots = [4, 3, 3, 1, 0, 0, 0, 0, 0];
+          break;
+        case 6:
+          multiclassSpellSlots = [4, 3, 3, 0, 0, 0, 0, 0, 0];
+          break;
+        case 5:
+          multiclassSpellSlots = [4, 3, 2, 0, 0, 0, 0, 0, 0];
+          break;
+        case 4:
+          multiclassSpellSlots = [4, 3, 0, 0, 0, 0, 0, 0, 0];
+          break;
+        case 3:
+          multiclassSpellSlots = [4, 2, 0, 0, 0, 0, 0, 0, 0];
+          break;
+        case 2:
+          multiclassSpellSlots = [3, 0, 0, 0, 0, 0, 0, 0, 0];
+          break;
+        default:
+          multiclassSpellSlots = [2, 0, 0, 0, 0, 0, 0, 0, 0];
+          break;
+      }
+      computedSpellSlots.max = multiclassSpellSlots.slice(0);
+      computedSpellSlots.current = multiclassSpellSlots.slice(0);
+    }
+  }
   Object.assign(parsedData.spellSlots, computedSpellSlots);
 
   // Parse HP
@@ -239,43 +229,39 @@ export default function parseDDBData(id) {
   parsedData.hp.type =
     rawData.preferences.hitPointType === 2 ? 'manual' : 'fixed';
 
-  const computedHp = () => {
-    const hp = { max: [], current: [] };
+  const computedHp = { max: [], current: [] };
 
-    if (rawData.overrideHitPoints) {
-      // Use override from ddb if it exists
-      hp.max = rawData.overrideHitPoints;
-      hp.current = rawData.overrideHitPoints;
-    } else {
-      const baseHp = rawData.baseHitPoints;
-      const conMod = Math.floor((parsedData.stats.con - 10) / 2);
-      let initialHitDie = 0;
-      let hpTotal = 0;
+  if (rawData.overrideHitPoints) {
+    // Use override from ddb if it exists
+    computedHp.max = rawData.overrideHitPoints;
+    computedHp.current = rawData.overrideHitPoints;
+  } else {
+    const baseHp = rawData.baseHitPoints;
+    const conMod = Math.floor((parsedData.stats.con - 10) / 2);
+    let initialHitDie = 0;
+    let hpTotal = 0;
 
-      computedClasses.forEach((cls) => {
-        const { level, hitDice } = cls;
-        if (cls.isStartingClass) {
-          initialHitDie = cls.hitDice;
-        }
-        if (parsedData.hp.type === 'fixed') {
-          // eslint-disable-next-line prettier/prettier
-          hpTotal += level * (hitDice / 2 + 1);
-        } else {
-          hpTotal += level * conMod;
-        }
-      });
-
-      if (parsedData.hp.type === 'fixed') {
-        hpTotal += initialHitDie;
-      } else {
-        hpTotal += baseHp;
+    computedClasses.forEach((cls) => {
+      const { level, hitDice } = cls;
+      if (cls.isStartingClass) {
+        initialHitDie = cls.hitDice;
       }
-      hp.max = hpTotal;
-      hp.current = hpTotal;
-    }
+      if (parsedData.hp.type === 'fixed') {
+        // eslint-disable-next-line prettier/prettier
+        hpTotal += level * (hitDice / 2 + 1);
+      } else {
+        hpTotal += level * conMod;
+      }
+    });
 
-    return hp;
-  };
+    if (parsedData.hp.type === 'fixed') {
+      hpTotal += initialHitDie;
+    } else {
+      hpTotal += baseHp;
+    }
+    computedHp.max = hpTotal;
+    computedHp.current = hpTotal;
+  }
   Object.assign(parsedData.hp, computedHp);
 
   // Description
