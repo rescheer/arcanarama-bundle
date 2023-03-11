@@ -101,7 +101,7 @@ export default function CharacterSelectApp(props) {
         if (char?.data?.fullName) {
           const hasDivider = index < sortedCharacters[player].length - 1;
 
-          const { fullName, race, totalLevel, classString } = char.data;
+          const { fullName, race, description } = char.data;
 
           // Get avatar
           let { avatarUrl } = char.data;
@@ -131,8 +131,9 @@ export default function CharacterSelectApp(props) {
                 primaryTypographyProps={{ variant: 'h5' }}
                 secondary={
                   <>
-                    <Typography>Level {totalLevel}</Typography>
-                    {race} {classString}
+                    {race}
+                    <br />
+                    {description.classes.simple.toString().replace(/,/g, ' / ')}
                   </>
                 }
                 secondaryTypographyProps={{ variant: 'caption' }}

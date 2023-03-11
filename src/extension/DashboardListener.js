@@ -107,6 +107,9 @@ function dashboardCharacterHandler(data, ack) {
     case 'reparse':
       Character.parseRawData(data[command].character.ddbID);
       break;
+    case 'delete':
+      Character.deleteCharacter(data[command].character.ddbID);
+      break;
     default:
       // unrecognized command
       break;

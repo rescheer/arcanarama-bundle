@@ -119,6 +119,17 @@ export default function TrackerApp(props) {
     }
   }
 
+  function handleRemoveButtonClick() {
+    if (character) {
+      handleClose();
+      // eslint-disable-next-line no-restricted-globals, no-alert
+      if (confirm(`Remove ${character.data.fullName}?`)) {
+        window.nodecg.sendMessage('character', { delete: { character } });
+        handleBackButtonClick();
+      }
+    }
+  }
+
   function handleKeypadClick(e) {
     const newValue = e.currentTarget.value;
 
@@ -226,6 +237,14 @@ export default function TrackerApp(props) {
             tooltipOpen
             sx={{ color: 'black' }}
             onClick={(event) => handleReparseButtonClick(event)}
+          />
+          <SpeedDialAction
+            key="remove"
+            icon={<Icon>refresh</Icon>}
+            tooltipTitle="Remove"
+            tooltipOpen
+            sx={{ color: 'red' }}
+            onClick={(event) => handleRemoveButtonClick(event)}
           />
         </SpeedDial>
         <Button

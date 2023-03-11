@@ -28,6 +28,13 @@ function getCharacterIndexById(id) {
   return index;
 }
 
+export function deleteCharacter(id) {
+  const nodecg = getContext();
+  const characters = nodecg.Replicant('characters');
+
+  characters.value.splice(getCharacterIndexById(id), 1);
+}
+
 export function getComputedData(obj) {
   obj.computedData = {};
   Object.assign(obj.computedData, {
