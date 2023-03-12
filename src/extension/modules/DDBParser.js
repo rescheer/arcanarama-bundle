@@ -58,7 +58,9 @@ export default function parseDDBData(id) {
   // Grab simple data
   parsedData.fullName = rawData.name;
   parsedData.race = rawData.race.fullName;
-  parsedData.avatarUrl = rawData.avatarUrl;
+  parsedData.avatarUrl =
+    rawData.avatarUrl ||
+    'https://www.dndbeyond.com/Content/Skins/Waterdeep/images/characters/default-avatar-builder.png';
   parsedData.hp.type =
     rawData.preferences.hitPointType === 2 ? 'manual' : 'fixed';
 
@@ -99,6 +101,39 @@ export default function parseDDBData(id) {
           break;
       }
     });
+  });
+  // Check for stat overrides
+  rawData.overrideStats.forEach((stat, index) => {
+    if (stat.value) {
+      switch (index) {
+        case 0:
+          // str
+          computedStats.str = stat.value;
+          break;
+        case 1:
+          // dex
+          computedStats.dex = stat.value;
+          break;
+        case 2:
+          // con
+          computedStats.con = stat.value;
+          break;
+        case 3:
+          // int
+          computedStats.int = stat.value;
+          break;
+        case 4:
+          // wis
+          computedStats.wis = stat.value;
+          break;
+        case 5:
+          // cha
+          computedStats.cha = stat.value;
+          break;
+        default:
+          break;
+      }
+    }
   });
   Object.assign(parsedData.stats, computedStats);
 
