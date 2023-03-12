@@ -158,8 +158,10 @@ export default function parseDDBData(id) {
     // Is a caster
     if (spellcasterClasses.length === 1) {
       // Has only a single caster class
-      computedSpellSlots.max = computedClasses[0].spellSlots.slice(0);
-      computedSpellSlots.current = computedClasses[0].spellSlots.slice(0);
+      computedSpellSlots.max =
+        computedClasses[spellcasterClasses[0]].spellSlots.slice(0);
+      computedSpellSlots.current =
+        computedClasses[spellcasterClasses[0]].spellSlots.slice(0);
     } else {
       // Has multiple caster classes
       let multiclassSpellSlots;
