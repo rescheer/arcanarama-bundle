@@ -59,6 +59,8 @@ export default function parseDDBData(id) {
   parsedData.fullName = rawData.name;
   parsedData.race = rawData.race.fullName;
   parsedData.avatarUrl = rawData.avatarUrl;
+  parsedData.hp.type =
+    rawData.preferences.hitPointType === 2 ? 'manual' : 'fixed';
 
   // Parse AC
 
@@ -79,19 +81,19 @@ export default function parseDDBData(id) {
           computedStats.str += mod.value;
           break;
         case 'dexterity-score':
-          computedStats.str += mod.value;
+          computedStats.dex += mod.value;
           break;
         case 'constitution-score':
-          computedStats.str += mod.value;
+          computedStats.con += mod.value;
           break;
         case 'intelligence-score':
-          computedStats.str += mod.value;
+          computedStats.int += mod.value;
           break;
         case 'wisdom-score':
-          computedStats.str += mod.value;
+          computedStats.wis += mod.value;
           break;
         case 'charisma-score':
-          computedStats.str += mod.value;
+          computedStats.cha += mod.value;
           break;
         default:
           break;
@@ -224,9 +226,6 @@ export default function parseDDBData(id) {
   Object.assign(parsedData.spellSlots, computedSpellSlots);
 
   // Parse HP
-  // First, get HP calculation method
-  parsedData.hp.type =
-    rawData.preferences.hitPointType === 2 ? 'manual' : 'fixed';
 
   const computedHp = { max: [], current: [] };
 
@@ -241,8 +240,8 @@ export default function parseDDBData(id) {
     let hpTotal = 0;
 
     computedClasses.forEach((cls) => {
-      const { level, hitDice } = cls;
-      if (cls.isStartingClass) {
+      const { level, hitDice, isStartingClass } = cls;
+      if (isStartingClass) {
         initialHitDie = cls.hitDice;
       }
       if (parsedData.hp.type === 'fixed') {
