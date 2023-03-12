@@ -351,10 +351,10 @@ function announceEntries(client, channel, key, rep) {
 
     switch (newEntries.length) {
       case 1:
-        chatMessageEntryText = `${newEntries[0]} entered`;
+        chatMessageEntryText = `@${newEntries[0]} entered`;
         break;
       case 2:
-        chatMessageEntryText = `${newEntries[0]} and ${newEntries[1]} entered`;
+        chatMessageEntryText = `@${newEntries[0]} and @${newEntries[1]} entered`;
         break;
       default:
         chatMessageEntryText = `Added ${newEntries.length} new entries to`;
