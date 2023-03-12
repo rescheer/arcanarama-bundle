@@ -145,11 +145,11 @@ export default function parseDDBData(id) {
   const computedSpellSlots = { max: [], current: [] };
 
   // Pull all caster classes
-  computedClasses.forEach((cls) => {
+  computedClasses.forEach((cls, index) => {
     if (cls.canCastSpells) {
       const divisor = cls.multiClassSpellSlotDivisor;
       const { level } = cls;
-      spellcasterClasses.push(cls);
+      spellcasterClasses.push(index);
       spellcasterLevels += Math.floor(level / divisor);
     }
   });
@@ -158,8 +158,8 @@ export default function parseDDBData(id) {
     // Is a caster
     if (spellcasterClasses.length === 1) {
       // Has only a single caster class
-      computedSpellSlots.max = computedClasses.spellSlots.slice(0);
-      computedSpellSlots.current = computedClasses.spellSlots.slice(0);
+      computedSpellSlots.max = computedClasses[0].spellSlots.slice(0);
+      computedSpellSlots.current = computedClasses[0].spellSlots.slice(0);
     } else {
       // Has multiple caster classes
       let multiclassSpellSlots;
