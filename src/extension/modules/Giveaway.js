@@ -469,7 +469,7 @@ export function announceWinner(client, channel, user, key, rep) {
     url,
   };
 
-  client.say(channel, `${winner} has been drawn for the ${name} giveaway!`);
+  client.say(channel, `@${winner} has been drawn for the ${name} giveaway!`);
   nodecg.sendMessage('giveaway:winnerAnnounced', data);
 
   rep.value[key].finalWinner = winner;
