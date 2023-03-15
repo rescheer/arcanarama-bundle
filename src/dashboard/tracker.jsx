@@ -34,7 +34,6 @@ function App() {
   const [activeApp, setActiveApp] = React.useState('select');
   const [activeChar, setActiveChar] = React.useState('');
   const [trackerPage, setTrackerPage] = React.useState(0);
-  const [oldTrackerPage, setOldTrackerPage] = React.useState(0);
 
   if (characters) {
     let component;
@@ -61,7 +60,6 @@ function App() {
             charSetter={setActiveChar}
             characters={characters}
             trackerPage={trackerPage}
-            oldTrackerPage={oldTrackerPage}
           />
         );
 
@@ -71,7 +69,6 @@ function App() {
               showLabels
               value={trackerPage}
               onChange={(event, newValue) => {
-                setOldTrackerPage(trackerPage);
                 setTrackerPage(newValue);
               }}
               sx={{
