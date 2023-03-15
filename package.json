@@ -98,7 +98,8 @@
     },
     "graphics": {
       "source": [
-        "src/graphics/utilityGraphic.html"
+        "src/graphics/utilityGraphic.html",
+        "src/graphics/nullStatus.html"
       ],
       "context": "browser",
       "distDir": "graphics/"

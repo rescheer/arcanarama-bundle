@@ -1,5 +1,39 @@
 import { getContext } from '../util/nodecg-api-context';
 
+function getStatById(id) {
+  let result;
+  switch (id) {
+    case 1:
+      // Strength
+      result = 'str';
+      break;
+    case 2:
+      // Dexterity
+      result = 'dex';
+      break;
+    case 3:
+      // Constitution
+      result = 'con';
+      break;
+    case 4:
+      // Intelligence
+      result = 'int';
+      break;
+    case 5:
+      // Wisdom
+      result = 'wis';
+      break;
+    case 6:
+      // Charisma
+      result = 'cha';
+      break;
+    default:
+      break;
+  }
+
+  return result;
+}
+
 export default function parseDDBData(id) {
   const replicant = getContext().Replicant(id);
   const { value: rawData } = replicant;
@@ -19,23 +53,50 @@ export default function parseDDBData(id) {
       cha: 0,
     },
     hp: {
-      max: '',
-      current: '',
-      temp: '',
-      tempMax: '',
-      type: '',
+      max: 0,
+      current: 0,
+      temp: 0,
+      tempMax: 0,
+      type: 0,
     },
-    ac: '',
-    condition: [],
+    ac: {
+      base: 0,
+      bonuses: [],
+    },
+    condition: {
+      blinded: false,
+      charmed: false,
+      deafened: false,
+      frightened: false,
+      grappled: false,
+      incapacitated: false,
+      invisible: false,
+      paralyzed: false,
+      petrified: false,
+      poisoned: false,
+      prone: false,
+      restrained: false,
+      stunned: false,
+      unconscious: false,
+      exhaustionLevel: 0,
+    },
     deathSaves: {
-      successes: '',
-      failures: '',
+      successes: 0,
+      failures: 0,
       stable: true,
     },
     isSpellcaster: false,
     spellSlots: {
       max: [],
       current: [],
+    },
+    items: {
+      attuned: [],
+      equipped: {
+        weapons: [],
+        armor: [],
+        other: [],
+      },
     },
     description: {
       classes: {
@@ -55,6 +116,44 @@ export default function parseDDBData(id) {
   const { feat: featMods } = rawData.modifiers;
   const modsArray = [raceMods, classMods, backgroundMods, itemMods, featMods];
 
+  // Inventory iterator
+  const equippedWeapons = [];
+  const equippedArmor = [];
+  const equippedOther = [];
+  const attunedItems = [];
+  rawData.inventory.forEach((item) => {
+    const { name, description, filterType, type, rarity } = item.definition;
+    const entry = { name, description, filterType, type, rarity };
+
+    // Get attuned items
+    if (item.isAttuned) {
+      attunedItems.push(entry);
+    }
+
+    // Get equipped items
+    if (item.equipped && +item.equippedEntityId === +id) {
+      switch (filterType) {
+        case 'Armor':
+          entry.armorClass = item.definition.armorClass;
+          entry.armorTypeId = item.definition.armorTypeId;
+          equippedArmor.push(entry);
+          break;
+        case 'Weapon':
+          entry.damage = item.definition?.damage?.diceString;
+          entry.damageType = item.definition?.damageType;
+          equippedWeapons.push(entry);
+          break;
+        default:
+          equippedOther.push(entry);
+          break;
+      }
+    }
+  });
+  parsedData.items.attuned = attunedItems;
+  parsedData.items.equipped.armor = equippedArmor;
+  parsedData.items.equipped.weapons = equippedWeapons;
+  parsedData.items.equipped.other = equippedOther;
+
   // Grab simple data
   parsedData.fullName = rawData.name;
   parsedData.race = rawData.race.fullName;
@@ -63,8 +162,6 @@ export default function parseDDBData(id) {
     'https://www.dndbeyond.com/Content/Skins/Waterdeep/images/characters/default-avatar-builder.png';
   parsedData.hp.type =
     rawData.preferences.hitPointType === 2 ? 'manual' : 'fixed';
-
-  // Parse AC
 
   // Parse Stats
   const computedStats = {
@@ -76,6 +173,10 @@ export default function parseDDBData(id) {
     cha: rawData.stats[5].value,
   };
 
+  // Modifier iterator
+  let modAc = 0;
+  let bonusHpPerLevel = 0;
+  const unarmoredDefenseStats = [];
   modsArray.forEach((modType) => {
     modType.forEach((mod) => {
       switch (mod.subType) {
@@ -96,6 +197,15 @@ export default function parseDDBData(id) {
           break;
         case 'charisma-score':
           computedStats.cha += mod.value;
+          break;
+        case 'armor-class':
+          modAc += mod.value;
+          break;
+        case 'unarmored-armor-class':
+          unarmoredDefenseStats.push(mod.statId);
+          break;
+        case 'hit-points-per-level':
+          bonusHpPerLevel = mod.value;
           break;
         default:
           break;
@@ -136,6 +246,80 @@ export default function parseDDBData(id) {
     }
   });
   Object.assign(parsedData.stats, computedStats);
+
+  // Parse AC
+  let armorAc = 10;
+  let isWearingArmor = false;
+  let shieldAc = 0;
+  let isWearingShield = false;
+
+  const dexMod = Math.floor((parsedData.stats.dex - 10) / 2);
+  // armorTypeId:
+  // 1: light (full dex bonus)
+  // 2: medium(max + 2 dex bonus)
+  // 3: heavy (0 dex bonus)
+  // 4: shield
+  equippedArmor.forEach((armor) => {
+    switch (armor.armorTypeId) {
+      case 1:
+        // Light armor (full dex bonus)
+        isWearingArmor = true;
+        armorAc = armor.armorClass + dexMod;
+        break;
+      case 2:
+        // Medium armor (max +2 dex bonus)
+        isWearingArmor = true;
+        armorAc = armor.armorClass + (dexMod >= 2 ? 2 : dexMod);
+        break;
+      case 3:
+        // Heavy armor (0 dex bonus)
+        isWearingArmor = true;
+        armorAc = armor.armorClass;
+        break;
+      case 4:
+        // Shield
+        isWearingShield = true;
+        shieldAc += armor.armorClass;
+        break;
+      default:
+        getContext.sendMessage('console', {
+          type: 'warn',
+          msg: `[Parser] Unknown armorTypeId found (type ${armor.armorTypeId}) on item "${armor.name}" of type "${armor.type}"`,
+        });
+        break;
+    }
+  });
+
+  if (unarmoredDefenseStats.length > 0) {
+    const unarmoredDefenseValues = [];
+
+    unarmoredDefenseStats.forEach((statId) => {
+      const unarmoredBonusStat = getStatById(statId);
+
+      if (unarmoredBonusStat === 'wis') {
+        // Monk - either shield or armor negates bonus
+        if (!isWearingArmor && !isWearingShield) {
+          unarmoredDefenseValues.push(
+            Math.floor((parsedData.stats[unarmoredBonusStat] - 10) / 2)
+          );
+        }
+      }
+
+      if (unarmoredBonusStat === 'con') {
+        // Barbarian - armor negates bonus
+        if (!isWearingArmor) {
+          unarmoredDefenseValues.push(
+            Math.floor((parsedData.stats[unarmoredBonusStat] - 10) / 2)
+          );
+        }
+      }
+    });
+
+    const highestValue = Math.max(...unarmoredDefenseValues);
+    parsedData.ac.base = armorAc + shieldAc + dexMod + modAc + highestValue;
+  } else {
+    parsedData.ac.base = armorAc + shieldAc + modAc;
+  }
 
   // Parse Classes
   const computedClasses = [];
@@ -263,7 +447,6 @@ export default function parseDDBData(id) {
   Object.assign(parsedData.spellSlots, computedSpellSlots);
 
   // Parse HP
-
   const computedHp = { max: [], current: [] };
 
   if (rawData.overrideHitPoints) {
@@ -278,9 +461,16 @@ export default function parseDDBData(id) {
 
     computedClasses.forEach((cls) => {
       const { level, hitDice, isStartingClass } = cls;
+
+      // 'Tough' feat handling
+      if (bonusHpPerLevel >= 0) {
+        hpTotal += level * bonusHpPerLevel;
+      }
+
       if (isStartingClass) {
         initialHitDie = cls.hitDice;
       }
+
       if (parsedData.hp.type === 'fixed') {
         // eslint-disable-next-line prettier/prettier
         hpTotal += level * (hitDice / 2 + 1);

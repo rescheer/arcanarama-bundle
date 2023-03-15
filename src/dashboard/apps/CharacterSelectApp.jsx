@@ -3,7 +3,7 @@ import * as React from 'react';
 import { useReplicant } from 'use-nodecg';
 import { ThemeProvider, createTheme } from '@mui/material/styles';
 import List from '@mui/material/List';
-import Button from '@mui/material/Button';
+import Fab from '@mui/material/Fab';
 import ListItemButton from '@mui/material/ListItemButton';
 import ListItemText from '@mui/material/ListItemText';
 import ListItemAvatar from '@mui/material/ListItemAvatar';
@@ -116,6 +116,7 @@ export default function CharacterSelectApp(props) {
               key={char.ddbID}
               alignItems="flex-start"
               divider={hasDivider}
+              sx={{ py: 0 }}
               onClick={(event) =>
                 handleCharacterClick(
                   sortedCharacters[player][index].ddbID,
@@ -152,7 +153,7 @@ export default function CharacterSelectApp(props) {
             <AccordionSummary expandIcon={<Icon>expand_more</Icon>}>
               <Typography variant="h5">{playerName}</Typography>
             </AccordionSummary>
-            <AccordionDetails sx={{ bgcolor: '#7687a8', px: 0 }}>
+            <AccordionDetails sx={{ bgcolor: '#7687a8', padding: 0 }}>
               <List>{characterChildren}</List>
             </AccordionDetails>
           </Accordion>
@@ -162,23 +163,18 @@ export default function CharacterSelectApp(props) {
 
     return (
       <ThemeProvider theme={baseTheme}>
-        <Button
+        <Fab
           sx={{
-            position: 'absolute',
-            right: -3,
-            mt: 1,
-            mb: 1,
-            py: 2,
-            zIndex: 90,
+            position: 'fixed',
+            bottom: 16,
+            right: 16,
           }}
-          type="button"
-          id="addNewButton"
-          variant="contained"
           color="secondary"
+          variant="circular"
           onClick={(event) => handleAddButtonClick(event)}
         >
           <Icon>add</Icon>
-        </Button>
+        </Fab>
         <Box sx={{ color: 'text.primary' }}>
           <Typography
             align="center"

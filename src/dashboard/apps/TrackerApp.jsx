@@ -39,9 +39,10 @@ const baseTheme = createTheme({
 });
 
 export default function TrackerApp(props) {
-  const { characters, appSetter, charSetter, activeChar } = props;
+  const { characters, appSetter, charSetter, activeChar, trackerPage } = props;
   let character;
   let characterIndex;
+  let pageComponent;
 
   // Config
   const BIO_YPOSITION = 2;
@@ -200,10 +201,34 @@ export default function TrackerApp(props) {
     setInputValue('0');
   }
 
+  switch (trackerPage) {
+    case 2:
+      // Settings
+      pageComponent = null;
+      break;
+    case 1:
+      // More
+      pageComponent = null;
+      break;
+    default:
+      // Hit Points
+      pageComponent = (
+        <HealthManager
+          handleHpChange={(newVal) => handleHpChange(newVal)}
+          setMaxHp={(newVal) => setMaxHp(newVal)}
+          handleTempHpChange={(newVal) => handleTempHpChange(newVal)}
+          inputValue={inputValue}
+          handleKeypadClick={(i, e) => handleKeypadClick(i, e)}
+        />
+      );
+      break;
+  }
+
   return (
     <ThemeProvider theme={baseTheme}>
       <Box key="main">
         <Backdrop open={speedDialOpen} sx={{ zIndex: 100 }} />
+
         <SpeedDial
           ariaLabel="SpeedDial"
           sx={{
@@ -248,6 +273,7 @@ export default function TrackerApp(props) {
             onClick={(event) => handleRemoveButtonClick(event)}
           />
         </SpeedDial>
+
         <Button
           sx={{
             position: 'absolute',
@@ -304,13 +330,7 @@ export default function TrackerApp(props) {
         tempHp={tempHp}
         tempMax={tempMax}
       />
-      <HealthManager
-        handleHpChange={(newVal) => handleHpChange(newVal)}
-        setMaxHp={(newVal) => setMaxHp(newVal)}
-        handleTempHpChange={(newVal) => handleTempHpChange(newVal)}
-        inputValue={inputValue}
-        handleKeypadClick={(i, e) => handleKeypadClick(i, e)}
-      />
+      {pageComponent}
     </ThemeProvider>
   );
 }

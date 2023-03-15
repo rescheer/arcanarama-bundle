@@ -30,7 +30,7 @@ const HealthBar = React.memo((props) => {
           marginLeft: 'auto',
           marginRight: 'auto',
           width: '80%',
-          maxWidth: 400,
+          maxWidth: 320,
           display: 'inline-block',
           top: 75,
           height: 20,
