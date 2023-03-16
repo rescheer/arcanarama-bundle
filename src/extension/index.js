@@ -5,12 +5,13 @@ import { initVibes } from './modules/VibeCheck';
 import ChatListener from './ChatListener';
 import DashboardListener from './DashboardListener';
 import debugListener from './debugListener';
+import { initMixer, sendTestMessage } from './modules/OSC';
 
 export default function (nodecg) {
   setContext(nodecg);
 
   const coreStatus = nodecg.Replicant('coreStatus', {
-    defaultValue: { chatConnected: null, trackerPage: 'select' },
+    defaultValue: { chatConnected: null, mixerConnected: false },
     persistent: false,
   });
 
@@ -23,6 +24,8 @@ export default function (nodecg) {
   ChatListener(nodecg);
   DashboardListener(nodecg);
   debugListener(nodecg);
+  initMixer(nodecg);
+  sendTestMessage();
 
   // TODO: Commands/Timers
   // TODO: Nat 20/Nat 1 announcements with per-player stats
