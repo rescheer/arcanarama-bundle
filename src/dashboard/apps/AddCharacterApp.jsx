@@ -4,11 +4,15 @@ import { ThemeProvider, createTheme } from '@mui/material/styles';
 import Icon from '@mui/material/Icon';
 import Box from '@mui/material/Box';
 import TextField from '@mui/material/TextField';
+import MenuItem from '@mui/material/MenuItem';
 import Button from '@mui/material/Button';
 import Typography from '@mui/material/Typography';
 
 const baseTheme = createTheme({
   palette: {
+    background: {
+      paper: '#2f3a4f',
+    },
     primary: {
       main: '#2f3a4f',
     },
@@ -25,15 +29,16 @@ const baseTheme = createTheme({
 
 export default function AddCharacterApp(props) {
   const { appSetter } = props;
+  const playerItemArray = [];
 
-  const [submitDisabled, setSubmitDisabled] = React.useState(false);
+  const [submitDisabled, setSubmitDisabled] = React.useState(true);
 
   const handleSubmit = (e) => {
     e.preventDefault();
     setSubmitDisabled(true);
     const formData = new FormData(e.currentTarget);
     const name = formData.get('name');
-    const player = formData.get('player').toUpperCase();
+    const player = formData.get('player');
     const ddbID = formData.get('ddbid');
 
     const responseNode = document.getElementById('response');
@@ -57,6 +62,21 @@ export default function AddCharacterApp(props) {
 
     return false;
   };
+
+  const playersRep = window.nodecg.Replicant('players');
+
+  window.NodeCG.waitForReplicants(playersRep).then(() => {
+    const players = Object.keys(playersRep.value);
+    players.forEach((player) => {
+      playerItemArray.push(
+        <MenuItem key={player} value={player}>
+          {player}
+        </MenuItem>
+      );
+    });
+
+    setSubmitDisabled(false);
+  });
 
   function handleBackButtonClick() {
     appSetter('select');
@@ -102,9 +122,9 @@ export default function AddCharacterApp(props) {
         <TextField
           id="ddbid"
           name="ddbid"
-          label="D&DBeyond ID"
+          label="D&D Beyond ID"
           required
-          helperText="Character must be set to Public - https://www.dndbeyond.com/characters/XXXXXXXX"
+          helperText="Character must be set to Public"
           inputProps={{ inputMode: 'text', pattern: '^[0-9]+$' }}
           InputLabelProps={{ shrink: true }}
           color="secondary"
@@ -113,16 +133,20 @@ export default function AddCharacterApp(props) {
         />
         <br />
         <TextField
+          select
           id="player"
-          name="player"
-          label="Player Name"
+          label="Player"
+          defaultValue=""
           required
-          inputProps={{ inputMode: 'text' }}
-          InputLabelProps={{ shrink: true }}
           color="secondary"
           variant="filled"
-          sx={{ mb: 1, width: 1, maxWidth: 500 }}
-        />
+          sx={{ mb: 1, width: 0.8, maxWidth: 350 }}
+        >
+          {playerItemArray}
+          <MenuItem key="Guest" value="Guest">
+            Guest
+          </MenuItem>
+        </TextField>
         <br />
         <br />
         <Button

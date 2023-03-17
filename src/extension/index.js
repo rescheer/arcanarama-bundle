@@ -10,6 +10,13 @@ import { initMixer, sendTestMessage } from './modules/OSC';
 export default function (nodecg) {
   setContext(nodecg);
 
+  let playersArray;
+  if (nodecg.bundleConfig.players) {
+    playersArray = nodecg.bundleConfig.players;
+  } else {
+    nodecg.log.warn('Players not found in bundle config. Using default');
+  }
+
   const coreStatus = nodecg.Replicant('coreStatus', {
     defaultValue: { chatConnected: null, mixerConnected: false },
     persistent: false,
@@ -17,6 +24,33 @@ export default function (nodecg) {
 
   const charactersRep = nodecg.Replicant('characters', {
     defaultValue: [],
+  });
+
+  const defaultPlayerRep = {};
+  if (playersArray.length > 0) {
+    playersArray.forEach((player) => {
+      defaultPlayerRep[player] = {
+        activeCharacter: undefined,
+        seat: undefined,
+        mixer: {
+          channel: undefined,
+          micEnabled: true,
+        },
+      };
+    });
+  }
+
+  defaultPlayerRep.Guest = {
+    activeCharacter: undefined,
+    seat: undefined,
+    mixer: {
+      channel: undefined,
+      micEnabled: true,
+    },
+  };
+
+  const playersRep = nodecg.Replicant('players', {
+    defaultValue: defaultPlayerRep,
   });
 
   initVibes(nodecg);
