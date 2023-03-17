@@ -78,7 +78,7 @@ function App() {
               }}
             >
               <BottomNavigationAction
-                label="Hit Points"
+                label="Status"
                 icon={<Icon>monitor_heart</Icon>}
                 sx={{ px: 0, minWidth: 60 }}
               />
