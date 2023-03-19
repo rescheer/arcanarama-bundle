@@ -7,7 +7,7 @@ import Typography from '@mui/material/Typography';
 // Ours
 import Keypad from './Keypad';
 
-const HealthManager = React.memo((props) => {
+const StatusManager = React.memo((props) => {
   const { handleHpChange, handleTempHpChange, inputValue, handleKeypadClick } =
     props;
 
@@ -98,4 +98,4 @@ const HealthManager = React.memo((props) => {
   );
 });
 
-export default HealthManager;
+export default StatusManager;

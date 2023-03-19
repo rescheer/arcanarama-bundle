@@ -10,7 +10,7 @@ import Icon from '@mui/material/Icon';
 import Typography from '@mui/material/Typography';
 
 // Ours
-import HealthManager from './components/HealthManager';
+import StatusManager from './components/StatusManager';
 import HealthBar from './components/HealthBar';
 
 const baseTheme = createTheme({
@@ -213,7 +213,7 @@ export default function TrackerApp(props) {
     default:
       // Hit Points
       pageComponent = (
-        <HealthManager
+        <StatusManager
           handleHpChange={(newVal) => handleHpChange(newVal)}
           setMaxHp={(newVal) => setMaxHp(newVal)}
           handleTempHpChange={(newVal) => handleTempHpChange(newVal)}
