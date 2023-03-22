@@ -259,9 +259,8 @@ export default function TrackerApp(props) {
     </Accordion>
   );
 
-  const spellCasterAccordion = (
+  const spellCasterAccordion = isSpellcaster ? (
     <Accordion
-      disabled={!isSpellcaster}
       sx={ACC_ROOT_PROPS}
       expanded={expanded === 'spells'}
       onChange={handleAccordionOpen('spells')}
@@ -273,7 +272,7 @@ export default function TrackerApp(props) {
         <SpellSlots spellSlots={spellSlots} isSpellcaster={isSpellcaster} />
       </AccordionDetails>
     </Accordion>
-  );
+  ) : null;
 
   const statsAccordion = (
     <Accordion
@@ -371,8 +370,8 @@ export default function TrackerApp(props) {
       </ThemeProvider>
       <ThemeProvider theme={accordianTheme}>
         {statusAccordion}
-        {statsAccordion}
         {spellCasterAccordion}
+        {statsAccordion}
       </ThemeProvider>
     </Box>
   );
