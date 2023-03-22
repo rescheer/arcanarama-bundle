@@ -67,7 +67,7 @@ export default function SpellSlots(props) {
 
     return (
       <Box>
-        <table style={{ width: '100%' }}>
+        <table style={{ width: '100%', tableLayout: 'fixed' }}>
           <tbody>
             <tr>{slotsTopRow}</tr>
             <tr>{slotsMidRow}</tr>
