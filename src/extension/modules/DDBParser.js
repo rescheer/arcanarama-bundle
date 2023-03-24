@@ -212,37 +212,20 @@ export default function parseDDBData(id) {
       }
     });
   });
+
   // Check for stat overrides
-  rawData.overrideStats.forEach((stat, index) => {
-    if (stat.value) {
-      switch (index) {
-        case 0:
-          // str
-          computedStats.str = stat.value;
-          break;
-        case 1:
-          // dex
-          computedStats.dex = stat.value;
-          break;
-        case 2:
-          // con
-          computedStats.con = stat.value;
-          break;
-        case 3:
-          // int
-          computedStats.int = stat.value;
-          break;
-        case 4:
-          // wis
-          computedStats.wis = stat.value;
-          break;
-        case 5:
-          // cha
-          computedStats.cha = stat.value;
-          break;
-        default:
-          break;
-      }
+  rawData.overrideStats.forEach((overrideStat, index) => {
+    if (overrideStat.value) {
+      const type = getStatById(index);
+      computedStats[type] = overrideStat.value;
+    }
+  });
+
+  // Check for bonus stats
+  rawData.bonusStats.forEach((bonusStat, index) => {
+    if (bonusStat.value) {
+      const type = getStatById(index);
+      computedStats[type] += bonusStat.value;
     }
   });
   Object.assign(parsedData.stats, computedStats);
