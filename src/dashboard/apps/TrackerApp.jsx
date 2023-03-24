@@ -74,8 +74,13 @@ export default function TrackerApp(props) {
     }
   });
 
-  const { fullName, avatarUrl, hp, isSpellcaster, stats, spellSlots } =
+  const { fullName, avatarUrl, hp, ac, isSpellcaster, stats, spellSlots } =
     character.data;
+
+  let currentAc = ac.base;
+  ac.bonuses.forEach((bonus) => {
+    currentAc += bonus;
+  });
 
   const [settingsOpen, setSettingsOpen] = React.useState(false);
   const [inputValue, setInputValue] = React.useState('0');
@@ -365,6 +370,7 @@ export default function TrackerApp(props) {
             maxHp={maxHp}
             tempHp={tempHp}
             tempMax={tempMax}
+            currentAc={currentAc}
           />
         </Box>
       </ThemeProvider>

@@ -3,9 +3,10 @@ import * as React from 'react';
 import Box from '@mui/material/Box';
 import LinearProgress from '@mui/material/LinearProgress';
 import Typography from '@mui/material/Typography';
+import Icon from '@mui/material/Icon';
 
 const HealthBar = React.memo((props) => {
-  const { currentHp, maxHp, tempHp, tempMax } = props;
+  const { currentHp, maxHp, tempHp, tempMax, currentAc } = props;
   let barBackgroundClass = '';
 
   function normalize(val, maxValue, minResult, maxResult) {
@@ -89,6 +90,23 @@ const HealthBar = React.memo((props) => {
           sx={{ position: 'relative', top: -50, fontSize: 15 }}
         >
           <br />/{maxHp}
+        </Typography>
+        <Typography
+          sx={{ position: 'absolute', top: 10, left: -50, fontSize: '46px' }}
+        >
+          <Icon fontSize="inherit">shield</Icon>
+          <Typography
+            color="black"
+            sx={{
+              position: 'relative',
+              fontSize: '25px',
+              top: -62,
+              textShadow: 'none',
+              fontWeight: 'bold',
+            }}
+          >
+            {currentAc}
+          </Typography>
         </Typography>
       </Typography>
     </Box>
