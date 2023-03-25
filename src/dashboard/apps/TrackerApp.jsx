@@ -89,6 +89,10 @@ export default function TrackerApp(props) {
   const [tempHp, setTempHpState] = React.useState(hp.temp);
   const [tempMax, setTempMaxState] = React.useState(0);
   const [expanded, setExpanded] = React.useState(false);
+  // eslint-disable-next-line no-unused-vars
+  const [currentSpellSlots, setCurrentSpellSlotsState] = React.useState(
+    spellSlots.current
+  );
 
   const handleAccordionOpen = (panel) => (event, isExpanded) => {
     setExpanded(isExpanded ? panel : false);
@@ -100,6 +104,9 @@ export default function TrackerApp(props) {
     setTempHpState(characters[characterIndex].data.hp.temp);
     setTempMaxState(characters[characterIndex].data.hp.tempMax);
     setMaxHpState(characters[characterIndex].data.hp.max);
+    setCurrentSpellSlotsState(
+      characters[characterIndex].data.spellSlots.current
+    );
   }, [characters, characterIndex]);
 
   function setCurrentHp(newVal) {
@@ -126,6 +133,11 @@ export default function TrackerApp(props) {
   function setTempMax(newVal) {
     setTempMaxState(newVal);
     characters[characterIndex].data.hp.tempMax = newVal;
+  }
+
+  function setCurrentSpellSlots(newVal) {
+    setCurrentSpellSlotsState(newVal);
+    characters[characterIndex].data.spellSlots.current = newVal;
   }
 
   function handleSettingsButtonClick() {}
@@ -274,7 +286,11 @@ export default function TrackerApp(props) {
         <Typography variant="button">Spell Slots</Typography>
       </AccordionSummary>
       <AccordionDetails sx={ACC_DETAILS_PROPS}>
-        <SpellSlots spellSlots={spellSlots} isSpellcaster={isSpellcaster} />
+        <SpellSlots
+          spellSlots={spellSlots}
+          isSpellcaster={isSpellcaster}
+          setCurrentSpellSlots={(newVal) => setCurrentSpellSlots(newVal)}
+        />
       </AccordionDetails>
     </Accordion>
   ) : null;
