@@ -67,6 +67,12 @@ export function getBeyondData(obj) {
   const characterUrl = `https://character-service.dndbeyond.com/character/v3/character/${id}/`;
   const charactersRep = nodecg.Replicant('characters');
 
+  charactersRep.value.forEach((element, index) => {
+    if (id === element.ddbID) {
+      charactersRep.value.splice(index, 1);
+    }
+  });
+
   return new Promise((resolve, reject) => {
     axios
       .get(characterUrl)
@@ -85,7 +91,7 @@ export function getBeyondData(obj) {
       .catch((error) => {
         reject(error);
         getContext().sendMessage('console', {
-          type: 'warn',
+          type: 'error',
           msg: `[getBeyondData] Failed to get JSON: ${error}`,
         });
       });

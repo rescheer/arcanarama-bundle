@@ -37,13 +37,12 @@ export default function AddCharacterApp(props) {
     e.preventDefault();
     setSubmitDisabled(true);
     const formData = new FormData(e.currentTarget);
-    const name = formData.get('name');
     const player = formData.get('player');
     const ddbID = formData.get('ddbid');
 
     const responseNode = document.getElementById('response');
 
-    const character = { name, player, ddbID };
+    const character = { player, ddbID };
 
     document.getElementById('submitButton').setAttribute('disabled', true);
 
@@ -135,6 +134,7 @@ export default function AddCharacterApp(props) {
         <TextField
           select
           id="player"
+          name="player"
           label="Player"
           defaultValue=""
           required

@@ -59,32 +59,15 @@ function dashboardGiveawayHandler(data) {
 }
 
 function dashboardCharacterHandler(data, ack) {
-  const nodecg = getContext();
-  const charactersRep = nodecg.Replicant('characters');
-
   const command = Object.keys(data)[0];
 
   switch (command) {
     case 'add':
       {
-        const character = new Character.CharacterItem(
-          data[command].ddbID,
-          data[command].player
-        );
-        let isInvalid = false;
-
-        charactersRep.value.forEach((element) => {
-          if (character.ddbID === element.ddbID) {
-            ack(
-              new Error('A character with this D&DBeyond ID already exists.')
-            );
-            isInvalid = true;
-          }
-        });
-
-        if (isInvalid) {
-          return;
-        }
+        const character = {
+          ddbID: data[command].ddbID,
+          player: data[command].player,
+        };
 
         if (ack && !ack.handled) {
           Character.getBeyondData(character)
@@ -94,7 +77,7 @@ function dashboardCharacterHandler(data, ack) {
             .catch((error) => {
               ack(
                 new Error(
-                  `Could not get data from D&D Beyond. Make sure character is set to public (error: ${error})`
+                  `Could not get data from D&D Beyond (error: ${error})`
                 )
               );
             });
