@@ -1,6 +1,5 @@
 /* eslint-disable react/prop-types */
 import * as React from 'react';
-import { useReplicant } from 'use-nodecg';
 import { ThemeProvider, createTheme } from '@mui/material/styles';
 import List from '@mui/material/List';
 import Fab from '@mui/material/Fab';
@@ -68,10 +67,7 @@ function sortCharacters(arr) {
 }
 
 export default function CharacterSelectApp(props) {
-  // eslint-disable-next-line no-unused-vars
-  const [characters, updateCharacters] = useReplicant('characters');
-  const { appSetter } = props;
-  const { charSetter } = props;
+  const { characters, appSetter, charSetter } = props;
 
   let sortedCharacters;
 
