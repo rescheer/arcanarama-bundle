@@ -36,7 +36,6 @@ const Status = React.memo((props) => {
 
   const inputKeypad = (
     <>
-      <Typography variant="h6">{action.toUpperCase()}</Typography>
       <Button
         variant="contained"
         color="error"
@@ -75,7 +74,7 @@ const Status = React.memo((props) => {
   );
 
   const actionTable = (
-    <table style={{ width: '100%' }}>
+    <table style={{ width: '100%', tableLayout: 'fixed' }}>
       <tbody>
         <tr>
           <td>
@@ -119,9 +118,27 @@ const Status = React.memo((props) => {
     </table>
   );
 
+  let content;
+  let contentHeading;
+
+  switch (action) {
+    case 'heal':
+    case 'hurt':
+    case 'temp':
+      content = inputKeypad;
+      contentHeading = `${action.toUpperCase()} HP`;
+      break;
+    case 'condition':
+      // content = conditionTable;
+      break;
+    default:
+      content = actionTable;
+  }
+
   return (
     <Box key="status" sx={{ textAlign: 'center' }}>
-      {action ? inputKeypad : actionTable}
+      <Typography variant="h6">{contentHeading}</Typography>
+      {content}
     </Box>
   );
 });
