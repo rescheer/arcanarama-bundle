@@ -172,7 +172,8 @@ export default function TrackerApp(props) {
       // eslint-disable-next-line no-restricted-globals, no-alert
       if (confirm(`Remove ${character.data.fullName}?`)) {
         window.nodecg.sendMessage('character', { delete: { character } });
-        handleBackButtonClick();
+        charSetter(undefined);
+        appSetter('select');
       }
     }
   }
