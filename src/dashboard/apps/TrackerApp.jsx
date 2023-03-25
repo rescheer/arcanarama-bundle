@@ -140,7 +140,9 @@ export default function TrackerApp(props) {
     characters[characterIndex].data.spellSlots.current = newVal;
   }
 
-  function handleSettingsButtonClick() {}
+  function handleSettingsButtonClick() {
+    setSettingsOpen(!settingsOpen);
+  }
 
   function handleBackButtonClick() {
     if (settingsOpen) {
@@ -151,30 +153,29 @@ export default function TrackerApp(props) {
     }
   }
 
-  /* function handleRefreshButtonClick() {
+  function handleRefreshButtonClick() {
     if (character) {
       window.nodecg.sendMessage('character', { refresh: { character } });
-      handleClose();
+      handleBackButtonClick();
     }
   }
 
   function handleResetButtonClick() {
     if (character) {
       window.nodecg.sendMessage('character', { reparse: { character } });
-      handleClose();
+      handleBackButtonClick();
     }
   }
 
   function handleRemoveButtonClick() {
     if (character) {
-      handleClose();
       // eslint-disable-next-line no-restricted-globals, no-alert
       if (confirm(`Remove ${character.data.fullName}?`)) {
         window.nodecg.sendMessage('character', { delete: { character } });
         handleBackButtonClick();
       }
     }
-  } */
+  }
 
   function handleKeypadClick(e) {
     const newValue = e.currentTarget.value;
@@ -310,28 +311,77 @@ export default function TrackerApp(props) {
     </Accordion>
   );
 
+  const fullAccordions = (
+    <ThemeProvider theme={accordianTheme}>
+      {statusAccordion}
+      {spellCasterAccordion}
+      {statsAccordion}
+    </ThemeProvider>
+  );
+
+  const settingsContent = (
+    <Box textAlign="center">
+      <Typography variant="h5" color="white">
+        Settings
+      </Typography>
+      <hr />
+      <Button
+        variant="contained"
+        onClick={(event) => handleRefreshButtonClick(event)}
+      >
+        Refresh
+      </Button>
+      <Typography variant="subtitle1" color="white">
+        Redownload this character from D&D Beyond and reset to original values
+      </Typography>
+      <hr />
+      <Button
+        variant="contained"
+        onClick={(event) => handleResetButtonClick(event)}
+      >
+        Reset
+      </Button>
+      <Typography variant="subtitle1" color="white">
+        Reset this character to original values
+      </Typography>
+      <hr />
+      <Button
+        variant="contained"
+        color="error"
+        onClick={(event) => handleRemoveButtonClick(event)}
+      >
+        Remove
+      </Button>
+      <Typography variant="subtitle1" color="white">
+        Remove this character from Autonorama
+      </Typography>
+    </Box>
+  );
+
   return (
     <Box>
       <ThemeProvider theme={baseTheme}>
         <Box key="main">
-          <Button
-            sx={{
-              position: 'absolute',
-              right: -3,
-              mt: 1,
-              mb: 1,
-              py: 1,
-              zIndex: 90,
-            }}
-            type="button"
-            size="small"
-            id="backButton"
-            variant="contained"
-            color="secondary"
-            onClick={(event) => handleSettingsButtonClick(event)}
-          >
-            <Icon>settings</Icon>
-          </Button>
+          {!settingsOpen ? (
+            <Button
+              sx={{
+                position: 'absolute',
+                right: -3,
+                mt: 1,
+                mb: 1,
+                py: 1,
+                zIndex: 90,
+              }}
+              type="button"
+              size="small"
+              id="backButton"
+              variant="contained"
+              color="secondary"
+              onClick={(event) => handleSettingsButtonClick(event)}
+            >
+              <Icon>settings</Icon>
+            </Button>
+          ) : null}
           <Button
             sx={{
               position: 'absolute',
@@ -390,11 +440,7 @@ export default function TrackerApp(props) {
           />
         </Box>
       </ThemeProvider>
-      <ThemeProvider theme={accordianTheme}>
-        {statusAccordion}
-        {spellCasterAccordion}
-        {statsAccordion}
-      </ThemeProvider>
+      {settingsOpen ? settingsContent : fullAccordions}
     </Box>
   );
 }
