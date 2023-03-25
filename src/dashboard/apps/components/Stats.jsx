@@ -10,8 +10,8 @@ export default function Stats(props) {
   const { stats } = props;
 
   const STAT_NAME_STYLE = 'button';
-  const STAT_VALUE_STYLE = 'h4';
-  const STAT_MOD_STYLE = 'subtitle2';
+  const STAT_MOD_STYLE = 'h4';
+  const STAT_VALUE_STYLE = 'subtitle2';
 
   const statsTopRow = [];
   const statsBottomRow = [];
@@ -26,10 +26,10 @@ export default function Stats(props) {
         <ButtonBase sx={{ width: 1 }}>
           <Paper elevation={3} sx={{ width: 1 }}>
             <Typography variant={STAT_NAME_STYLE}>{name}</Typography>
-            <Typography variant={STAT_VALUE_STYLE}>{value}</Typography>
             <Typography variant={STAT_MOD_STYLE}>
-              {mod > 0 ? `+${mod}` : `${mod}`}
+              {mod >= 0 ? `+${mod}` : `${mod}`}
             </Typography>
+            <Typography variant={STAT_VALUE_STYLE}>{value}</Typography>
           </Paper>
         </ButtonBase>
       </td>
