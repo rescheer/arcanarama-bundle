@@ -47,9 +47,9 @@ const accordianTheme = createTheme({
 });
 
 /**
- * Returns an array with all player names found in the passed array
+ * Returns an object of characters sorted by player
  * @param {Object[]} arr
- * @returns {Object[]} An Array containing player names
+ * @returns {Object} An Array containing player names
  */
 function sortCharacters(arr) {
   const result = {};
