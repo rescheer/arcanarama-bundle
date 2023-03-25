@@ -2,9 +2,10 @@
 /* eslint-disable react/prop-types */
 import * as React from 'react';
 import Box from '@mui/material/Box';
-import Button from '@mui/material/Button';
+import Paper from '@mui/material/Paper';
 import Typography from '@mui/material/Typography';
 import Icon from '@mui/material/Icon';
+import ButtonBase from '@mui/material/ButtonBase';
 
 export default function SpellSlots(props) {
   const { spellSlots, isSpellcaster } = props;
@@ -38,15 +39,19 @@ export default function SpellSlots(props) {
 
       if (max > 0) {
         element = (
-          <td key={level} className="td-border">
-            <Typography
-              variant={SLOT_LEVEL_STYLE}
-            >{`Level ${level}`}</Typography>
-            <Typography variant={SLOT_CURR_STYLE}>
-              {curr}
-              <Typography variant={SLOT_MAX_STYLE}>{`/${max}`}</Typography>
-            </Typography>
-            <Typography>{icons}</Typography>
+          <td key={level}>
+            <ButtonBase sx={{ width: 1 }}>
+              <Paper elevation={3} sx={{ width: 1 }}>
+                <Typography
+                  variant={SLOT_LEVEL_STYLE}
+                >{`Level ${level}`}</Typography>
+                <Typography variant={SLOT_CURR_STYLE}>
+                  {curr}
+                  <Typography variant={SLOT_MAX_STYLE}>{`/${max}`}</Typography>
+                </Typography>
+                <Typography>{icons}</Typography>
+              </Paper>
+            </ButtonBase>
           </td>
         );
       }

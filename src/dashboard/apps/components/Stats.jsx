@@ -2,7 +2,8 @@
 /* eslint-disable react/prop-types */
 import * as React from 'react';
 import Box from '@mui/material/Box';
-import Button from '@mui/material/Button';
+import ButtonBase from '@mui/material/ButtonBase';
+import Paper from '@mui/material/Paper';
 import Typography from '@mui/material/Typography';
 
 export default function Stats(props) {
@@ -21,12 +22,16 @@ export default function Stats(props) {
     const value = stats[stat];
     const mod = Math.floor((value - 10) / 2);
     const element = (
-      <td key={name} className="td-border">
-        <Typography variant={STAT_NAME_STYLE}>{name}</Typography>
-        <Typography variant={STAT_VALUE_STYLE}>{value}</Typography>
-        <Typography variant={STAT_MOD_STYLE}>
-          {mod > 0 ? `+${mod}` : `${mod}`}
-        </Typography>
+      <td key={name}>
+        <ButtonBase sx={{ width: 1 }}>
+          <Paper elevation={3} sx={{ width: 1 }}>
+            <Typography variant={STAT_NAME_STYLE}>{name}</Typography>
+            <Typography variant={STAT_VALUE_STYLE}>{value}</Typography>
+            <Typography variant={STAT_MOD_STYLE}>
+              {mod > 0 ? `+${mod}` : `${mod}`}
+            </Typography>
+          </Paper>
+        </ButtonBase>
       </td>
     );
     switch (Math.floor(index / 3)) {
