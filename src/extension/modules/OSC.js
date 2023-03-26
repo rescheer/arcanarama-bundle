@@ -70,7 +70,7 @@ export function setChannelMute(ch, bool) {
   const mutedState = bool ? 0 : 1;
   const mutedString = bool ? 'mute' : 'unmute';
 
-  if (channel > 0 && channel <= 16) {
+  if (+channel > 0 && +channel <= 16) {
     if (ch.toString().length === 1) {
       channel = `0${ch}`;
     }
