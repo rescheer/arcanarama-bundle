@@ -301,7 +301,7 @@ export default function parseDDBData(id) {
     const highestValue = Math.max(...unarmoredDefenseValues);
     parsedData.ac.base = armorAc + shieldAc + dexMod + modAc + highestValue;
   } else {
-    parsedData.ac.base = armorAc + shieldAc + modAc;
+    parsedData.ac.base = armorAc + shieldAc + dexMod + modAc;
   }
 
   // Parse Classes
