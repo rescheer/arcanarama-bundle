@@ -64,15 +64,13 @@ function dashboardCharacterHandler(data, ack) {
   switch (command) {
     case 'add':
       {
-        const character = {
-          ddbID: data[command].ddbID,
-          player: data[command].player,
-        };
+        const { ddbId, player } = data[command];
 
         if (ack && !ack.handled) {
-          Character.getBeyondData(character)
+          Character.getBeyondData(ddbId, player)
             .then((result) => {
-              ack(null, result);
+              Character.parseRawData(ddbId);
+              ack(null, `${result} imported successfully`);
             })
             .catch((error) => {
               ack(
@@ -85,13 +83,17 @@ function dashboardCharacterHandler(data, ack) {
       }
       break;
     case 'refresh':
-      Character.getBeyondData(data[command].character);
+      Character.getBeyondData(data[command].ddbId, data[command].player).then(
+        () => {
+          Character.parseRawData(data[command].ddbId);
+        }
+      );
       break;
     case 'reparse':
-      Character.parseRawData(data[command].character.ddbID);
+      Character.parseRawData(data[command].ddbId);
       break;
     case 'delete':
-      Character.deleteCharacter(data[command].character.ddbID);
+      Character.deleteCharacter(data[command].ddbId);
       break;
     default:
       // unrecognized command

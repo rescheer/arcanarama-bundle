@@ -14,7 +14,7 @@ function App() {
   // eslint-disable-next-line no-unused-vars
   const [characters, updateCharacters] = useReplicant('characters');
   const [activeApp, setActiveApp] = React.useState('select');
-  const [activeChar, setActiveChar] = React.useState('');
+  const [activeCharId, setActiveCharId] = React.useState('');
 
   if (characters) {
     let component;
@@ -24,7 +24,7 @@ function App() {
         component = (
           <CharacterSelectApp
             appSetter={setActiveApp}
-            charSetter={setActiveChar}
+            charSetter={setActiveCharId}
             characters={characters}
           />
         );
@@ -36,8 +36,8 @@ function App() {
         component = (
           <TrackerApp
             appSetter={setActiveApp}
-            activeChar={activeChar}
-            charSetter={setActiveChar}
+            activeCharId={activeCharId}
+            charSetter={setActiveCharId}
             characters={characters}
           />
         );

@@ -91,23 +91,22 @@ const HealthBar = React.memo((props) => {
         >
           <br />/{maxHp}
         </Typography>
-        <Typography
-          sx={{ position: 'absolute', top: 10, left: -50, fontSize: '46px' }}
-        >
+        <Box sx={{ position: 'absolute', top: 4, left: -50, fontSize: '46px' }}>
           <Icon fontSize="inherit">shield</Icon>
           <Typography
             color="black"
+            paragraph={false}
             sx={{
               position: 'relative',
               fontSize: '25px',
-              top: -62,
+              top: -68,
               textShadow: 'none',
               fontWeight: 'bold',
             }}
           >
             {currentAc}
           </Typography>
-        </Typography>
+        </Box>
       </Typography>
     </Box>
   );

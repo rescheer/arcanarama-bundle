@@ -23,7 +23,7 @@ export default function (nodecg) {
   });
 
   const charactersRep = nodecg.Replicant('characters', {
-    defaultValue: [],
+    defaultValue: {},
   });
 
   const defaultPlayerRep = {};

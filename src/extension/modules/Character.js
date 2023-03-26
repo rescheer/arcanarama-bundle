@@ -3,36 +3,11 @@ import axios from 'axios';
 import { getContext } from '../util/nodecg-api-context';
 import parseDDBData from './DDBParser';
 
-export class CharacterItem {
-  constructor(ddbID, player) {
-    this.ddbID = ddbID;
-    this.player = player;
-    this.timestamp = '';
-    this.hidden = false;
-    this.data = {};
-    this.override = {};
-    this.computedData = {};
-  }
-}
-
-function getCharacterIndexById(id) {
-  const nodecg = getContext();
-  const characters = nodecg.Replicant('characters');
-  let index;
-
-  characters.value.forEach((character, i) => {
-    if (id === character.ddbID) {
-      index = i;
-    }
-  });
-  return index;
-}
-
 export function deleteCharacter(id) {
   const nodecg = getContext();
-  const characters = nodecg.Replicant('characters');
+  const charactersRep = nodecg.Replicant('characters');
 
-  characters.value.splice(getCharacterIndexById(id), 1);
+  delete charactersRep.value[id];
 }
 
 export function getComputedData(obj) {
@@ -46,13 +21,8 @@ export function getComputedData(obj) {
 export function parseRawData(id) {
   const nodecg = getContext();
   const charactersRep = nodecg.Replicant('characters');
-  const index = getCharacterIndexById(id);
-  const char = charactersRep.value[index];
-  if (char) {
-    char.data = {};
-    Object.assign(char.data, parseDDBData(id));
-    char.computedData = getComputedData(char);
-  }
+
+  charactersRep.value[id].data = parseDDBData(id);
 }
 
 export function resetOverrides(obj) {
@@ -61,39 +31,19 @@ export function resetOverrides(obj) {
   getComputedData();
 }
 
-export function getBeyondData(obj) {
+export async function getBeyondData(ddbId, player) {
+  const result = { player, ddbId };
+  const characterUrl = `https://character-service.dndbeyond.com/character/v3/character/${ddbId}/`;
   const nodecg = getContext();
-  const id = obj.ddbID;
-  const characterUrl = `https://character-service.dndbeyond.com/character/v3/character/${id}/`;
   const charactersRep = nodecg.Replicant('characters');
 
-  charactersRep.value.forEach((element, index) => {
-    if (id === element.ddbID) {
-      charactersRep.value.splice(index, 1);
-    }
-  });
+  const response = await axios.get(characterUrl);
+  const newRep = nodecg.Replicant(ddbId);
+  const characterName = response.data.data.name;
 
-  return new Promise((resolve, reject) => {
-    axios
-      .get(characterUrl)
-      .then((res) => {
-        charactersRep.value.push(obj);
-        getContext().sendMessage('console', {
-          type: 'info',
-          msg: `[getBeyondData] Successfully got DDB data for ${res.data.data.name} (id ${obj.ddbID})`,
-        });
-        const newRep = getContext().Replicant(id);
-        obj.timestamp = Date.now();
-        newRep.value = res.data.data;
-        parseRawData(id);
-        resolve('Character added successfully');
-      })
-      .catch((error) => {
-        reject(error);
-        getContext().sendMessage('console', {
-          type: 'error',
-          msg: `[getBeyondData] Failed to get JSON: ${error}`,
-        });
-      });
-  });
+  result.timestamp = Date.now();
+  newRep.value = response.data.data;
+  charactersRep.value[ddbId] = result;
+
+  return characterName;
 }

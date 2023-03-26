@@ -57,9 +57,8 @@ const accordianTheme = createTheme({
 });
 
 export default function TrackerApp(props) {
-  const { characters, appSetter, charSetter, activeChar } = props;
+  const { characters, appSetter, charSetter, activeCharId } = props;
   let character;
-  let characterIndex;
 
   // Config
   const BIO_YPOSITION = 2;
@@ -67,12 +66,12 @@ export default function TrackerApp(props) {
   const ACC_DETAILS_PROPS = { bgcolor: '#7687a8', padding: 0 };
   const ACC_ROOT_PROPS = { bgcolor: '#525f78' };
 
-  characters.forEach((char, index) => {
-    if (+activeChar === +char.ddbID) {
-      character = characters[index];
-      characterIndex = index;
-    }
-  });
+  if (Object.hasOwn(characters, activeCharId)) {
+    character = characters[activeCharId];
+  } else {
+    charSetter(undefined);
+    appSetter('select');
+  }
 
   const { fullName, avatarUrl, hp, ac, isSpellcaster, stats, spellSlots } =
     character.data;
@@ -100,44 +99,42 @@ export default function TrackerApp(props) {
 
   // When another client changes the replicant, update states from it
   React.useEffect(() => {
-    setCurrentHpState(characters[characterIndex].data.hp.current);
-    setTempHpState(characters[characterIndex].data.hp.temp);
-    setTempMaxState(characters[characterIndex].data.hp.tempMax);
-    setMaxHpState(characters[characterIndex].data.hp.max);
-    setCurrentSpellSlotsState(
-      characters[characterIndex].data.spellSlots.current
-    );
-  }, [characters, characterIndex]);
+    setCurrentHpState(characters[activeCharId].data.hp.current);
+    setTempHpState(characters[activeCharId].data.hp.temp);
+    setTempMaxState(characters[activeCharId].data.hp.tempMax);
+    setMaxHpState(characters[activeCharId].data.hp.max);
+    setCurrentSpellSlotsState(characters[activeCharId].data.spellSlots.current);
+  }, [characters, activeCharId]);
 
   function setCurrentHp(newVal) {
     setCurrentHpState(newVal);
-    characters[characterIndex].data.hp.current = newVal;
+    characters[activeCharId].data.hp.current = newVal;
   }
 
   function setTempHp(newVal) {
     setTempHpState(newVal);
-    characters[characterIndex].data.hp.temp = newVal;
+    characters[activeCharId].data.hp.temp = newVal;
   }
 
   function setMaxHp(newVal) {
     if (currentHp < newVal) {
       setMaxHpState(newVal);
-      characters[characterIndex].data.hp.max = newVal;
+      characters[activeCharId].data.hp.max = newVal;
     } else {
       setMaxHpState(newVal);
-      characters[characterIndex].data.hp.max = newVal;
+      characters[activeCharId].data.hp.max = newVal;
       setCurrentHp(newVal);
     }
   }
 
   function setTempMax(newVal) {
     setTempMaxState(newVal);
-    characters[characterIndex].data.hp.tempMax = newVal;
+    characters[activeCharId].data.hp.tempMax = newVal;
   }
 
   function setCurrentSpellSlots(newVal) {
     setCurrentSpellSlotsState(newVal);
-    characters[characterIndex].data.spellSlots.current = newVal;
+    characters[activeCharId].data.spellSlots.current = newVal;
   }
 
   function handleSettingsButtonClick() {
@@ -155,15 +152,21 @@ export default function TrackerApp(props) {
 
   function handleRefreshButtonClick() {
     if (character) {
-      window.nodecg.sendMessage('character', { refresh: { character } });
-      handleBackButtonClick();
+      window.nodecg.sendMessage('character', {
+        refresh: { ddbId: character.ddbId, player: character.player },
+      });
+      charSetter(undefined);
+      appSetter('select');
     }
   }
 
   function handleResetButtonClick() {
     if (character) {
-      window.nodecg.sendMessage('character', { reparse: { character } });
-      handleBackButtonClick();
+      window.nodecg.sendMessage('character', {
+        reparse: { ddbId: character.ddbId },
+      });
+      charSetter(undefined);
+      appSetter('select');
     }
   }
 
@@ -171,7 +174,9 @@ export default function TrackerApp(props) {
     if (character) {
       // eslint-disable-next-line no-restricted-globals, no-alert
       if (confirm(`Remove ${character.data.fullName}?`)) {
-        window.nodecg.sendMessage('character', { delete: { character } });
+        window.nodecg.sendMessage('character', {
+          delete: { ddbId: character.ddbId },
+        });
         charSetter(undefined);
         appSetter('select');
       }

@@ -48,22 +48,62 @@ const accordianTheme = createTheme({
 
 /**
  * Returns an object of characters sorted by player
- * @param {Object[]} arr
+ * @param {Object} replicant - A replicant containing one or more characters
  * @returns {Object} An Array containing player names
  */
-function sortCharacters(arr) {
+function groupCharactersByPlayer(replicant) {
   const result = {};
+  const data = replicant;
 
-  arr.forEach((element) => {
-    const p = element.player;
-    const resultKeys = Object.keys(result);
-    if (!resultKeys.includes(p)) {
-      result[p] = [];
+  if (data) {
+    const keys = Object.keys(data);
+    if (keys.length > 0) {
+      keys.forEach((key) => {
+        const p = data[key].player;
+        if (!keys.includes(p)) {
+          result[p] = [];
+        }
+        result[p].push(data[key]);
+      });
     }
-    result[p].push(element);
-  });
+  }
 
   return result;
+}
+
+function getRelativeTimeString(date, lang = navigator.language) {
+  // Allow dates or times to be passed
+  const timeMs = typeof date === 'number' ? date : date.getTime();
+
+  // Get the amount of seconds between the given date and now
+  const deltaSeconds = Math.round((timeMs - Date.now()) / 1000);
+
+  // Array reprsenting one minute, hour, day, week, month, etc in seconds
+  const cutoffs = [
+    60,
+    3600,
+    86400,
+    86400 * 7,
+    86400 * 30,
+    86400 * 365,
+    Infinity,
+  ];
+
+  // Array equivalent to the above but in the string representation of the units
+  const units = ['second', 'minute', 'hour', 'day', 'week', 'month', 'year'];
+
+  // Grab the ideal cutoff unit
+  const unitIndex = cutoffs.findIndex(
+    (cutoff) => cutoff > Math.abs(deltaSeconds)
+  );
+
+  // Get the divisor to divide from the seconds. E.g. if our unit is "day" our divisor
+  // is one day in seconds, so we can divide our seconds by this to get the # of days
+  const divisor = unitIndex ? cutoffs[unitIndex - 1] : 1;
+
+  // Intl.RelativeTimeFormat do its magic
+  const rtf = new Intl.RelativeTimeFormat(lang, { numeric: 'auto' });
+  return rtf.format(Math.floor(deltaSeconds / divisor), units[unitIndex]);
 }
 
 export default function CharacterSelectApp(props) {
@@ -72,7 +112,7 @@ export default function CharacterSelectApp(props) {
   let sortedCharacters;
 
   if (characters) {
-    sortedCharacters = sortCharacters(characters);
+    sortedCharacters = groupCharactersByPlayer(characters);
   }
 
   function handleCharacterClick(id) {
@@ -97,7 +137,9 @@ export default function CharacterSelectApp(props) {
         if (char?.data?.fullName) {
           const hasDivider = index < sortedCharacters[player].length - 1;
 
-          const { fullName, race, description } = char.data;
+          const { fullName, description } = char.data;
+          const { timestamp } = char;
+          const timeString = getRelativeTimeString(timestamp);
 
           // Get avatar
           let { avatarUrl } = char.data;
@@ -109,13 +151,13 @@ export default function CharacterSelectApp(props) {
 
           characterChildren.push(
             <ListItemButton
-              key={char.ddbID}
+              key={char.ddbId}
               alignItems="flex-start"
               divider={hasDivider}
               sx={{ py: 0 }}
               onClick={(event) =>
                 handleCharacterClick(
-                  sortedCharacters[player][index].ddbID,
+                  sortedCharacters[player][index].ddbId,
                   event
                 )
               }
@@ -128,9 +170,9 @@ export default function CharacterSelectApp(props) {
                 primaryTypographyProps={{ variant: 'h5' }}
                 secondary={
                   <>
-                    {race}
-                    <br />
                     {description.classes.simple.toString().replace(/,/g, ' / ')}
+                    <br />
+                    Imported {timeString}
                   </>
                 }
                 secondaryTypographyProps={{ variant: 'caption' }}

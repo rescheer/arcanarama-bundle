@@ -237,12 +237,12 @@ export default function parseDDBData(id) {
   let isWearingShield = false;
 
   const dexMod = Math.floor((parsedData.stats.dex - 10) / 2);
-  // armorTypeId:
-  // 1: light (full dex bonus)
-  // 2: medium(max + 2 dex bonus)
-  // 3: heavy (0 dex bonus)
-  // 4: shield
   equippedArmor.forEach((armor) => {
+    // armorTypeId:
+    // 1: light (full dex bonus)
+    // 2: medium(max + 2 dex bonus)
+    // 3: heavy (0 dex bonus)
+    // 4: shield
     switch (armor.armorTypeId) {
       case 1:
         // Light armor (full dex bonus)
@@ -300,7 +300,11 @@ export default function parseDDBData(id) {
 
     const highestValue = Math.max(...unarmoredDefenseValues);
     parsedData.ac.base = armorAc + shieldAc + dexMod + modAc + highestValue;
+  } else if (isWearingArmor) {
+    // The char is wearing armor and does not have Unarmored Defense
+    parsedData.ac.base = armorAc + shieldAc + modAc;
   } else {
+    // The char is not wearing armor and does not have Unarmored Defense
     parsedData.ac.base = armorAc + shieldAc + dexMod + modAc;
   }
 
