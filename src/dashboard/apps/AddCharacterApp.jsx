@@ -3,6 +3,7 @@ import * as React from 'react';
 import { ThemeProvider, createTheme } from '@mui/material/styles';
 import Icon from '@mui/material/Icon';
 import Box from '@mui/material/Box';
+import CircularProgress from '@mui/material/CircularProgress';
 import TextField from '@mui/material/TextField';
 import MenuItem from '@mui/material/MenuItem';
 import Button from '@mui/material/Button';
@@ -31,17 +32,17 @@ export default function AddCharacterApp(props) {
   const { appSetter } = props;
   const playerItemArray = [];
 
-  let submitDisabled = false;
+  const [isWaitingForData, setIsWaitingForData] = React.useState(false);
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    submitDisabled = true;
+    setIsWaitingForData(true);
     const formData = new FormData(e.currentTarget);
     const player = formData.get('player');
     const ddbId = formData.get('ddbid');
 
     const responseNode = document.getElementById('response');
-
+    responseNode.innerHTML = '';
     const character = { player, ddbId };
 
     window.nodecg
@@ -49,12 +50,12 @@ export default function AddCharacterApp(props) {
       .then((result) => {
         responseNode.style.color = 'green';
         responseNode.innerHTML = result;
-        submitDisabled = false;
+        setIsWaitingForData(false);
       })
       .catch((error) => {
         responseNode.style.color = 'red';
         responseNode.innerHTML = error.message;
-        submitDisabled = false;
+        setIsWaitingForData(false);
       });
   };
 
@@ -69,8 +70,6 @@ export default function AddCharacterApp(props) {
         </MenuItem>
       );
     });
-
-    submitDisabled = false;
   });
 
   function handleBackButtonClick() {
@@ -92,8 +91,8 @@ export default function AddCharacterApp(props) {
         id="backButton"
         variant="contained"
         color="primary"
-        disabled={submitDisabled}
         onClick={(event) => handleBackButtonClick(event)}
+        disabled={isWaitingForData}
       >
         <Icon>arrow_back</Icon>
       </Button>
@@ -152,11 +151,19 @@ export default function AddCharacterApp(props) {
             id="submitButton"
             variant="contained"
             color="secondary"
-            disabled={submitDisabled}
+            disabled={isWaitingForData}
           >
             Add Character
           </Button>
         </form>
+        <br />
+        <CircularProgress
+          id="loadingindicator"
+          color="success"
+          sx={
+            isWaitingForData ? { display: 'inline-block' } : { display: 'none' }
+          }
+        />
         <p id="response" />
       </Box>
     </ThemeProvider>

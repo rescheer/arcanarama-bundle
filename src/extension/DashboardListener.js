@@ -70,13 +70,11 @@ function dashboardCharacterHandler(data, ack) {
           Character.getBeyondData(ddbId, player)
             .then((result) => {
               Character.parseRawData(ddbId);
-              ack(null, `${result} imported successfully`);
+              ack(null, result);
             })
             .catch((error) => {
               ack(
-                new Error(
-                  `Could not get data from D&D Beyond (error: ${error})`
-                )
+                new Error(`Couldn't get data from D&D Beyond (error: ${error})`)
               );
             });
         }

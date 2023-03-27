@@ -37,13 +37,29 @@ export async function getBeyondData(ddbId, player) {
   const nodecg = getContext();
   const charactersRep = nodecg.Replicant('characters');
 
-  const response = await axios.get(characterUrl);
-  const newRep = nodecg.Replicant(ddbId);
-  const characterName = response.data.data.name;
+  return new Promise((resolve, reject) => {
+    axios
+      .get(characterUrl)
+      .then((res) => {
+        const newRep = nodecg.Replicant(ddbId);
+        const characterName = res.data.data.name;
 
-  result.timestamp = Date.now();
-  newRep.value = response.data.data;
-  charactersRep.value[ddbId] = result;
+        getContext().sendMessage('console', {
+          type: 'info',
+          msg: `[getBeyondData] Successfully got DDB data for ${characterName} (id ${ddbId})`,
+        });
 
-  return characterName;
+        result.timestamp = Date.now();
+        newRep.value = res.data.data;
+        charactersRep.value[ddbId] = result;
+        resolve(`${characterName} was imported successfully!`);
+      })
+      .catch((error) => {
+        reject(error);
+        getContext().sendMessage('console', {
+          type: 'error',
+          msg: `[getBeyondData] Failed to get JSON: ${error}`,
+        });
+      });
+  });
 }
