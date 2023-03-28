@@ -135,10 +135,16 @@ export function initVibes(nodecg) {
   vibesStatus.on('change', (newValue) => {
     switch (newValue.update) {
       case 'success':
-        nodecg.log.info('[Vibecheck] Module loaded.');
+        nodecg.sendMessage('console', {
+          type: 'info',
+          msg: '[Vibecheck] Module loaded.',
+        });
         break;
       case 'failure':
-        nodecg.log.error('[Vibecheck] Module failed to load.');
+        nodecg.sendMessage('console', {
+          type: 'error',
+          msg: '[Vibecheck] Module failed to load.',
+        });
         break;
       default:
         break;
