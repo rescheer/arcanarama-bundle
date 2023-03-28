@@ -1,6 +1,6 @@
 import * as Giveaway from './modules/Giveaway';
 import { getContext } from './util/nodecg-api-context';
-import { getChatClient, getChatChannel } from './util/chatclient-context';
+import { getChatClient, getChatChannel } from './util/twitch-api-context';
 import * as Character from './modules/Character';
 
 function dashboardGiveawayHandler(data) {

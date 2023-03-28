@@ -41,7 +41,6 @@ function App() {
       disableWindowBlurListener: true,
       preventDuplicate: true,
       hideIconVariant: true,
-      style: { minWidth: '200px', left: '0px' },
     });
   }
 

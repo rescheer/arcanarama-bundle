@@ -5,7 +5,8 @@ import { initVibes } from './modules/VibeCheck';
 import ChatListener from './ChatListener';
 import DashboardListener from './DashboardListener';
 import debugListener from './debugListener';
-import { initMixer, sendTestMessage } from './modules/OSC';
+import { initMixer } from './modules/OSC';
+import { initTwitchAuth } from './modules/Twitch';
 
 export default function (nodecg) {
   setContext(nodecg);
@@ -18,7 +19,11 @@ export default function (nodecg) {
   }
 
   const coreStatus = nodecg.Replicant('coreStatus', {
-    defaultValue: { chatConnected: null, mixerConnected: false },
+    defaultValue: {
+      chatConnected: null,
+      twitchConnected: null,
+      mixerConnected: false,
+    },
     persistent: false,
   });
 
@@ -27,7 +32,7 @@ export default function (nodecg) {
   });
 
   const defaultPlayerRep = {};
-  if (playersArray.length > 0) {
+  if (Array.isArray(playersArray) && playersArray.length > 0) {
     playersArray.forEach((player) => {
       defaultPlayerRep[player] = {
         activeCharacter: undefined,
@@ -59,11 +64,9 @@ export default function (nodecg) {
   DashboardListener(nodecg);
   debugListener(nodecg);
   initMixer(nodecg);
-  sendTestMessage();
+  initTwitchAuth();
 
   // TODO: Commands/Timers
-  // TODO: Nat 20/Nat 1 announcements with per-player stats
-  // TODO: Sub/Follow Alerts
   // TODO: Spotify Connect(song info)
   // TODO: Discord Connect(twitch chat / stream message when someone joins the discord)
 }
