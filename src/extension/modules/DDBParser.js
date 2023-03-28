@@ -216,7 +216,7 @@ export default function parseDDBData(id) {
   // Check for stat overrides
   rawData.overrideStats.forEach((overrideStat, index) => {
     if (overrideStat.value) {
-      const type = getStatById(index);
+      const type = getStatById(index + 1);
       computedStats[type] = overrideStat.value;
     }
   });
