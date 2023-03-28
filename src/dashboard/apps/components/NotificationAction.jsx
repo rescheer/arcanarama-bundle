@@ -4,7 +4,7 @@ import IconButton from '@mui/material/IconButton';
 import Icon from '@mui/material/Icon';
 import CircularProgress from '@mui/material/CircularProgress';
 
-export function NotificationTimed(props) {
+export default function NotificationTimed(props) {
   const { text, duration, closeSnackbar } = props;
   const UPDATE_MS = 30;
 
@@ -42,24 +42,6 @@ export function NotificationTimed(props) {
         value={normalize(progress)}
         sx={{ position: 'absolute' }}
       />
-      <Icon fontSize="large">close</Icon>
-    </IconButton>
-  );
-
-  return noteCloseAction;
-}
-
-export function NotificationPersist(props) {
-  const { text, closeSnackbar } = props;
-
-  const noteCloseAction = (
-    <IconButton
-      size="small"
-      aria-label="close"
-      color="inherit"
-      value={text}
-      onClick={(e) => closeSnackbar(e.currentTarget.value)}
-    >
       <Icon fontSize="large">close</Icon>
     </IconButton>
   );
