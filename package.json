@@ -138,6 +138,7 @@
     "gsap": "^3.10.4",
     "nodecg-io-core": "^0.2.0",
     "nodecg-io-twitch-chat": "^0.2.0",
+    "notistack": "^3.0.1",
     "osc": "^2.4.4",
     "parcel": "^2.8.3",
     "prop-types": "^15.8.1",
