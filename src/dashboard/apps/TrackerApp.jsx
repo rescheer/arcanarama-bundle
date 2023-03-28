@@ -202,10 +202,12 @@ export default function TrackerApp(props) {
           }
           break;
         default:
-          if (inputValue === '0') {
-            setInputValue(`${newValue}`);
-          } else {
-            setInputValue(`${inputValue}${newValue}`);
+          if (inputValue.length < 3) {
+            if (inputValue === '0') {
+              setInputValue(`${newValue}`);
+            } else {
+              setInputValue(`${inputValue}${newValue}`);
+            }
           }
           break;
       }
@@ -326,7 +328,7 @@ export default function TrackerApp(props) {
   );
 
   const settingsContent = (
-    <Box textAlign="center">
+    <Box textAlign="center" sx={{ px: 1 }}>
       <Typography variant="h5" color="white">
         Settings
       </Typography>
