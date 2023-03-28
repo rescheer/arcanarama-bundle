@@ -36,26 +36,26 @@ const Status = React.memo((props) => {
 
   const inputKeypad = (
     <>
-      <Button
-        variant="contained"
-        color="error"
-        value="Cancel"
-        onClick={(e) => handleCancelClick(e)}
-        sx={{ mx: 2, width: '35%' }}
-      >
-        Cancel
-      </Button>
-      <Button
-        variant="contained"
-        color="info"
-        value="Cancel"
-        onClick={(e) => handleConfirmClick(e)}
-        sx={{ mx: 2, width: '35%' }}
-      >
-        Confirm
-      </Button>
-      <Typography variant="h5" color="text.primary">
+      <Typography variant="h5" color="text.primary" sx={{ py: 1 }}>
         {`${inputValue}`}
+        <Button
+          variant="contained"
+          color="error"
+          value="Cancel"
+          onClick={(e) => handleCancelClick(e)}
+          sx={{ position: 'absolute', left: 8, width: '30%' }}
+        >
+          Cancel
+        </Button>
+        <Button
+          variant="contained"
+          color="info"
+          value="Cancel"
+          onClick={(e) => handleConfirmClick(e)}
+          sx={{ position: 'absolute', right: 8, width: '30%' }}
+        >
+          {action}
+        </Button>
       </Typography>
       <Keypad
         tableWidth="50%"
@@ -67,7 +67,7 @@ const Status = React.memo((props) => {
           width: KEYPAD_SIZE,
           minWidth: 0,
           borderRadius: '50%',
-          margin: 0.5,
+          margin: 0.25,
         }}
       />
     </>
@@ -119,14 +119,12 @@ const Status = React.memo((props) => {
   );
 
   let content;
-  let contentHeading;
 
   switch (action) {
     case 'heal':
     case 'hurt':
     case 'temp':
       content = inputKeypad;
-      contentHeading = `${action.toUpperCase()} HP`;
       break;
     case 'condition':
       // content = conditionTable;
@@ -137,7 +135,6 @@ const Status = React.memo((props) => {
 
   return (
     <Box key="status" sx={{ textAlign: 'center' }}>
-      <Typography variant="h6">{contentHeading}</Typography>
       {content}
     </Box>
   );
