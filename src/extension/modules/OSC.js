@@ -48,7 +48,10 @@ export function initMixer(nodecg) {
   udpPort.on('message', (oscMessage) => {
     // Needs to check for responses and update the status rep
     if (oscMessage.address === '/info') {
-      nodecg.log.info('[OSC] Mixer connection test successful');
+      nodecg.sendMessage('console', {
+        type: 'info',
+        msg: '[OSC] Mixer connection test successful',
+      });
       coreStatus.value.mixerConnected = true;
     } else {
       nodecg.log.info(oscMessage);
@@ -56,12 +59,9 @@ export function initMixer(nodecg) {
   });
 
   udpPort.open();
+  udpPort.send({ address: '/info', args: [] });
 
   return udpPort;
-}
-
-export function sendTestMessage() {
-  udpPort.send({ address: '/info', args: [] });
 }
 
 export function setChannelMute(ch, bool) {
