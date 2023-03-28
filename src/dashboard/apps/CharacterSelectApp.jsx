@@ -109,11 +109,17 @@ function getRelativeTimeString(date, lang = navigator.language) {
 export default function CharacterSelectApp(props) {
   const { characters, appSetter, charSetter } = props;
 
+  const [expanded, setExpanded] = React.useState('');
+
   let sortedCharacters;
 
   if (characters) {
     sortedCharacters = groupCharactersByPlayer(characters);
   }
+
+  const handleAccordionOpen = (panel) => (event, isExpanded) => {
+    setExpanded(isExpanded ? panel : false);
+  };
 
   function handleCharacterClick(id) {
     window.localStorage.setItem('storedChar', id);
@@ -187,7 +193,11 @@ export default function CharacterSelectApp(props) {
 
       playerChildren.push(
         <ThemeProvider theme={accordianTheme} key={player}>
-          <Accordion sx={{ bgcolor: '#525f78' }}>
+          <Accordion
+            sx={{ bgcolor: '#525f78' }}
+            expanded={expanded === player}
+            onChange={handleAccordionOpen(player)}
+          >
             <AccordionSummary expandIcon={<Icon>expand_more</Icon>}>
               <Typography variant="h5">{playerName}</Typography>
             </AccordionSummary>
