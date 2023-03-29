@@ -1,7 +1,11 @@
-import * as Giveaway from './modules/Giveaway';
 import { getContext } from './util/nodecg-api-context';
 import { getChatClient, getChatChannel } from './util/twitch-api-context';
+
+import * as Giveaway from './modules/Giveaway';
 import * as Character from './modules/Character';
+import * as Mixer from './modules/OSC';
+
+// Message packet format: { COMMAND: { ARG1: value, ARG2: value, ...}}
 
 function dashboardGiveawayHandler(data) {
   const nodecg = getContext();
@@ -99,7 +103,48 @@ function dashboardCharacterHandler(data, ack) {
   }
 }
 
+function dashboardMixerHandler(data, ack) {
+  const nodecg = getContext();
+  const statusRep = nodecg.Replicant('coreStatus');
+  const command = Object.keys(data)[0];
+
+  if (statusRep.value.mixerConnected) {
+    switch (command) {
+      case 'mute':
+      case 'unmute':
+        {
+          // Args: { channel: <string>, muteBool: <bool> }
+          const { channel, muteBool } = data[command];
+
+          if (ack && !ack.handled) {
+            Mixer.setChannelMute(channel, muteBool)
+              .then((result) => {
+                ack(null, result);
+              })
+              .catch((error) => {
+                nodecg.sendMessage('console', {
+                  type: 'error',
+                  msg: `[OSC] Mute/Unmute Failed: ${error}`,
+                });
+                ack(new Error(`Error: ${error}`));
+              });
+          }
+        }
+        break;
+
+      default:
+        break;
+    }
+  } else {
+    nodecg.sendMessage('console', {
+      type: 'warn',
+      msg: `[OSC] Ignored command '${command}': Mixer not connected.`,
+    });
+  }
+}
+
 export default function dashboardListener(nodecg) {
   nodecg.listenFor('giveaway', dashboardGiveawayHandler);
   nodecg.listenFor('character', dashboardCharacterHandler);
+  nodecg.listenFor('mixer', dashboardMixerHandler);
 }
