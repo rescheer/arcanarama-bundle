@@ -110,21 +110,40 @@ function dashboardMixerHandler(data, ack) {
 
   if (statusRep.value.mixerConnected) {
     switch (command) {
-      case 'mute':
-      case 'unmute':
+      case 'setChannelMute':
         {
-          // Args: { channel: <string>, muteBool: <bool> }
-          const { channel, muteBool } = data[command];
+          // Args: { channel: <string>, micState: <number> }
+          const { channel, micState } = data[command];
 
           if (ack && !ack.handled) {
-            Mixer.setChannelMute(channel, muteBool)
+            Mixer.setChannelMute(channel, micState)
               .then((result) => {
                 ack(null, result);
               })
               .catch((error) => {
                 nodecg.sendMessage('console', {
                   type: 'error',
-                  msg: `[OSC] Mute/Unmute Failed: ${error}`,
+                  msg: `[OSC] Set Mute Failed: ${error}`,
+                });
+                ack(new Error(`Error: ${error}`));
+              });
+          }
+        }
+        break;
+      case 'getChannelMute':
+        {
+          // Args: { channel: <string> }
+          const { channel, micState } = data[command];
+
+          if (ack && !ack.handled) {
+            Mixer.getChannelMute(channel, micState)
+              .then((result) => {
+                ack(null, result);
+              })
+              .catch((error) => {
+                nodecg.sendMessage('console', {
+                  type: 'error',
+                  msg: `[OSC] Get Mute Failed: ${error}`,
                 });
                 ack(new Error(`Error: ${error}`));
               });
@@ -132,6 +151,30 @@ function dashboardMixerHandler(data, ack) {
         }
         break;
 
+      case 'setHardMute':
+        // Args: { state: <number> }
+        break;
+      case 'getHardMute':
+        // Args: {}
+        break;
+
+      case 'setSendFader':
+        // Args: { channel: <string>, sendChannel: <string>, level: <number> }
+        break;
+      case 'getSendFader':
+        // Args: { channel: <string>, sendChannel: <string> }
+        break;
+
+      case 'setGateState':
+        // Args: { channel: <string>, state: <number> }
+        break;
+      case 'getGateState':
+        // Args: { channel: <string> }
+        break;
+
+      case 'getChannelName':
+        // Args: { channel: <string> }
+        break;
       default:
         break;
     }
