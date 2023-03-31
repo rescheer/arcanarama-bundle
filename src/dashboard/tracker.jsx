@@ -12,10 +12,13 @@ import AddCharacterApp from './apps/AddCharacterApp';
 import NotificationTimed from './apps/components/NotificationAction';
 
 const charactersRep = window.nodecg.Replicant('characters');
+const playersRep = window.nodecg.Replicant('players');
 
 function App() {
   // eslint-disable-next-line no-unused-vars
   const [characters, updateCharacters] = useReplicant('characters');
+  // eslint-disable-next-line no-unused-vars
+  const [players, updatePlayers] = useReplicant('players');
   const { enqueueSnackbar, closeSnackbar } = useSnackbar();
   const [activeApp, setActiveApp] = React.useState('select');
   const [activeCharId, setActiveCharId] = React.useState('');
@@ -75,6 +78,7 @@ function App() {
             activeCharId={activeCharId}
             charSetter={setActiveCharId}
             characters={characters}
+            players={players}
           />
         );
         break;
@@ -84,7 +88,7 @@ function App() {
   return null;
 }
 
-window.NodeCG.waitForReplicants(charactersRep).then(() => {
+window.NodeCG.waitForReplicants(charactersRep, playersRep).then(() => {
   ReactDOM.createRoot(document.querySelector('#root')).render(
     <React.StrictMode>
       <SnackbarProvider dense>

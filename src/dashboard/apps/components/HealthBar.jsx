@@ -6,7 +6,7 @@ import Typography from '@mui/material/Typography';
 import Icon from '@mui/material/Icon';
 
 const HealthBar = React.memo((props) => {
-  const { currentHp, maxHp, tempHp, tempMax, currentAc } = props;
+  const { currentHp, maxHp, tempHp, tempMax, currentAc, micEnabled } = props;
   let barBackgroundClass = '';
 
   function normalize(val, maxValue, minResult, maxResult) {
@@ -17,8 +17,10 @@ const HealthBar = React.memo((props) => {
     barBackgroundClass = 'flashRed';
   }
 
+  const bgColor = micEnabled ? '' : 'red';
+
   return (
-    <Box sx={{ textAlign: 'center' }}>
+    <Box sx={{ textAlign: 'center', backgroundColor: bgColor }}>
       <LinearProgress
         variant="buffer"
         value={normalize(currentHp, maxHp, 0, 100)}

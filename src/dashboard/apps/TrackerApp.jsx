@@ -14,6 +14,7 @@ import Status from './components/Status';
 import HealthBar from './components/HealthBar';
 import SpellSlots from './components/SpellSlots';
 import Stats from './components/Stats';
+import StreamMenu from './components/StreamMenu';
 
 const baseTheme = createTheme({
   palette: {
@@ -57,11 +58,16 @@ const accordianTheme = createTheme({
 });
 
 export default function TrackerApp(props) {
-  const { characters, appSetter, charSetter, activeCharId } = props;
+  const {
+    characters,
+    appSetter,
+    charSetter,
+    activeCharId,
+    players,
+    updatePlayers,
+  } = props;
   let character;
 
-  // Config
-  const BIO_YPOSITION = 2;
   // Accordion Props
   const ACC_DETAILS_PROPS = { bgcolor: '#7687a8', padding: 0 };
   const ACC_ROOT_PROPS = { bgcolor: '#525f78' };
@@ -75,6 +81,7 @@ export default function TrackerApp(props) {
 
   const { fullName, avatarUrl, hp, ac, isSpellcaster, stats, spellSlots } =
     character.data;
+  const activePlayer = character.player;
 
   let currentAc = ac.base;
   ac.bonuses.forEach((bonus) => {
@@ -93,11 +100,16 @@ export default function TrackerApp(props) {
     spellSlots.current
   );
 
+  const [micEnabled, setMicEnabled] = React.useState(
+    players[activePlayer].mixer.micEnabled
+  );
+
   const handleAccordionOpen = (panel) => (event, isExpanded) => {
     setExpanded(isExpanded ? panel : false);
   };
 
-  // When another client changes the replicant, update states from it
+  // When another client changes the replicant,
+  // update this client's states
   React.useEffect(() => {
     setCurrentHpState(characters[activeCharId].data.hp.current);
     setTempHpState(characters[activeCharId].data.hp.temp);
@@ -319,11 +331,33 @@ export default function TrackerApp(props) {
     </Accordion>
   );
 
+  const streamAccordion = (
+    <Accordion
+      sx={ACC_ROOT_PROPS}
+      expanded={expanded === 'stream'}
+      onChange={handleAccordionOpen('stream')}
+    >
+      <AccordionSummary expandIcon={<Icon>expand_more</Icon>}>
+        <Typography variant="button">Stream</Typography>
+      </AccordionSummary>
+      <AccordionDetails sx={ACC_DETAILS_PROPS}>
+        <StreamMenu
+          players={players}
+          updatePlayers={updatePlayers}
+          activePlayer={activePlayer}
+          micEnabled={micEnabled}
+          setMicEnabled={setMicEnabled}
+        />
+      </AccordionDetails>
+    </Accordion>
+  );
+
   const fullAccordions = (
     <ThemeProvider theme={accordianTheme}>
       {statusAccordion}
       {spellCasterAccordion}
       {statsAccordion}
+      {streamAccordion}
     </ThemeProvider>
   );
 
@@ -432,11 +466,11 @@ export default function TrackerApp(props) {
                 right: 0,
                 marginLeft: 'auto',
                 marginRight: 'auto',
-                top: BIO_YPOSITION + 43,
+                top: 45,
                 textShadow: '2px 2px 4px black',
               }}
             >
-              {fullName}
+              {micEnabled ? fullName : 'MUTED'}
             </Typography>
           </Box>
           <HealthBar
@@ -445,6 +479,7 @@ export default function TrackerApp(props) {
             tempHp={tempHp}
             tempMax={tempMax}
             currentAc={currentAc}
+            micEnabled={micEnabled}
           />
         </Box>
       </ThemeProvider>

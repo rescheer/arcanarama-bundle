@@ -11,13 +11,6 @@ import { initTwitchAuth } from './modules/Twitch';
 export default function (nodecg) {
   setContext(nodecg);
 
-  let playersArray;
-  if (nodecg.bundleConfig.players) {
-    playersArray = nodecg.bundleConfig.players;
-  } else {
-    nodecg.log.warn('Players not found in bundle config. Using default');
-  }
-
   const coreStatus = nodecg.Replicant('coreStatus', {
     defaultValue: {
       chatConnected: null,
@@ -31,26 +24,37 @@ export default function (nodecg) {
     defaultValue: {},
   });
 
+  let playersArray;
+  if (nodecg.bundleConfig.players) {
+    playersArray = nodecg.bundleConfig.players;
+  } else {
+    nodecg.log.warn('Players not found in bundle config. Using default');
+  }
+
   const defaultPlayerRep = {};
   if (Array.isArray(playersArray) && playersArray.length > 0) {
     playersArray.forEach((player) => {
       defaultPlayerRep[player] = {
-        activeCharacter: undefined,
-        seat: undefined,
+        activeCharacter: 0,
+        seat: 0,
         mixer: {
-          channel: undefined,
+          channel: 0,
+          monitorBus: 0,
           micEnabled: true,
+          gateEnabled: true,
         },
       };
     });
   }
 
   defaultPlayerRep.Guest = {
-    activeCharacter: undefined,
-    seat: undefined,
+    activeCharacter: 0,
+    seat: 0,
     mixer: {
-      channel: undefined,
+      channel: 0,
+      monitorBus: 0,
       micEnabled: true,
+      gateEnabled: true,
     },
   };
 

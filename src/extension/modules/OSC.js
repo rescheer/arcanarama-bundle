@@ -75,7 +75,7 @@ function handleOscMessage(oscMessage) {
         }
       } else if (
         address === recievedAddress &&
-        expectedValue === !!recievedArgs[0].value
+        expectedValue === recievedArgs[0].value
       ) {
         promise.resolve(recievedArgs[0].value);
         delete oscVerifyQueueRep.value[key];
@@ -109,8 +109,13 @@ function checkVerifyQueue() {
 
   queueKeys.forEach((key) => {
     const timestamp = key;
-
-    if (currentTime - timestamp > 3000) {
+    if (currentTime - timestamp > 500) {
+      const { address } = oscVerifyQueueRep.value[key];
+      udpPort.send({
+        address,
+        args: [],
+      });
+    } else if (currentTime - timestamp > 3000) {
       const { promise } = oscVerifyQueueRep.value[key];
       promise.reject('Request timed out');
       delete oscVerifyQueueRep.value[key];
@@ -216,10 +221,9 @@ export function setChannelMute(ch, state) {
 
     return resultPromise;
   } // Else
-  nodecg.log.warn(
-    `[OSC] Attempted to ${mutedString} channel out of bounds (channel ${channel})`
-  );
-  return false;
+  const errorMsg = `[OSC] Attempted to ${mutedString} channel out of bounds (channel ${channel})`;
+  nodecg.sendMessage('console', { type: 'error', msg: errorMsg });
+  return Promise.reject(errorMsg);
 }
 
 /**
