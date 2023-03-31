@@ -49,21 +49,21 @@ const accordianTheme = createTheme({
 /**
  * Returns an object of characters sorted by player
  * @param {Object} replicant - A replicant containing one or more characters
- * @returns {Object} An Array containing player names
+ * @returns {Object} An Object with Player keys and character values
  */
 function groupCharactersByPlayer(replicant) {
   const result = {};
   const data = replicant;
 
   if (data) {
-    const keys = Object.keys(data);
-    if (keys.length > 0) {
-      keys.forEach((key) => {
-        const p = data[key].player;
-        if (!keys.includes(p)) {
+    const ddbIdArray = Object.keys(data);
+    if (ddbIdArray.length > 0) {
+      ddbIdArray.forEach((ddbId) => {
+        const p = data[ddbId].player;
+        if (!Object.keys(result).includes(p)) {
           result[p] = [];
         }
-        result[p].push(data[key]);
+        result[p].push(data[ddbId]);
       });
     }
   }
