@@ -57,7 +57,7 @@ export default function parseDDBData(id) {
       current: 0,
       temp: 0,
       tempMax: 0,
-      type: 0,
+      type: '',
     },
     ac: {
       base: 0,
@@ -450,7 +450,7 @@ export default function parseDDBData(id) {
       const { level, hitDice, isStartingClass } = cls;
 
       // 'Tough' feat handling
-      if (bonusHpPerLevel >= 0) {
+      if (bonusHpPerLevel > 0) {
         hpTotal += level * bonusHpPerLevel;
       }
 
@@ -459,8 +459,11 @@ export default function parseDDBData(id) {
       }
 
       if (parsedData.hp.type === 'fixed') {
-        // eslint-disable-next-line prettier/prettier
-        hpTotal += level * (hitDice / 2 + 1);
+        if (isStartingClass) {
+          hpTotal += (level - 1) * (hitDice / 2 + 1) + conMod * level;
+        } else {
+          hpTotal += level * (hitDice / 2 + 1) + conMod * level;
+        }
       } else {
         hpTotal += level * conMod;
       }
