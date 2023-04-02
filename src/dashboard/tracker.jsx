@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 /* eslint-disable react/jsx-props-no-spreading */
 /* eslint-disable react/prop-types */
 import * as React from 'react';
@@ -13,15 +14,16 @@ import NotificationTimed from './apps/components/NotificationAction';
 
 const charactersRep = window.nodecg.Replicant('characters');
 const playersRep = window.nodecg.Replicant('players');
+const notificationsRep = window.nodecg.Replicant('notifications');
 
 function App() {
-  // eslint-disable-next-line no-unused-vars
   const [characters, updateCharacters] = useReplicant('characters');
-  // eslint-disable-next-line no-unused-vars
   const [players, updatePlayers] = useReplicant('players');
+  const [notifications, updateNotifications] = useReplicant('notifications');
   const { enqueueSnackbar, closeSnackbar } = useSnackbar();
   const [activeApp, setActiveApp] = React.useState('select');
   const [activeCharId, setActiveCharId] = React.useState('');
+  const [activePlayer, setActivePlayer] = React.useState('');
 
   function handleNewNote(data) {
     const NOTE_DEFAULT_VARIANT = 'default';
@@ -64,6 +66,7 @@ function App() {
           <CharacterSelectApp
             appSetter={setActiveApp}
             charSetter={setActiveCharId}
+            playerSetter={setActivePlayer}
             characters={characters}
           />
         );
@@ -79,6 +82,8 @@ function App() {
             charSetter={setActiveCharId}
             characters={characters}
             players={players}
+            activePlayer={activePlayer}
+            notifications={notifications}
           />
         );
         break;
@@ -88,7 +93,11 @@ function App() {
   return null;
 }
 
-window.NodeCG.waitForReplicants(charactersRep, playersRep).then(() => {
+window.NodeCG.waitForReplicants(
+  charactersRep,
+  playersRep,
+  notificationsRep
+).then(() => {
   ReactDOM.createRoot(document.querySelector('#root')).render(
     <React.StrictMode>
       <SnackbarProvider dense>

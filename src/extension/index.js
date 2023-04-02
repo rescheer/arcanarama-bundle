@@ -62,6 +62,11 @@ export default function (nodecg) {
     defaultValue: defaultPlayerRep,
   });
 
+  const notificationsRep = nodecg.Replicant('notifications', {
+    defaultValue: {},
+    persistent: false,
+  });
+
   initVibes(nodecg);
   initGiveaway(nodecg);
   ChatListener(nodecg);

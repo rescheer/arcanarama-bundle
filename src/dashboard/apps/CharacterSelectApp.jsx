@@ -15,6 +15,9 @@ import Accordion from '@mui/material/Accordion';
 import AccordionSummary from '@mui/material/AccordionSummary';
 import AccordionDetails from '@mui/material/AccordionDetails';
 
+// Ours
+import getRelativeTimeString from '../utils/Common';
+
 const baseTheme = createTheme({
   palette: {
     primary: {
@@ -62,10 +65,11 @@ function groupCharactersByPlayer(replicant, showHidden = false) {
     if (ddbIdArray.length > 0) {
       ddbIdArray.forEach((ddbId) => {
         const p = data[ddbId].player;
-        if (!Object.keys(result).includes(p)) {
-          result[p] = [];
-        }
         if (!data[ddbId].hidden || showHidden) {
+          if (!Object.keys(result).includes(p)) {
+            result[p] = [];
+          }
+
           result[p].push(data[ddbId]);
         }
       });
@@ -75,43 +79,8 @@ function groupCharactersByPlayer(replicant, showHidden = false) {
   return result;
 }
 
-function getRelativeTimeString(date, lang = navigator.language) {
-  // Allow dates or times to be passed
-  const timeMs = typeof date === 'number' ? date : date.getTime();
-
-  // Get the amount of seconds between the given date and now
-  const deltaSeconds = Math.round((timeMs - Date.now()) / 1000);
-
-  // Array reprsenting one minute, hour, day, week, month, etc in seconds
-  const cutoffs = [
-    60,
-    3600,
-    86400,
-    86400 * 7,
-    86400 * 30,
-    86400 * 365,
-    Infinity,
-  ];
-
-  // Array equivalent to the above but in the string representation of the units
-  const units = ['second', 'minute', 'hour', 'day', 'week', 'month', 'year'];
-
-  // Grab the ideal cutoff unit
-  const unitIndex = cutoffs.findIndex(
-    (cutoff) => cutoff > Math.abs(deltaSeconds)
-  );
-
-  // Get the divisor to divide from the seconds. E.g. if our unit is "day" our divisor
-  // is one day in seconds, so we can divide our seconds by this to get the # of days
-  const divisor = unitIndex ? cutoffs[unitIndex - 1] : 1;
-
-  // Intl.RelativeTimeFormat do its magic
-  const rtf = new Intl.RelativeTimeFormat(lang, { numeric: 'auto' });
-  return rtf.format(Math.floor(deltaSeconds / divisor), units[unitIndex]);
-}
-
 export default function CharacterSelectApp(props) {
-  const { characters, appSetter, charSetter } = props;
+  const { characters, appSetter, charSetter, playerSetter } = props;
 
   const [expanded, setExpanded] = React.useState('');
   const [showHidden, setShowHidden] = React.useState(false);
@@ -128,12 +97,14 @@ export default function CharacterSelectApp(props) {
 
   function handleCharacterClick(id) {
     window.localStorage.setItem('storedChar', id);
+    playerSetter(characters[id].player);
     charSetter(id);
     appSetter('tracker');
   }
 
   function handleAddButtonClick() {
     window.localStorage.removeItem('storedChar');
+    playerSetter(undefined);
     charSetter(undefined);
     appSetter('add');
   }

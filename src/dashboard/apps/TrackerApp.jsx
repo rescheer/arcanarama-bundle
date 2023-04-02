@@ -15,6 +15,7 @@ import HealthBar from './components/HealthBar';
 import SpellSlots from './components/SpellSlots';
 import Stats from './components/Stats';
 import StreamMenu from './components/StreamMenu';
+import NotificationHistory from './components/NotificationHistory';
 
 const baseTheme = createTheme({
   palette: {
@@ -64,7 +65,8 @@ export default function TrackerApp(props) {
     charSetter,
     activeCharId,
     players,
-    updatePlayers,
+    activePlayer,
+    notifications,
   } = props;
   let character;
 
@@ -81,7 +83,6 @@ export default function TrackerApp(props) {
 
   const { fullName, avatarUrl, hp, ac, isSpellcaster, stats, spellSlots } =
     character.data;
-  const activePlayer = character.player;
 
   let currentAc = ac.base;
   ac.bonuses.forEach((bonus) => {
@@ -355,10 +356,27 @@ export default function TrackerApp(props) {
       <AccordionDetails sx={ACC_DETAILS_PROPS}>
         <StreamMenu
           players={players}
-          updatePlayers={updatePlayers}
           activePlayer={activePlayer}
           micEnabled={micEnabled}
           setMicEnabled={setMicEnabled}
+        />
+      </AccordionDetails>
+    </Accordion>
+  );
+
+  const notificationHistoryAccordion = (
+    <Accordion
+      sx={ACC_ROOT_PROPS}
+      expanded={expanded === 'notifications'}
+      onChange={handleAccordionOpen('notifications')}
+    >
+      <AccordionSummary expandIcon={<Icon>expand_more</Icon>}>
+        <Typography variant="button">Notification History</Typography>
+      </AccordionSummary>
+      <AccordionDetails sx={ACC_DETAILS_PROPS}>
+        <NotificationHistory
+          activePlayer={activePlayer}
+          notifications={notifications}
         />
       </AccordionDetails>
     </Accordion>
@@ -370,6 +388,7 @@ export default function TrackerApp(props) {
       {spellCasterAccordion}
       {statsAccordion}
       {streamAccordion}
+      {notificationHistoryAccordion}
     </ThemeProvider>
   );
 
