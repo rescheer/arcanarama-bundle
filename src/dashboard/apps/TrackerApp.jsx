@@ -195,6 +195,18 @@ export default function TrackerApp(props) {
     }
   }
 
+  function handleHideButtonClick() {
+    if (!character.hidden) {
+      window.nodecg.sendMessage('character', {
+        hide: { ddbId: character.ddbId },
+      });
+    } else {
+      window.nodecg.sendMessage('character', {
+        unhide: { ddbId: character.ddbId },
+      });
+    }
+  }
+
   function handleKeypadClick(e) {
     const newValue = e.currentTarget.value;
 
@@ -365,6 +377,17 @@ export default function TrackerApp(props) {
     <Box textAlign="center" sx={{ px: 1 }}>
       <Typography variant="h5" color="white">
         Settings
+      </Typography>
+      <hr />
+      <Button
+        variant="contained"
+        onClick={(event) => handleHideButtonClick(event)}
+      >
+        {character.hidden ? 'Unhide' : 'Hide'}
+      </Button>
+      <Typography variant="subtitle1" color="white">
+        {character.hidden ? 'Unhide' : 'Hide'} this character from the character
+        select list
       </Typography>
       <hr />
       <Button

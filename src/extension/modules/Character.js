@@ -18,6 +18,13 @@ export function getComputedData(obj) {
   });
 }
 
+export function setHiddenStatus(id, hidden) {
+  const nodecg = getContext();
+  const charactersRep = nodecg.Replicant('characters');
+
+  charactersRep.value[id].hidden = !!hidden;
+}
+
 export function parseRawData(id) {
   const nodecg = getContext();
   const charactersRep = nodecg.Replicant('characters');
@@ -32,7 +39,7 @@ export function resetOverrides(obj) {
 }
 
 export async function getBeyondData(ddbId, player) {
-  const result = { player, ddbId };
+  const result = { player, ddbId, hidden: false };
   const characterUrl = `https://character-service.dndbeyond.com/character/v3/character/${ddbId}/`;
   const nodecg = getContext();
   const charactersRep = nodecg.Replicant('characters');

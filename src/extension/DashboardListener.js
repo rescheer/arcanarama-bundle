@@ -97,6 +97,12 @@ function dashboardCharacterHandler(data, ack) {
     case 'delete':
       Character.deleteCharacter(data[command].ddbId);
       break;
+    case 'hide':
+      Character.setHiddenStatus(data[command].ddbId, true);
+      break;
+    case 'unhide':
+      Character.setHiddenStatus(data[command].ddbId, false);
+      break;
     default:
       // unrecognized command
       break;

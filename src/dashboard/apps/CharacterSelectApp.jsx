@@ -10,6 +10,7 @@ import Avatar from '@mui/material/Avatar';
 import Typography from '@mui/material/Typography';
 import Icon from '@mui/material/Icon';
 import Box from '@mui/material/Box';
+import Switch from '@mui/material/Switch';
 import Accordion from '@mui/material/Accordion';
 import AccordionSummary from '@mui/material/AccordionSummary';
 import AccordionDetails from '@mui/material/AccordionDetails';
@@ -49,9 +50,10 @@ const accordianTheme = createTheme({
 /**
  * Returns an object of characters sorted by player
  * @param {Object} replicant - A replicant containing one or more characters
+ * @param {bool} showHidden - (default: false) If true, shows hidden characters
  * @returns {Object} An Object with Player keys and character values
  */
-function groupCharactersByPlayer(replicant) {
+function groupCharactersByPlayer(replicant, showHidden = false) {
   const result = {};
   const data = replicant;
 
@@ -63,7 +65,9 @@ function groupCharactersByPlayer(replicant) {
         if (!Object.keys(result).includes(p)) {
           result[p] = [];
         }
-        result[p].push(data[ddbId]);
+        if (!data[ddbId].hidden || showHidden) {
+          result[p].push(data[ddbId]);
+        }
       });
     }
   }
@@ -110,11 +114,12 @@ export default function CharacterSelectApp(props) {
   const { characters, appSetter, charSetter } = props;
 
   const [expanded, setExpanded] = React.useState('');
+  const [showHidden, setShowHidden] = React.useState(false);
 
   let sortedCharacters;
 
   if (characters) {
-    sortedCharacters = groupCharactersByPlayer(characters);
+    sortedCharacters = groupCharactersByPlayer(characters, showHidden);
   }
 
   const handleAccordionOpen = (panel) => (event, isExpanded) => {
@@ -131,6 +136,10 @@ export default function CharacterSelectApp(props) {
     window.localStorage.removeItem('storedChar');
     charSetter(undefined);
     appSetter('add');
+  }
+
+  function handleShowHiddenSwitchClick() {
+    setShowHidden(!showHidden);
   }
 
   if (sortedCharacters) {
@@ -155,6 +164,13 @@ export default function CharacterSelectApp(props) {
             avatarUrl = defaultAvatarUrl;
           }
 
+          const primaryInfo = (
+            <>
+              {char.hidden ? <Icon>visibility_off</Icon> : ''}
+              {fullName}
+            </>
+          );
+
           characterChildren.push(
             <ListItemButton
               key={char.ddbId}
@@ -172,7 +188,7 @@ export default function CharacterSelectApp(props) {
                 <Avatar src={avatarUrl} sx={{ height: 80, width: 80, mr: 2 }} />
               </ListItemAvatar>
               <ListItemText
-                primary={fullName}
+                primary={primaryInfo}
                 primaryTypographyProps={{ variant: 'h5' }}
                 secondary={
                   <>
@@ -236,7 +252,11 @@ export default function CharacterSelectApp(props) {
             variant="subtitle2"
             sx={{ position: 'relative', top: 10 }}
           >
-            Grouped by Player
+            Show Hidden Characters{' '}
+            <Switch
+              onChange={(e) => handleShowHiddenSwitchClick(e)}
+              color="secondary"
+            />
           </Typography>
         </Box>
         <Box sx={{ position: 'relative', top: 18 }}>{playerChildren}</Box>
