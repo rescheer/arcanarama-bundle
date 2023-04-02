@@ -6,12 +6,11 @@ import Typography from '@mui/material/Typography';
 
 export default function StreamMenu(props) {
   const { players, activePlayer, micEnabled, setMicEnabled } = props;
-  const activeChannel = players[activePlayer].mixer.channel;
 
   const [errorString, setErrorString] = React.useState('');
   const [micEnabledWaiting, setMicEnabledWaiting] = React.useState(false);
 
-  function getMicStateFromMixer() {
+  function getMicStateFromMixer(activeChannel) {
     window.nodecg.sendMessage(
       'mixer',
       {
@@ -31,7 +30,7 @@ export default function StreamMenu(props) {
     );
   }
 
-  function handleMicEnabledChange() {
+  function handleMicEnabledChange(activeChannel) {
     const newState = !micEnabled;
     const newStateAsNumber = !micEnabled ? 1 : 0;
 
@@ -51,7 +50,7 @@ export default function StreamMenu(props) {
           if (error) {
             setMicEnabledWaiting(false);
             setErrorString(`${error.message}. Try again`);
-            getMicStateFromMixer();
+            getMicStateFromMixer(activeChannel);
             return;
           }
           players[activePlayer].mixer.micEnabled = newState;
@@ -65,46 +64,51 @@ export default function StreamMenu(props) {
     }
   }
 
-  const micStatusText = micEnabled ? (
-    <Typography>Active</Typography>
-  ) : (
-    <Typography color="red">MUTED</Typography>
-  );
+  if (players) {
+    const activeChannel = players[activePlayer].mixer.channel;
 
-  const audioMenu = (
-    <Box>
-      <Typography variant="h5" textAlign="center">
-        Audio
-      </Typography>
-      <Typography variant="subtitle2" textAlign="center" color="red">
-        {errorString}
-      </Typography>
-      <table style={{ width: '100%' }}>
-        <tbody>
-          <tr>
-            <td style={{ textAlign: 'left' }}>Mixer Channel</td>
-            <td style={{ textAlign: 'right' }}>{`CH ${activeChannel}`}</td>
-          </tr>
-          <tr>
-            <td style={{ textAlign: 'left' }}>Mic Status</td>
-            <td style={{ textAlign: 'right' }}>{micStatusText}</td>
-          </tr>
-        </tbody>
-      </table>
-      <hr />
-      <Button
-        variant="contained"
-        color="error"
-        disabled={micEnabledWaiting}
-        sx={{ width: '35%', margin: 1 }}
-        onClick={() => {
-          handleMicEnabledChange();
-        }}
-      >
-        {micEnabled ? 'Mute' : 'Unmute'}
-      </Button>
-    </Box>
-  );
+    const micStatusText = micEnabled ? (
+      <Typography>Active</Typography>
+    ) : (
+      <Typography color="red">MUTED</Typography>
+    );
 
-  return audioMenu;
+    const audioMenu = (
+      <Box>
+        <Typography variant="h5" textAlign="center">
+          Audio
+        </Typography>
+        <Typography variant="subtitle2" textAlign="center" color="red">
+          {errorString}
+        </Typography>
+        <table style={{ width: '100%' }}>
+          <tbody>
+            <tr>
+              <td style={{ textAlign: 'left' }}>Mixer Channel</td>
+              <td style={{ textAlign: 'right' }}>{`CH ${activeChannel}`}</td>
+            </tr>
+            <tr>
+              <td style={{ textAlign: 'left' }}>Mic Status</td>
+              <td style={{ textAlign: 'right' }}>{micStatusText}</td>
+            </tr>
+          </tbody>
+        </table>
+        <hr />
+        <Button
+          variant="contained"
+          color="error"
+          disabled={micEnabledWaiting}
+          sx={{ width: '35%', margin: 1 }}
+          onClick={() => {
+            handleMicEnabledChange(activeChannel);
+          }}
+        >
+          {micEnabled ? 'Mute' : 'Unmute'}
+        </Button>
+      </Box>
+    );
+
+    return audioMenu;
+  }
+  return null;
 }
