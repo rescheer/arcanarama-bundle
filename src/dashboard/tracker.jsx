@@ -15,11 +15,13 @@ import NotificationTimed from './apps/components/NotificationAction';
 const charactersRep = window.nodecg.Replicant('characters');
 const playersRep = window.nodecg.Replicant('players');
 const notificationsRep = window.nodecg.Replicant('notifications');
+const messengerRep = window.nodecg.Replicant('messenger');
 
 function App() {
   const [characters] = useReplicant('characters');
   const [players] = useReplicant('players');
   const [notifications] = useReplicant('notifications');
+  const [messages] = useReplicant('messenger');
   const { enqueueSnackbar, closeSnackbar } = useSnackbar();
   const [activeApp, setActiveApp] = React.useState('select');
   const [activeCharId, setActiveCharId] = React.useState('');
@@ -29,12 +31,10 @@ function App() {
     function enqueueNewNote(note) {
       const { text, variant, duration } = note;
 
-      const noteVariant = variant || 'default';
-      const noteDuration = duration || 10 * 1000;
       const noteAction = (
         <NotificationTimed
           text={text}
-          duration={noteDuration}
+          duration={duration}
           closeSnackbar={(e) => closeSnackbar(e)}
         />
       );
@@ -42,9 +42,8 @@ function App() {
       enqueueSnackbar(text, {
         key: text,
         action: noteAction,
-        variant: noteVariant,
-        autoHideDuration: noteDuration,
-        disableWindowBlurListener: true,
+        variant,
+        autoHideDuration: duration,
         preventDuplicate: true,
         hideIconVariant: true,
       });
@@ -97,6 +96,7 @@ function App() {
             players={players}
             activePlayer={activePlayer}
             notifications={notifications}
+            messages={messages}
           />
         );
         break;
@@ -109,7 +109,8 @@ function App() {
 window.NodeCG.waitForReplicants(
   charactersRep,
   playersRep,
-  notificationsRep
+  notificationsRep,
+  messengerRep
 ).then(() => {
   ReactDOM.createRoot(document.querySelector('#root')).render(
     <React.StrictMode>

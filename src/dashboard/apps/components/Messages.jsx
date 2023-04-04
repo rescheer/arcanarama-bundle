@@ -1,11 +1,11 @@
 /* eslint-disable react/prop-types */
 import * as React from 'react';
+import Icon from '@mui/material/Icon';
 import Box from '@mui/material/Box';
 import Paper from '@mui/material/Paper';
 import Stack from '@mui/material/Stack';
-import Typography from '@mui/material/Typography';
-import Icon from '@mui/material/Icon';
 import Button from '@mui/material/Button';
+import Typography from '@mui/material/Typography';
 import { styled } from '@mui/material/styles';
 
 // Ours
@@ -19,8 +19,8 @@ const Item = styled(Paper)(({ theme, ...props }) => ({
   color: theme.palette.text.primary,
 }));
 
-export default function NotificationHistory(props) {
-  const { activePlayer, notifications } = props;
+export default function Messages(props) {
+  const { activePlayer, messages } = props;
   const itemsPerPage = 5;
   let totalPages = 1;
 
@@ -57,36 +57,36 @@ export default function NotificationHistory(props) {
     setCurrentPage(newPage);
   }
 
-  if (notifications) {
-    const playerNotes = notifications[activePlayer];
+  if (messages) {
+    const playerMessages = messages[activePlayer];
 
-    const noteItemArrayFull = playerNotes.map((note) => (
-      <Item key={note.timestamp} variant={note.variant}>
+    const messageItemArrayFull = playerMessages.map((message) => (
+      <Item key={message.sentTimestamp} variant="default">
         <Typography variant="caption" align="left">
-          Sent to: {note.isGlobalNotification ? 'All' : note.sentTo.join(', ')}
+          From: {message.from}
         </Typography>
-        <Typography>{note.text}</Typography>
+        <Typography>{message.message}</Typography>
         <Typography variant="body2" align="right">
-          {getRelativeTimeString(note.timestamp)}
+          {getRelativeTimeString(message.sentTimestamp)}
         </Typography>
       </Item>
     ));
-    noteItemArrayFull.reverse();
+    messageItemArrayFull.reverse();
 
-    if (noteItemArrayFull.length === 0) {
-      noteItemArrayFull.push(
+    if (messageItemArrayFull.length === 0) {
+      messageItemArrayFull.push(
         <Item key="emptyItem" variant="default">
-          No notifications yet.
+          No messages yet.
         </Item>
       );
     }
 
-    const noteItemChunks = [];
-    for (let i = 0; i < noteItemArrayFull.length; i += itemsPerPage) {
-      const chunk = noteItemArrayFull.slice(i, i + itemsPerPage);
-      noteItemChunks.push(chunk);
+    const messageItemChunks = [];
+    for (let i = 0; i < messageItemArrayFull.length; i += itemsPerPage) {
+      const chunk = messageItemArrayFull.slice(i, i + itemsPerPage);
+      messageItemChunks.push(chunk);
     }
-    totalPages = noteItemChunks.length;
+    totalPages = messageItemChunks.length;
 
     const buttonSpacing = 1;
     const buttonProps = { mx: buttonSpacing, my: 1, px: 0.6, minWidth: 0 };
@@ -137,7 +137,7 @@ export default function NotificationHistory(props) {
     return (
       <Box sx={{ padding: 1 }}>
         {paginationObject}
-        <Stack spacing={1}>{noteItemChunks[currentPage - 1]}</Stack>
+        <Stack spacing={1}>{messageItemChunks[currentPage - 1]}</Stack>
         {paginationObject}
       </Box>
     );

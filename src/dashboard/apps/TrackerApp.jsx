@@ -16,6 +16,7 @@ import SpellSlots from './components/SpellSlots';
 import Stats from './components/Stats';
 import StreamMenu from './components/StreamMenu';
 import NotificationHistory from './components/NotificationHistory';
+import Messages from './components/Messages';
 
 const baseTheme = createTheme({
   palette: {
@@ -67,6 +68,7 @@ export default function TrackerApp(props) {
     players,
     activePlayer,
     notifications,
+    messages,
   } = props;
   let character;
 
@@ -344,6 +346,21 @@ export default function TrackerApp(props) {
     </Accordion>
   );
 
+  const messengerAccordion = (
+    <Accordion
+      sx={ACC_ROOT_PROPS}
+      expanded={expanded === 'messenger'}
+      onChange={handleAccordionOpen('messenger')}
+    >
+      <AccordionSummary expandIcon={<Icon>expand_more</Icon>}>
+        <Typography variant="button">Messages</Typography>
+      </AccordionSummary>
+      <AccordionDetails sx={ACC_DETAILS_PROPS}>
+        <Messages activePlayer={activePlayer} messages={messages} />
+      </AccordionDetails>
+    </Accordion>
+  );
+
   const streamAccordion = (
     <Accordion
       sx={ACC_ROOT_PROPS}
@@ -388,6 +405,7 @@ export default function TrackerApp(props) {
       {spellCasterAccordion}
       {statsAccordion}
       {streamAccordion}
+      {messengerAccordion}
       {notificationHistoryAccordion}
     </ThemeProvider>
   );

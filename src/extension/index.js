@@ -8,6 +8,7 @@ import { initVibes } from './modules/VibeCheck';
 import { initMixer } from './modules/OSC';
 import { initTwitchAuth } from './modules/Twitch';
 import { initNotifier } from './modules/Notifier';
+import { initMessenger } from './modules/Messenger';
 
 export default function (nodecg) {
   setContext(nodecg);
@@ -77,6 +78,7 @@ export default function (nodecg) {
   initMixer(nodecg);
   initTwitchAuth();
   initNotifier(nodecg);
+  initMessenger(nodecg);
 
   // TODO: Commands/Timers
   // TODO: Spotify Connect(song info)
