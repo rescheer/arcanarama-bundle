@@ -371,7 +371,7 @@ export default function TrackerApp(props) {
       onChange={handleAccordionOpen('notifications')}
     >
       <AccordionSummary expandIcon={<Icon>expand_more</Icon>}>
-        <Typography variant="button">Notification History</Typography>
+        <Typography variant="button">Notifications</Typography>
       </AccordionSummary>
       <AccordionDetails sx={ACC_DETAILS_PROPS}>
         <NotificationHistory

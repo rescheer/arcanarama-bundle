@@ -4,6 +4,7 @@ import { getChatClient, getChatChannel } from './util/twitch-api-context';
 import * as Giveaway from './modules/Giveaway';
 import * as Character from './modules/Character';
 import * as Mixer from './modules/OSC';
+import { addNotification } from './modules/Notifier';
 
 // Message packet format: { COMMAND: { ARG1: value, ARG2: value, ...}}
 
@@ -192,8 +193,15 @@ function dashboardMixerHandler(data, ack) {
   }
 }
 
+function dashboardNotifierHandler(data) {
+  const { text, duration, variant, toPlayers } = data;
+
+  addNotification({ text, duration, variant }, toPlayers);
+}
+
 export default function dashboardListener(nodecg) {
   nodecg.listenFor('giveaway', dashboardGiveawayHandler);
   nodecg.listenFor('character', dashboardCharacterHandler);
   nodecg.listenFor('mixer', dashboardMixerHandler);
+  nodecg.listenFor('notifier', dashboardNotifierHandler);
 }

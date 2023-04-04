@@ -27,6 +27,7 @@ export function addNotification(noteData, sendToPlayers = []) {
   const notificationsRep = nodecg.Replicant('notifications');
   const fullPlayerList = Object.keys(playersRep.value);
   let verifiedPlayerList;
+  let isGlobalNotification;
   const newNotificationsRepValue = notificationsRep?.value;
 
   if (!text) {
@@ -52,16 +53,21 @@ export function addNotification(noteData, sendToPlayers = []) {
         });
         return null;
       }
+      isGlobalNotification = false;
       verifiedPlayerList = sendToPlayers;
     } else {
+      isGlobalNotification = true;
       verifiedPlayerList = fullPlayerList;
     }
 
     verifiedPlayerList.forEach((playerName) => {
-      newNotificationsRepValue.value[playerName].push({
+      newNotificationsRepValue[playerName].push({
         text,
         variant,
         duration,
+        isGlobalNotification,
+        sentTo: verifiedPlayerList,
+        timestamp: Date.now(),
       });
     });
 

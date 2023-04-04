@@ -187,7 +187,11 @@ export default function SpellSlots(props) {
       </table>
     );
 
-    return <Box>{activeSlotLevel ? slotMenu : spellSlotTable}</Box>;
+    return (
+      <Box sx={{ padding: 1 }}>
+        {activeSlotLevel ? slotMenu : spellSlotTable}
+      </Box>
+    );
   }
 
   return null;

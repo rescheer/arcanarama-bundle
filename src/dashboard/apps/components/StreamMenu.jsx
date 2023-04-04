@@ -74,7 +74,7 @@ export default function StreamMenu(props) {
     );
 
     const audioMenu = (
-      <Box>
+      <Box sx={{ padding: 1 }}>
         <Typography variant="h5" textAlign="center">
           Audio
         </Typography>

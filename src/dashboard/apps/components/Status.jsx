@@ -134,7 +134,7 @@ const Status = React.memo((props) => {
   }
 
   return (
-    <Box key="status" sx={{ textAlign: 'center' }}>
+    <Box key="status" sx={{ textAlign: 'center', padding: 1 }}>
       {content}
     </Box>
   );

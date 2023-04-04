@@ -47,7 +47,7 @@ export default function Stats(props) {
   });
 
   return (
-    <Box>
+    <Box sx={{ padding: 1 }}>
       <table style={{ width: '100%', tableLayout: 'fixed' }}>
         <tbody>
           <tr>{statsTopRow}</tr>
