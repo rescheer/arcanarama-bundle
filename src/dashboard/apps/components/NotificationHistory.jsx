@@ -14,37 +14,47 @@ const Item = styled(Paper)(({ theme }) => ({
   backgroundColor: theme.palette.mode === 'dark' ? '#1A2027' : '#fff',
   ...theme.typography.body2,
   padding: theme.spacing(1),
-  textAlign: 'center',
-  color: theme.palette.text.secondary,
+  textAlign: 'left',
+  color: theme.palette.text.primary,
 }));
 
 export default function NotificationHistory(props) {
   const { activePlayer, notifications } = props;
   const itemsPerPage = 5;
   let totalPages = 1;
-  let content;
 
-  const [currentPage, setcurrentPage] = React.useState(1);
+  const [currentPage, setCurrentPage] = React.useState(1);
+  const [, setTime] = React.useState(Date.now());
+
+  React.useEffect(() => {
+    const interval = setInterval(() => setTime(Date.now()), 1000);
+    return () => {
+      clearInterval(interval);
+    };
+  }, []);
 
   function handlePageChange(event, value) {
-    setcurrentPage(value);
+    setCurrentPage(value);
   }
 
   if (notifications) {
-    if (!notifications[activePlayer]) {
-      notifications[activePlayer] = [];
-    }
     const playerNotes = notifications[activePlayer];
 
     const noteItemArrayFull = playerNotes.map((note) => (
       <Item key={note.timestamp}>
         <Typography>{note.message}</Typography>
-        <Typography variant="caption" align="right">
+        <Typography variant="subtitle2" align="right">
           {getRelativeTimeString(note.timestamp)}
         </Typography>
       </Item>
     ));
     noteItemArrayFull.reverse();
+
+    if (noteItemArrayFull.length === 0) {
+      noteItemArrayFull.push(
+        <Item key="emptyItem">No notifications yet.</Item>
+      );
+    }
 
     const noteItemChunks = [];
     for (let i = 0; i < noteItemArrayFull.length; i += itemsPerPage) {
@@ -53,36 +63,23 @@ export default function NotificationHistory(props) {
     }
     totalPages = noteItemChunks.length;
 
-    if (noteItemArrayFull.length > 0) {
-      content = (
-        <Box>
-          <Typography align="center" variant="h5">
-            Page {currentPage}
-          </Typography>
-          <Stack>{noteItemChunks[currentPage - 1]}</Stack>
-          <Pagination
-            count={totalPages}
-            page={currentPage}
-            onChange={(event, value) => handlePageChange(event, value)}
-            color="secondary"
-          />
-        </Box>
-      );
-    } else {
-      content = (
-        <Box>
-          <Typography align="center">
-            Page {currentPage} of {totalPages === 0 ? 1 : totalPages}
-          </Typography>
-          <Stack>
-            <Item>No notifications yet.</Item>
-          </Stack>
-          <Pagination disabled color="secondary" />
-        </Box>
-      );
-    }
-
-    return content;
+    return (
+      <Box>
+        <Pagination
+          count={totalPages}
+          page={currentPage}
+          onChange={(event, value) => handlePageChange(event, value)}
+          color="secondary"
+        />
+        <Stack spacing={1}>{noteItemChunks[currentPage - 1]}</Stack>
+        <Pagination
+          count={totalPages}
+          page={currentPage}
+          onChange={(event, value) => handlePageChange(event, value)}
+          color="secondary"
+        />
+      </Box>
+    );
   }
   return null;
 }

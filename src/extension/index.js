@@ -1,12 +1,13 @@
 /* eslint-disable no-unused-vars */
 import { setContext } from './util/nodecg-api-context';
-import { initGiveaway } from './modules/Giveaway';
-import { initVibes } from './modules/VibeCheck';
 import ChatListener from './ChatListener';
 import DashboardListener from './DashboardListener';
 import debugListener from './debugListener';
+import { initGiveaway } from './modules/Giveaway';
+import { initVibes } from './modules/VibeCheck';
 import { initMixer } from './modules/OSC';
 import { initTwitchAuth } from './modules/Twitch';
+import { initNotifier } from './modules/Notifier';
 
 export default function (nodecg) {
   setContext(nodecg);
@@ -62,18 +63,15 @@ export default function (nodecg) {
     defaultValue: defaultPlayerRep,
   });
 
-  const notificationsRep = nodecg.Replicant('notifications', {
-    defaultValue: {},
-    persistent: false,
-  });
-
-  initVibes(nodecg);
-  initGiveaway(nodecg);
   ChatListener(nodecg);
   DashboardListener(nodecg);
   debugListener(nodecg);
+
+  initVibes(nodecg);
+  initGiveaway(nodecg);
   initMixer(nodecg);
   initTwitchAuth();
+  initNotifier(nodecg);
 
   // TODO: Commands/Timers
   // TODO: Spotify Connect(song info)

@@ -1,8 +1,11 @@
 import { RefreshingAuthProvider } from '@twurple/auth';
 import { ApiClient } from '@twurple/api';
 import { EventSubWsListener } from '@twurple/eventsub-ws';
+
+// Ours
 import { getContext } from '../util/nodecg-api-context';
 import * as TwitchContext from '../util/twitch-api-context';
+import { addNotification } from './Notifier';
 
 let subSpamTimerId;
 const subSpamEvents = [];
@@ -90,7 +93,7 @@ function handleDelayedSubEvent() {
     });
     const newSubsString = `GIFT WINNERS: ${newSubs.join(', ')}`;
 
-    getContext().sendMessage('notifier', {
+    addNotification({
       text: newSubsString,
       duration: NOTE_GIFTWINS_AUTOHIDE,
       variant: 'success',
@@ -113,7 +116,7 @@ function addToDelayedSubEvent(event) {
 function handleIncomingRaidEvent(event) {
   const { raidingBroadcasterDisplayName, viewers } = event;
 
-  getContext().sendMessage('notifier', {
+  addNotification({
     text: `${raidingBroadcasterDisplayName} is raiding with ${viewers} viewers!`,
     duration: NOTE_RAID_AUTOHIDE,
     variant: 'info',
@@ -132,7 +135,7 @@ function handleGiftSubEvent(event) {
     }
   }
 
-  getContext().sendMessage('notifier', {
+  addNotification({
     text: message,
     duration: NOTE_GIFTER_AUTOHIDE,
     variant: 'info',
@@ -170,7 +173,7 @@ function handleResubEvent(event) {
   })`;
   const message = `${subInfo} ${monthsInfo} Msg: "${messageText}"`;
 
-  getContext().sendMessage('notifier', {
+  addNotification({
     text: message,
     duration: NOTE_RESUB_AUTOHIDE,
     variant: 'success',
@@ -184,7 +187,7 @@ function handleSubEvent(event) {
     const tierReadable = parseTier(tier);
     const message = `NEW SUB: ${userDisplayName}${tierReadable}`;
 
-    getContext().sendMessage('notifier', {
+    addNotification({
       text: message,
       duration: NOTE_NEWSUB_AUTOHIDE,
       variant: 'success',
@@ -199,7 +202,7 @@ function handleChannelFollowEvent(event) {
 
   const message = `NEW FOLLOWER: ${userDisplayName}`;
 
-  getContext().sendMessage('notifier', {
+  addNotification({
     text: message,
     duration: NOTE_FOLLOW_AUTOHIDE,
     variant: 'default',
