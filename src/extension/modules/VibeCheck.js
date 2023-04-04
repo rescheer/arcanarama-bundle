@@ -110,6 +110,7 @@ export function refreshVibeResponses() {
  * @param {Object} nodecg - The nodecg context to use for initializing replicants
  */
 export function initVibes(nodecg) {
+  const statusRep = nodecg.Replicant('coreStatus');
   const vibesData = nodecg.Replicant('vibesData', {
     defaultValue: [],
     persistent: false,
@@ -137,14 +138,16 @@ export function initVibes(nodecg) {
       case 'success':
         nodecg.sendMessage('console', {
           type: 'info',
-          msg: '[Vibecheck] Module loaded.',
+          msg: '[Vibecheck] Module Ready.',
         });
+        statusRep.value.vibeCheckReady = true;
         break;
       case 'failure':
         nodecg.sendMessage('console', {
           type: 'error',
           msg: '[Vibecheck] Module failed to load.',
         });
+        statusRep.value.vibeCheckReady = false;
         break;
       default:
         break;

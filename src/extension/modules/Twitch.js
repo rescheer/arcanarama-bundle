@@ -210,6 +210,8 @@ function handleChannelFollowEvent(event) {
 }
 
 function initTwitchEventSub(user, authProvider) {
+  const nodecg = getContext();
+  const statusRep = nodecg.Replicant('coreStatus');
   const apiClient = new ApiClient({ authProvider });
   const listener = new EventSubWsListener({ apiClient });
 
@@ -247,6 +249,7 @@ function initTwitchEventSub(user, authProvider) {
   });
 
   listener.start();
+  statusRep.value.eventSubConnected = true;
 }
 
 export async function initTwitchAuth() {
@@ -279,7 +282,7 @@ export async function initTwitchAuth() {
 
     await authProvider.addUser(clientUserId, tokenData);
     TwitchContext.setTwitchAuthProvider(authProvider);
-    statusRep.value.twitchConnected = true;
+    statusRep.value.twitchAuth = true;
     initTwitchEventSub(clientUserId, authProvider);
   } else {
     nodecg.sendMessage('console', {

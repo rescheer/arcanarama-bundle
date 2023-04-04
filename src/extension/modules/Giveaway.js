@@ -5,6 +5,7 @@ const announcerTimer = {};
 const giveawayReps = {};
 
 export function initGiveaway(nodecg) {
+  const statusRep = nodecg.Replicant('coreStatus');
   const giveawayData = nodecg.Replicant('giveawayData', {
     defaultValue: {
       defaultKeyword: {
@@ -32,6 +33,13 @@ export function initGiveaway(nodecg) {
   giveawayReps.data = giveawayData;
   giveawayReps.settings = giveawaySettings;
   giveawayReps.status = giveawayStatus;
+
+  nodecg.sendMessage('console', {
+    type: 'info',
+    msg: '[Giveaway] Module Ready.',
+  });
+
+  statusRep.value.giveawayReady = true;
 }
 
 function getRandomNumber(min, max) {

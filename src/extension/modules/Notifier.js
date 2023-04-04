@@ -3,6 +3,7 @@ import { getContext } from '../util/nodecg-api-context';
 // eslint-disable-next-line import/prefer-default-export
 export function initNotifier(nodecg) {
   // Set up Replicant
+  const statusRep = nodecg.Replicant('coreStatus');
   const playersRep = nodecg.Replicant('players');
   const notificationsRep = nodecg.Replicant('notifications', {
     defaultValue: {},
@@ -11,6 +12,12 @@ export function initNotifier(nodecg) {
 
   Object.keys(playersRep.value).forEach((player) => {
     notificationsRep.value[player] = [];
+  });
+
+  statusRep.value.notifierReady = true;
+  nodecg.sendMessage('console', {
+    type: 'info',
+    msg: '[Notifier] Module Ready.',
   });
 }
 

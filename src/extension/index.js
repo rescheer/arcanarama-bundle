@@ -14,9 +14,14 @@ export default function (nodecg) {
 
   const coreStatus = nodecg.Replicant('coreStatus', {
     defaultValue: {
-      chatConnected: null,
-      twitchConnected: null,
+      twitchAuth: false,
+      chatConnected: false,
+      eventSubConnected: false,
       mixerConnected: false,
+      vibeCheckReady: false,
+      giveawayReady: false,
+      notifierReady: false,
+      messengerReady: false,
     },
     persistent: false,
   });
