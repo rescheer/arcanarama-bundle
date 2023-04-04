@@ -98,7 +98,7 @@ export default function StreamMenu(props) {
           variant="contained"
           color="error"
           disabled={micEnabledWaiting}
-          sx={{ width: '35%', margin: 1 }}
+          sx={{ width: '95%', margin: 1 }}
           onClick={() => {
             handleMicEnabledChange(activeChannel);
           }}
