@@ -285,6 +285,16 @@ export default function TrackerApp(props) {
         setTempHp(inputValue);
         setInputValue('0');
         break;
+      case 'set':
+        if (inputValue > maxHp) {
+          setCurrentHp(maxHp);
+        } else if (inputValue < 0) {
+          setCurrentHp(0);
+        } else {
+          setCurrentHp(inputValue);
+        }
+        setInputValue('0');
+        break;
       default:
         break;
     }
@@ -302,6 +312,7 @@ export default function TrackerApp(props) {
       </AccordionSummary>
       <AccordionDetails sx={ACC_DETAILS_PROPS}>
         <Status
+          currentHp={currentHp}
           handleHpChange={(newVal) => handleHpChange(newVal)}
           setMaxHp={(newVal) => setMaxHp(newVal)}
           inputValue={inputValue}
@@ -331,6 +342,7 @@ export default function TrackerApp(props) {
     </Accordion>
   ) : null;
 
+  // eslint-disable-next-line no-unused-vars
   const statsAccordion = (
     <Accordion
       sx={ACC_ROOT_PROPS}
@@ -403,7 +415,6 @@ export default function TrackerApp(props) {
     <ThemeProvider theme={accordianTheme}>
       {statusAccordion}
       {spellCasterAccordion}
-      {statsAccordion}
       {streamAccordion}
       {messengerAccordion}
       {notificationHistoryAccordion}

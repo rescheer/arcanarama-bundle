@@ -1,27 +1,31 @@
 /* eslint-disable react/prop-types */
 import * as React from 'react';
 import Box from '@mui/material/Box';
+import ButtonBase from '@mui/material/ButtonBase';
 import Button from '@mui/material/Button';
+import Paper from '@mui/material/Paper';
 import Typography from '@mui/material/Typography';
 
 // Ours
 import Keypad from './Keypad';
 
 const Status = React.memo((props) => {
-  const { handleHpChange, inputValue, setInputValue, handleKeypadClick } =
-    props;
+  // Props
+  const {
+    handleHpChange,
+    inputValue,
+    setInputValue,
+    handleKeypadClick,
+    currentHp,
+  } = props;
   const KEYPAD_SIZE = 50;
-  const ACTION_BUTTON_PROPS = {
-    height: 60,
-    width: 80,
-    my: 2,
-  };
 
+  // States
   const [action, setAction] = React.useState('');
 
-  function handleActionClick(e) {
-    const buttonValue = e.currentTarget.value;
-    setAction(buttonValue);
+  // Handlers
+  function handleActionClick(e, actionValue) {
+    setAction(actionValue);
   }
 
   function handleCancelClick() {
@@ -33,6 +37,147 @@ const Status = React.memo((props) => {
     handleHpChange(action);
     setAction('');
   }
+
+  // Functions
+  function splitIntoRows(fullArray, maxColumns) {
+    const splitArray = [];
+
+    if (maxColumns > 0) {
+      fullArray.forEach((element, index) => {
+        const rowNumber = Math.floor(index / maxColumns);
+        if (!splitArray[rowNumber]) {
+          splitArray[rowNumber] = [];
+        }
+        splitArray[rowNumber].push(element);
+      });
+
+      const result = splitArray.map((row) => <tr>{row}</tr>);
+
+      return <tbody key="status-actions-body">{result}</tbody>;
+    }
+    return null;
+  }
+
+  const actionsObject = {
+    hurtHp: {
+      category: 'HP',
+      buttonText: 'Hurt',
+      friendlyName: 'Hurt HP',
+      action: 'hurt',
+      buttonColor: 'red',
+      textColor: 'white',
+      colSpan: 1,
+      disabled: false,
+    },
+    tempHp: {
+      category: 'HP',
+      buttonText: 'Temp',
+      friendlyName: 'Temp HP',
+      action: 'temp',
+      buttonColor: 'blue',
+      textColor: 'white',
+      colSpan: 1,
+      disabled: false,
+    },
+    healHp: {
+      category: 'HP',
+      buttonText: 'Heal',
+      friendlyName: 'Heal HP',
+      action: 'heal',
+      buttonColor: 'green',
+      textColor: 'white',
+      colSpan: 1,
+      disabled: false,
+    },
+    setHp: {
+      category: 'HP',
+      buttonText: 'Set',
+      friendlyName: 'Set HP',
+      action: 'set',
+      buttonColor: 'white',
+      textColor: 'black',
+      colSpan: 1,
+      disabled: false,
+    },
+    setMaxHp: {
+      category: 'HP',
+      buttonText: 'Max',
+      friendlyName: 'Max HP',
+      action: 'max',
+      buttonColor: 'pink',
+      textColor: 'white',
+      colSpan: 1,
+      disabled: true,
+    },
+    rest: {
+      category: 'Long',
+      buttonText: 'Rest',
+      friendlyName: 'Long Rest',
+      action: 'rest',
+      buttonColor: 'black',
+      textColor: 'white',
+      colSpan: 1,
+      disabled: true,
+    },
+    conditions: {
+      category: 'Toggle',
+      buttonText: 'Conditions',
+      friendlyName: 'Toggle Conditions',
+      action: 'conditions',
+      buttonColor: 'gray',
+      textColor: 'white',
+      colSpan: 2,
+      disabled: true,
+    },
+    deathSaves: {
+      category: 'Death',
+      buttonText: 'Saves',
+      friendlyName: 'Death Saves',
+      action: 'saves',
+      buttonColor: 'gray',
+      textColor: 'white',
+      colSpan: 1,
+      disabled: currentHp > 0,
+    },
+  };
+  const actionsObjectKeys = Object.keys(actionsObject);
+
+  const actionsMap = actionsObjectKeys.map((actionKey) => {
+    const actionObject = actionsObject[actionKey];
+    const paperProps = {
+      width: 1,
+      height: 70,
+      color: actionObject.textColor,
+      backgroundColor: actionObject.buttonColor,
+      display: 'flex',
+      flexDirection: 'column',
+      justifyContent: 'center',
+      opacity: actionObject.disabled ? 0.5 : 1,
+    };
+    const BTN_CATEGORY_STYLE = 'button';
+    const BTN_TEXT_STYLE = 'button';
+
+    return (
+      <td key={actionKey} colSpan={actionObject.colSpan}>
+        <ButtonBase
+          sx={{ width: 1 }}
+          disabled={actionObject.disabled}
+          onClick={(e) => handleActionClick(e, actionObject.action)}
+        >
+          <Paper elevation={actionObject.disabled ? 0 : 3} sx={paperProps}>
+            <Typography variant={BTN_CATEGORY_STYLE}>
+              {`${actionObject.category}`}
+
+              <br />
+              <Typography variant={BTN_TEXT_STYLE}>
+                {actionObject.buttonText}
+              </Typography>
+            </Typography>
+          </Paper>
+        </ButtonBase>
+      </td>
+    );
+  });
 
   const inputKeypad = (
     <>
@@ -54,7 +199,7 @@ const Status = React.memo((props) => {
           onClick={(e) => handleConfirmClick(e)}
           sx={{ position: 'absolute', right: 8, width: '30%' }}
         >
-          {action}
+          Confirm
         </Button>
       </Typography>
       <Keypad
@@ -74,47 +219,13 @@ const Status = React.memo((props) => {
   );
 
   const actionTable = (
-    <table style={{ width: '100%', tableLayout: 'fixed' }}>
-      <tbody>
-        <tr>
-          <td>
-            <Button
-              variant="contained"
-              color="error"
-              size="small"
-              value="hurt"
-              onClick={(e) => handleActionClick(e)}
-              sx={ACTION_BUTTON_PROPS}
-            >
-              Hurt
-            </Button>
-          </td>
-          <td>
-            <Button
-              variant="contained"
-              color="info"
-              size="small"
-              value="temp"
-              onClick={(e) => handleActionClick(e)}
-              sx={ACTION_BUTTON_PROPS}
-            >
-              TempHP
-            </Button>
-          </td>
-          <td>
-            <Button
-              variant="contained"
-              color="success"
-              size="small"
-              value="heal"
-              onClick={(e) => handleActionClick(e)}
-              sx={ACTION_BUTTON_PROPS}
-            >
-              Heal
-            </Button>
-          </td>
-        </tr>
-      </tbody>
+    <table
+      style={{
+        width: '100%',
+        tableLayout: 'fixed',
+      }}
+    >
+      {splitIntoRows(actionsMap, 3)}
     </table>
   );
 
@@ -124,10 +235,18 @@ const Status = React.memo((props) => {
     case 'heal':
     case 'hurt':
     case 'temp':
+    case 'set':
+    case 'max':
       content = inputKeypad;
       break;
-    case 'condition':
-      // content = conditionTable;
+    case 'rest':
+      // content = restConfirmation;
+      break;
+    case 'conditions':
+      // content = conditionList;
+      break;
+    case 'saves':
+      // content = deathSaves;
       break;
     default:
       content = actionTable;
