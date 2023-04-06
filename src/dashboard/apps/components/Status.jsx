@@ -51,7 +51,9 @@ const Status = React.memo((props) => {
         splitArray[rowNumber].push(element);
       });
 
-      const result = splitArray.map((row) => <tr>{row}</tr>);
+      // This array will not change, so we can break this rule
+      // eslint-disable-next-line react/no-array-index-key
+      const result = splitArray.map((row, index) => <tr key={index}>{row}</tr>);
 
       return <tbody key="status-actions-body">{result}</tbody>;
     }
