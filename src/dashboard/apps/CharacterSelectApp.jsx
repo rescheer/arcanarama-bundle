@@ -1,6 +1,7 @@
 /* eslint-disable react/prop-types */
 import * as React from 'react';
 import { ThemeProvider, createTheme } from '@mui/material/styles';
+import Button from '@mui/material/Button';
 import List from '@mui/material/List';
 import Fab from '@mui/material/Fab';
 import ListItemButton from '@mui/material/ListItemButton';
@@ -94,6 +95,10 @@ export default function CharacterSelectApp(props) {
   const handleAccordionOpen = (panel) => (event, isExpanded) => {
     setExpanded(isExpanded ? panel : false);
   };
+
+  function handleDmViewClick() {
+    appSetter('dm');
+  }
 
   function handleCharacterClick(id) {
     window.localStorage.setItem('storedChar', id);
@@ -229,6 +234,17 @@ export default function CharacterSelectApp(props) {
               color="secondary"
             />
           </Typography>
+          <Button
+            sx={{ width: 1, mt: 2, py: 1 }}
+            type="button"
+            size="small"
+            id="backButton"
+            variant="contained"
+            color="secondary"
+            onClick={() => handleDmViewClick()}
+          >
+            DM View
+          </Button>
         </Box>
         <Box sx={{ position: 'relative', top: 18 }}>{playerChildren}</Box>
       </ThemeProvider>

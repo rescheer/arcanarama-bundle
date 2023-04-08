@@ -6,7 +6,16 @@ import Typography from '@mui/material/Typography';
 import Icon from '@mui/material/Icon';
 
 const HealthBar = React.memo((props) => {
-  const { currentHp, maxHp, tempHp, tempMax, currentAc, micEnabled } = props;
+  const {
+    currentHp,
+    maxHp,
+    tempHp,
+    tempMax,
+    currentAc,
+    avatarUrl,
+    fullName,
+    micEnabled,
+  } = props;
   let barBackgroundClass = '';
 
   function normalize(val, maxValue, minResult, maxResult) {
@@ -20,7 +29,43 @@ const HealthBar = React.memo((props) => {
   const bgColor = micEnabled ? '' : 'red';
 
   return (
-    <Box sx={{ textAlign: 'center', backgroundColor: bgColor }}>
+    <Box
+      sx={{
+        position: 'relative',
+        textAlign: 'center',
+        backgroundColor: bgColor,
+        color: 'text.primary',
+        width: 1,
+      }}
+    >
+      <img
+        src={avatarUrl}
+        alt="avatar"
+        style={{
+          position: 'absolute',
+          left: 0,
+          right: 0,
+          margin: 'auto',
+          width: '25%',
+          maxWidth: 100,
+          borderRadius: '50%',
+        }}
+      />
+      <Typography
+        align="center"
+        noWrap
+        variant="h5"
+        sx={{
+          position: 'absolute',
+          left: 0,
+          right: 0,
+          margin: 'auto',
+          top: 45,
+          textShadow: '2px 2px 4px black',
+        }}
+      >
+        {micEnabled ? fullName : 'MUTED'}
+      </Typography>
       <LinearProgress
         variant="buffer"
         value={normalize(currentHp, maxHp, 0, 100)}

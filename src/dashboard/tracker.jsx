@@ -2,6 +2,7 @@
 /* eslint-disable react/prop-types */
 import * as React from 'react';
 import ReactDOM from 'react-dom/client';
+import { ThemeProvider, createTheme } from '@mui/material/styles';
 import { useReplicant } from 'use-nodecg';
 import { SnackbarProvider, useSnackbar } from 'notistack';
 
@@ -9,6 +10,7 @@ import { SnackbarProvider, useSnackbar } from 'notistack';
 import TrackerApp from './apps/TrackerApp';
 import CharacterSelectApp from './apps/CharacterSelectApp';
 import AddCharacterApp from './apps/AddCharacterApp';
+import DmApp from './apps/DmApp';
 import NotificationTimed from './apps/components/NotificationAction';
 
 // Replicants
@@ -17,16 +19,43 @@ const playersRep = window.nodecg.Replicant('players');
 const notificationsRep = window.nodecg.Replicant('notifications');
 const messengerRep = window.nodecg.Replicant('messenger');
 
+const baseTheme = createTheme({
+  palette: {
+    primary: {
+      main: '#2f3a4f',
+    },
+    secondary: {
+      main: '#00bebe',
+    },
+    success: {
+      main: '#40bf40',
+    },
+    info: {
+      main: '#0244f1',
+    },
+    text: {
+      primary: 'rgba(255, 255, 255, 1)',
+      secondary: 'rgba(0, 0, 0, 1)',
+    },
+    background: {
+      paper: '#009797',
+    },
+    divider: 'rgba(255, 255, 255, 0.3)',
+  },
+});
+
 function App() {
+  // States
   const [characters] = useReplicant('characters');
   const [players] = useReplicant('players');
   const [notifications] = useReplicant('notifications');
   const [messages] = useReplicant('messenger');
   const { enqueueSnackbar, closeSnackbar } = useSnackbar();
   const [activeApp, setActiveApp] = React.useState('select');
-  const [activeCharId, setActiveCharId] = React.useState('');
+  const [activeCharId, setActiveCharId] = React.useState(0);
   const [activePlayer, setActivePlayer] = React.useState('');
 
+  // Effects
   React.useEffect(() => {
     function enqueueNewNote(note) {
       const { text, variant, duration } = note;
@@ -69,11 +98,23 @@ function App() {
     };
   }, [notifications, enqueueSnackbar, closeSnackbar, activePlayer]);
 
+  React.useEffect(() => {
+    function handleCharActivation(charId) {
+      if (charId) {
+        const playerName = characters[charId].player;
+        players[playerName].activeCharacter = charId;
+      }
+    }
+    handleCharActivation(activeCharId);
+  }, [activeCharId, characters, players]);
+
   if (characters && players) {
+    let id = '';
     let component;
 
     switch (activeApp) {
       case 'select':
+        id = 'AppContainer';
         component = (
           <CharacterSelectApp
             appSetter={setActiveApp}
@@ -84,9 +125,23 @@ function App() {
         );
         break;
       case 'add':
+        id = 'AppContainer';
         component = <AddCharacterApp appSetter={setActiveApp} />;
         break;
+      case 'dm':
+        id = '';
+        component = (
+          <DmApp
+            appSetter={setActiveApp}
+            characters={characters}
+            players={players}
+            notifications={notifications}
+            messages={messages}
+          />
+        );
+        break;
       default:
+        id = 'AppContainer';
         component = (
           <TrackerApp
             appSetter={setActiveApp}
@@ -101,7 +156,7 @@ function App() {
         );
         break;
     }
-    return <div id="AppContainer">{component}</div>;
+    return <div id={id}>{component}</div>;
   }
   return null;
 }
@@ -115,7 +170,9 @@ window.NodeCG.waitForReplicants(
   ReactDOM.createRoot(document.querySelector('#root')).render(
     <React.StrictMode>
       <SnackbarProvider dense>
-        <App />
+        <ThemeProvider theme={baseTheme}>
+          <App />
+        </ThemeProvider>
       </SnackbarProvider>
     </React.StrictMode>
   );

@@ -69,6 +69,10 @@ export default function (nodecg) {
     defaultValue: defaultPlayerRep,
   });
 
+  Object.keys(playersRep.value).forEach((player) => {
+    playersRep.value[player].activeCharacter = 0;
+  });
+
   ChatListener(nodecg);
   DashboardListener(nodecg);
   debugListener(nodecg);

@@ -18,31 +18,6 @@ import StreamMenu from './components/StreamMenu';
 import NotificationHistory from './components/NotificationHistory';
 import Messages from './components/Messages';
 
-const baseTheme = createTheme({
-  palette: {
-    primary: {
-      main: '#2f3a4f',
-    },
-    secondary: {
-      main: '#00bebe',
-    },
-    success: {
-      main: '#40bf40',
-    },
-    info: {
-      main: '#0244f1',
-    },
-    text: {
-      primary: 'rgba(255, 255, 255, 1)',
-      secondary: 'rgba(0, 0, 0, 0.7)',
-    },
-    background: {
-      paper: '#009797',
-    },
-    divider: 'rgba(255, 255, 255, 0.3)',
-  },
-});
-
 const accordianTheme = createTheme({
   palette: {
     primary: {
@@ -52,8 +27,8 @@ const accordianTheme = createTheme({
       main: '#00bebe',
     },
     text: {
-      primary: 'rgba(0, 0, 0, 0.9)',
-      secondary: 'rgba(0, 0, 0, 0.5)',
+      primary: 'rgba(0, 0, 0, 1)',
+      secondary: 'rgba(0, 0, 0, 1)',
     },
     divider: 'rgba(255, 255, 255, 0.3)',
   },
@@ -79,7 +54,7 @@ export default function TrackerApp(props) {
   if (Object.hasOwn(characters, activeCharId)) {
     character = characters[activeCharId];
   } else {
-    charSetter(undefined);
+    charSetter(0);
     appSetter('select');
   }
 
@@ -98,10 +73,7 @@ export default function TrackerApp(props) {
   const [tempHp, setTempHpState] = React.useState(hp.temp);
   const [tempMax, setTempMaxState] = React.useState(0);
   const [expanded, setExpanded] = React.useState(false);
-  // eslint-disable-next-line no-unused-vars
-  const [currentSpellSlots, setCurrentSpellSlotsState] = React.useState(
-    spellSlots.current
-  );
+  const [, setCurrentSpellSlotsState] = React.useState(spellSlots.current);
 
   const [micEnabled, setMicEnabled] = React.useState(
     players[activePlayer].mixer.micEnabled
@@ -160,7 +132,7 @@ export default function TrackerApp(props) {
     if (settingsOpen) {
       setSettingsOpen(false);
     } else {
-      charSetter(undefined);
+      charSetter(0);
       appSetter('select');
     }
   }
@@ -170,7 +142,7 @@ export default function TrackerApp(props) {
       window.nodecg.sendMessage('character', {
         refresh: { ddbId: character.ddbId, player: character.player },
       });
-      charSetter(undefined);
+      charSetter(0);
       appSetter('select');
     }
   }
@@ -180,7 +152,7 @@ export default function TrackerApp(props) {
       window.nodecg.sendMessage('character', {
         reparse: { ddbId: character.ddbId },
       });
-      charSetter(undefined);
+      charSetter(0);
       appSetter('select');
     }
   }
@@ -192,7 +164,7 @@ export default function TrackerApp(props) {
         window.nodecg.sendMessage('character', {
           delete: { ddbId: character.ddbId },
         });
-        charSetter(undefined);
+        charSetter(0);
         appSetter('select');
       }
     }
@@ -471,89 +443,62 @@ export default function TrackerApp(props) {
     </Box>
   );
 
+  const playerViewContent = (
+    <Box key="playerView">
+      {!settingsOpen ? (
+        <Button
+          sx={{
+            position: 'absolute',
+            right: -3,
+            mt: 1,
+            mb: 1,
+            py: 1,
+            zIndex: 90,
+          }}
+          type="button"
+          size="small"
+          id="backButton"
+          variant="contained"
+          color="secondary"
+          onClick={(event) => handleSettingsButtonClick(event)}
+        >
+          <Icon>settings</Icon>
+        </Button>
+      ) : null}
+      <Button
+        sx={{
+          position: 'absolute',
+          left: -3,
+          mt: 1,
+          mb: 1,
+          py: 1,
+          zIndex: 90,
+        }}
+        type="button"
+        size="small"
+        id="backButton"
+        variant="contained"
+        color="primary"
+        onClick={(event) => handleBackButtonClick(event)}
+      >
+        <Icon>arrow_back</Icon>
+      </Button>
+      <HealthBar
+        currentHp={currentHp}
+        maxHp={maxHp}
+        tempHp={tempHp}
+        tempMax={tempMax}
+        currentAc={currentAc}
+        avatarUrl={avatarUrl}
+        fullName={fullName}
+        micEnabled={micEnabled}
+      />
+    </Box>
+  );
+
   return (
     <Box>
-      <ThemeProvider theme={baseTheme}>
-        <Box key="main">
-          {!settingsOpen ? (
-            <Button
-              sx={{
-                position: 'absolute',
-                right: -3,
-                mt: 1,
-                mb: 1,
-                py: 1,
-                zIndex: 90,
-              }}
-              type="button"
-              size="small"
-              id="backButton"
-              variant="contained"
-              color="secondary"
-              onClick={(event) => handleSettingsButtonClick(event)}
-            >
-              <Icon>settings</Icon>
-            </Button>
-          ) : null}
-          <Button
-            sx={{
-              position: 'absolute',
-              left: -3,
-              mt: 1,
-              mb: 1,
-              py: 1,
-              zIndex: 90,
-            }}
-            type="button"
-            size="small"
-            id="backButton"
-            variant="contained"
-            color="primary"
-            onClick={(event) => handleBackButtonClick(event)}
-          >
-            <Icon>arrow_back</Icon>
-          </Button>
-          <Box sx={{ color: 'text.primary' }}>
-            <img
-              src={avatarUrl}
-              alt="avatar"
-              style={{
-                position: 'absolute',
-                left: 0,
-                right: 0,
-                margin: 'auto',
-                width: '25%',
-                maxWidth: 100,
-                borderRadius: '50%',
-              }}
-            />
-            <Typography
-              align="center"
-              noWrap
-              variant="h5"
-              sx={{
-                position: 'absolute',
-                left: 0,
-                right: 0,
-                marginLeft: 'auto',
-                marginRight: 'auto',
-                top: 45,
-                textShadow: '2px 2px 4px black',
-              }}
-            >
-              {micEnabled ? fullName : 'MUTED'}
-            </Typography>
-          </Box>
-          <HealthBar
-            currentHp={currentHp}
-            maxHp={maxHp}
-            tempHp={tempHp}
-            tempMax={tempMax}
-            currentAc={currentAc}
-            micEnabled={micEnabled}
-          />
-        </Box>
-      </ThemeProvider>
+      {playerViewContent}
       {settingsOpen ? settingsContent : fullAccordions}
     </Box>
   );

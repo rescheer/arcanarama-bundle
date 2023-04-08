@@ -16,7 +16,7 @@ const Item = styled(Paper)(({ theme, ...props }) => ({
     props.variant === 'default' ? '#fff' : theme.palette[props.variant].main,
   padding: theme.spacing(1),
   textAlign: 'left',
-  color: theme.palette.text.primary,
+  color: theme.palette.text.secondary,
 }));
 
 export default function NotificationHistory(props) {
