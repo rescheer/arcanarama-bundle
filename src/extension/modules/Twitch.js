@@ -232,24 +232,27 @@ function initTwitchEventSub(user, authProvider) {
   listener.onSubscriptionCreateFailure((sub, error) =>
     getContext().sendMessage('console', {
       type: 'error',
-      msg: `[EventSub] ${error}`,
+      msg: `[EventSub] Subscription creation failed (Error: ${error?.message})`,
     })
   );
-  listener.onUserSocketConnect(() =>
+
+  listener.onUserSocketConnect(() => {
     getContext().sendMessage('console', {
       type: 'info',
       msg: '[EventSub] Connected to EventSub server.',
-    })
-  );
+    });
+    statusRep.value.eventSubConnected = true;
+  });
+
   listener.onUserSocketDisconnect((userId, error) => {
     getContext().sendMessage('console', {
       type: 'warn',
-      msg: `[EventSub] UserId ${userId} was disconnected from EventSub server (Error: ${error}).`,
+      msg: `[EventSub] UserId ${userId} was disconnected from EventSub server. Attempting to reconnect (Error: ${error?.message}).`,
     });
+    statusRep.value.eventSubConnected = false;
   });
 
   listener.start();
-  statusRep.value.eventSubConnected = true;
 }
 
 export async function initTwitchAuth() {
@@ -289,5 +292,6 @@ export async function initTwitchAuth() {
       type: 'error',
       msg: '[initTwitchAuth] Invalid auth data in twitchAuth replicant. Skipping Twitch authorization',
     });
+    statusRep.value.twitchAuth = false;
   }
 }
