@@ -80,7 +80,7 @@ export default function (nodecg) {
   initVibes(nodecg);
   initGiveaway(nodecg);
   initMixer(nodecg);
-  initTwitchAuth();
+  // initTwitchAuth();
   initNotifier(nodecg);
   initMessenger(nodecg);
 
